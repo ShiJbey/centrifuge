@@ -1,5 +1,5 @@
-import * as RD from '@projectstorm/react-diagrams';
-import { DiagramEngine, DiagramModel } from '@projectstorm/react-diagrams';
+import createEngine, { DiagramEngine, DiagramModel } from '@projectstorm/react-diagrams';
+import { PersonNodeFactory } from './components/PersonNode/PersonNodeFactory';
 
 
 class Application {
@@ -7,12 +7,9 @@ class Application {
   protected diagramEngine: DiagramEngine;
 
   constructor() {
-    this.diagramEngine = RD.default();
+    this.diagramEngine = createEngine();
+    this.diagramEngine.getNodeFactories().registerFactory(new PersonNodeFactory());
     this.activeModel = new DiagramModel();
-    this.initModel();
-  }
-
-  private initModel(): void {
     this.diagramEngine.setModel(this.activeModel);
   }
 

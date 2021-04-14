@@ -1,10 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface NodeModelSpec {
-  type: string;
-}
-
 interface TrayWidgetItemProps {
   model: {[key:string]: string};
   color?: string;

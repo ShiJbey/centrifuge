@@ -5,15 +5,21 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
+    "incremental": true,
     "sourceMap": true,
     "baseUrl": ".",
     "outDir": "dist",
+    "target": "ES6",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
       "*": ["node_modules/*"]
     },
-    "jsx": "react"
+    "jsx": "react",
+    "lib": [
+			"DOM",
+			"ES6"
+		]
   },
   "include": [
     "src/**/*"
