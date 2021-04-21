@@ -10,7 +10,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "clean": "rimraf ./.webpack ./out yarn-error.log ./dist",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext ./src"
   },
   "keywords": [],
   "author": {
@@ -54,7 +54,10 @@
                 {
                   "html": "./src/index.html",
                   "js": "./src/renderer.ts",
-                  "name": "main_window"
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/preload.ts"
+                  }
                 }
               ]
             }
@@ -103,6 +106,7 @@
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",
     "react-dom": "^17.0.2",
+    "react-icons": "^4.2.0",
     "react-is": "^17.0.2",
     "resize-observer-polyfill": "^1.5.1",
     "rimraf": "^3.0.2",

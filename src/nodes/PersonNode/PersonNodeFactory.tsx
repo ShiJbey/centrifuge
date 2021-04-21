@@ -10,8 +10,8 @@ export class PersonNodeFactory extends AbstractReactFactory<PersonNodeModel, Dia
     super('person-node');
   }
 
-  public generateModel(config?: any): PersonNodeModel {
-    return new PersonNodeModel(config);
+  public generateModel(): PersonNodeModel {
+    return new PersonNodeModel();
   }
 
   public generateReactWidget(event: GenerateWidgetEvent<PersonNodeModel>): JSX.Element {

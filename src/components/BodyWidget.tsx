@@ -3,40 +3,55 @@ import styled from 'styled-components';
 import Application from '../Application';
 import TrayWidget from './TrayWidget';
 import TrayWidgetItem from './TrayWidgetItem';
-import { DefaultNodeModel } from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import {
   CanvasWidget,
   BaseModel,
-  BaseModelGenerics
+  BaseModelGenerics,
 } from '@projectstorm/react-canvas-core';
+import { Button, ButtonGroup, Modal } from 'react-bootstrap';
 import AppCanvasWidget from './AppCanvasWidget';
-import PersonNodeInspector from './PersonNodeInspector';
-import { PersonNodeModel } from './PersonNode/PersonNodeModel';
+// import PersonNodeInspector from './PersonNodeInspector';
+import { PersonNodeModel } from '../nodes/PersonNode/PersonNodeModel';
+import { RelationshipNodeModel } from '../nodes/RelationshipNode';
+import { EventNodeModel } from '../nodes/EventNode';
+import {
+  ASYMMETRIC_FRIENDSHIP_NODE_COLOR,
+  EVENT_NODE_COLOR,
+  RELATIONSHIP_NODE_COLOR,
+  PERSON_NODE_COLOR,
+  LOVE_TRIANGLE_NODE_COLOR,
+  BUSINESS_RIVALRY_NODE_COLOR,
+  JEALOUS_UNCLE_NODE_COLOR,
+  LIKES_NODE_COLOR,
+  DISLIKES_NODE_COLOR,
+  VARIABLE_NODE_COLOR,
+  NUMBER_NODE_COLOR,
+  STRING_NODE_COLOR,
+  BOOL_NODE_COLOR,
+  MODIFIER_NODE_COLOR
+} from '../constants';
+import { AsymmetricFriendshipNodeModel } from '../nodes/AsymmetricFriendshipNode';
+import { LoveTriangleNodeModel } from '../nodes/LoveTriangleNode';
+import { BusinessRivalryNodeModel } from '../nodes/BusinessRivalryNode';
+import { JealousUncleNodeModel } from '../nodes/JealousUncleNode';
+import { LikesNodeModel } from '../nodes/LikesNode';
+import { DislikesNodeModel } from '../nodes/DislikesNode';
+import { processDiagram } from '../model-to-ds';
+import { SerializedDiagram } from '../utils';
+import { VariableNodeModel } from '../nodes/VariableNode';
+import ToastData from '../toast-data';
+import { BoolNodeModel } from '../nodes/BoolNode';
+import { NumberNodeModel } from '../nodes/NumberNode';
+import { StringNodeModel } from '../nodes/StringNode';
+import { ModifierNodeModel } from '../nodes/ModifierNode';
 
-interface BodyWidgetProps {
-  app: Application;
-}
-
-interface BodyWidgetState {
-  selectedNode: BaseModel<BaseModelGenerics>;
-}
 
 const WidgetBody = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-`;
-
-const WidgetHeader = styled.div`
-  display: flex;
-  background: rgb(30, 30, 30);
-  flex-grow: 0;
-  flex-shrink: 0;
-  color: white;
-  font-family: Helvetica, Arial, sans-serif;
-  padding: 10px;
-  align-items: center;
+  height: 100%;
 `;
 
 const WidgetContent = styled.div`
@@ -49,65 +64,105 @@ const WidgetLayer = styled.div`
   flex-grow: 1;
 `;
 
-const PERSON_NODE_COLOR = 'rgb(51, 204, 255)';
-const RELATIONSHIP_NODE_COLOR = 'rgb(102, 255, 102)';
-const EVENT_NODE_COLOR = 'rgb(255, 204, 102)';
-
-function createPersonNode(label?: string): DefaultNodeModel {
-  const node = new DefaultNodeModel(label ?? 'New Person', PERSON_NODE_COLOR);
-  node.addOutPort('relationship');
-  return node;
+export interface BodyWidgetProps {
+  app: Application;
+  onNodeAlert?: (data: ToastData) => void;
+  onShowCode?: (code: string) => void;
 }
 
-function createRelationshipNode(label?: string): DefaultNodeModel {
-  const node = new DefaultNodeModel(
-    label ?? 'New Relationship',
-    RELATIONSHIP_NODE_COLOR
-  );
-  node.addInPort('person 1');
-  node.addInPort('person 2');
-  return node;
+export interface BodyWidgetState {
+  selectedNode: BaseModel<BaseModelGenerics>;
+  showCodeModal: boolean;
+  showInstructionModal: boolean;
+  dsCode?: string;
 }
 
-function createEventNode(label?: string): DefaultNodeModel {
-  const node = new DefaultNodeModel(label ?? 'New Event', EVENT_NODE_COLOR);
-  node.addInPort('subjects');
-  node.addInPort('before');
-  node.addInPort('after');
-  return node;
-}
-
-class BodyWidget extends React.Component<BodyWidgetProps, BodyWidgetState> {
-
+export class BodyWidget extends React.Component<BodyWidgetProps, BodyWidgetState> {
   constructor(props: BodyWidgetProps) {
     super(props);
     this.state = {
-      selectedNode: null
+      selectedNode: null,
+      showCodeModal: false,
+      showInstructionModal: false,
     };
+    this.onSearch = this.onSearch.bind(this);
+    this.onShowCodeModal = this.onShowCodeModal.bind(this);
+    this.onHideCodeModal = this.onHideCodeModal.bind(this);
   }
 
+  onSearch(): void {
+    console.log(this.props.app.getDiagramEngine().getModel().serialize());
+  }
+
+  onShowCodeModal(): void {
+    this.setState({
+      ...this.state,
+      showCodeModal: true,
+      dsCode: processDiagram(
+        this.props.app.getDiagramEngine().getModel().serialize() as unknown as SerializedDiagram
+      )[1],
+    });
+  }
+
+  onHideCodeModal(): void {
+    this.setState({
+      ...this.state,
+      showCodeModal: false,
+    });
+  }
 
   render(): ReactNode {
     const onDrop = (event: React.DragEvent) => {
       const data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
 
-      let node: DefaultNodeModel = null;
+      let node: NodeModel = null;
 
       if (data.type === 'person') {
-        node = createPersonNode();
+        node = new PersonNodeModel();
       } else if (data.type === 'relationship') {
-        node = createRelationshipNode();
+        node = new RelationshipNodeModel();
+      } else if (data.type === 'event') {
+        node = new EventNodeModel();
+      } else if (data.type === 'asymmetric-friendship') {
+        node = new AsymmetricFriendshipNodeModel();
+      } else if (data.type === 'love-triangle') {
+        node = new LoveTriangleNodeModel();
+      } else if (data.type === 'business-rivalry') {
+        node = new BusinessRivalryNodeModel();
+      } else if (data.type === 'jealous-uncle') {
+        node = new JealousUncleNodeModel();
+      } else if (data.type === 'likes') {
+        node = new LikesNodeModel();
+      } else if (data.type === 'dislikes') {
+        node = new DislikesNodeModel();
+      } else if (data.type === 'variable') {
+        node = new VariableNodeModel();
+      } else if (data.type === 'string') {
+        node = new StringNodeModel();
+      } else if (data.type === 'number') {
+        node = new NumberNodeModel();
+      } else if (data.type === 'boolean') {
+        node = new BoolNodeModel();
+      } else if (data.type === 'modifier') {
+        node = new ModifierNodeModel();
       } else {
-        node = createEventNode();
+        return;
       }
 
       node.registerListener({
         selectionChanged: (event) => {
+          if (this.state.selectedNode) {
+            this.state.selectedNode.setLocked(false);
+          }
+
           if (event.isSelected) {
             this.setState({
               selectedNode: event.entity,
             });
-
+          } else {
+            this.setState({
+              selectedNode: null,
+            });
           }
         },
       });
@@ -125,43 +180,110 @@ class BodyWidget extends React.Component<BodyWidgetProps, BodyWidgetState> {
       event.preventDefault();
     };
 
-    const node = new PersonNodeModel();
-    node.setPosition(400, 300);
-    this.props.app.getDiagramEngine().getModel().addNode(node);
-
     return (
-      <WidgetBody>
-        <WidgetHeader>
-          <div className="title">Talk of the Town Inspector</div>
-        </WidgetHeader>
-        <WidgetContent>
-          <TrayWidget>
-            <TrayWidgetItem
-              model={{ type: 'person' }}
-              name="Person Node"
-              color={PERSON_NODE_COLOR}
-            />
-            <TrayWidgetItem
-              model={{ type: 'relationship' }}
-              name="Relationship Node"
-              color={RELATIONSHIP_NODE_COLOR}
-            />
-            <TrayWidgetItem
-              model={{ type: 'event' }}
-              name="Event Node"
-              color={EVENT_NODE_COLOR}
-            />
-          </TrayWidget>
-          <WidgetLayer onDrop={onDrop} onDragOver={onDragOver}>
-            <AppCanvasWidget>
-              <CanvasWidget engine={this.props.app.getDiagramEngine()} />
-            </AppCanvasWidget>
-          </WidgetLayer>
-          <TrayWidget>
-            {/* <PersonNodeInspector nodeData={{label: this.state.selectedNode.getOptions().name}}/> */}
-          </TrayWidget>
-        </WidgetContent>
-      </WidgetBody>
+      <>
+        <WidgetBody>
+          <WidgetContent>
+            {/* <TrayWidget>
+              <h3 className="text-center">Primitives</h3>
+              <TrayWidgetItem
+                model={{ type: 'variable' }}
+                name="Variable Node"
+                color={VARIABLE_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'number' }}
+                name="Number Node"
+                color={NUMBER_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'string' }}
+                name="String Node"
+                color={STRING_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'boolean' }}
+                name="Boolean Node"
+                color={BOOL_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'modifier' }}
+                name="Modifier Node"
+                color={MODIFIER_NODE_COLOR}
+              />
+              <h3 className="text-center">Entities</h3>
+              <TrayWidgetItem
+                model={{ type: 'person' }}
+                name="Person Node"
+                color={PERSON_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'relationship' }}
+                name="Relationship Node"
+                color={RELATIONSHIP_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'event' }}
+                name="Event Node"
+                color={EVENT_NODE_COLOR}
+              />
+              <h3 className="text-center">Patterns</h3>
+              <TrayWidgetItem
+                model={{ type: 'asymmetric-friendship' }}
+                name="Asymmetric Friendship"
+                color={ASYMMETRIC_FRIENDSHIP_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'love-triangle' }}
+                name="Love Triangle"
+                color={LOVE_TRIANGLE_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'business-rivalry' }}
+                name="Business Rivalry"
+                color={BUSINESS_RIVALRY_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'jealous-uncle' }}
+                name="Jealous Uncle"
+                color={JEALOUS_UNCLE_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'likes' }}
+                name="Likes Node"
+                color={LIKES_NODE_COLOR}
+              />
+              <TrayWidgetItem
+                model={{ type: 'dislikes' }}
+                name="Dislikes Node"
+                color={DISLIKES_NODE_COLOR}
+              />
+            </TrayWidget> */}
+            <WidgetLayer
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+            >
+              <AppCanvasWidget>
+                <CanvasWidget engine={this.props.app.getDiagramEngine()} />
+              </AppCanvasWidget>
+              <ButtonGroup
+                style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '10px',
+                  height: '3rem',
+                  width: 'fit-content',
+                }}
+              >
+                <Button variant="primary" onClick={this.onSearch}>
+                  Search
+                </Button>
+                <Button variant="primary" onClick={this.onShowCodeModal}>ShowCode</Button>
+              </ButtonGroup>
+            </WidgetLayer>
+          </WidgetContent>
+        </WidgetBody>
+      </>
     );
   }
 }

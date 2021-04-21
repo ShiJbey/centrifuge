@@ -6,6 +6,8 @@ const Tray = styled.div`
   background: rgb(20, 20, 20);
   flex-grow: 0;
   flex-shrink: 0;
+  overflow: hidden;
+  overflow-y: scroll;
 `;
 
 const TrayWidget: React.FC = (props) => {
