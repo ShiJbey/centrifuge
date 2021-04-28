@@ -3,7 +3,7 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { PersonNodeModel } from './PersonNodeModel';
 import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { PERSON_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../constants';
+import { PERSON_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../utility/constants';
 
 const Node = styled.div<{ background: string; selected: boolean }>`
   display: grid;
@@ -52,6 +52,14 @@ export class PersonNodeWidget extends React.Component<PersonNodeWidgetProps> {
   }
 
   public render(): React.ReactNode {
+    const onValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      this.setState({
+        ...this.state,
+        label: event.target.value,
+      });
+      this.props.node.getOptions().label = event.target.value;
+    };
+
     const outPort = this.props.node.outPort;
     const nodeOptions = this.props.node.getOptions();
 
@@ -62,7 +70,22 @@ export class PersonNodeWidget extends React.Component<PersonNodeWidgetProps> {
         background={nodeOptions.color}
       >
         <Title>
-          <TitleName>{nodeOptions.label}</TitleName>
+          <TitleName
+            onClick={(event) => {
+              event.currentTarget.contentEditable = 'true';
+            }}
+            onChange={onValueChange}
+            onDrag={(e) => e.preventDefault()}
+            onFocus={() => {
+              this.props.node.setLocked(true);
+            }}
+            onBlur={(event) => {
+              event.currentTarget.contentEditable = 'false';
+              this.props.node.setLocked(false);
+            }}
+          >
+            {nodeOptions.label}
+          </TitleName>
         </Title>
         <Ports>
           <PortsContainer>

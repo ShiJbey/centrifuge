@@ -5,7 +5,7 @@ import {
   SerializedDiagram,
   SerializedNodeModel,
   SerializedLinkModel,
-} from './utils';
+} from './serialization';
 
 const linkPortToSourceMap: { [key: string]: any } = {};
 const nodeIDToLvarMap: { [key: string]: any } = {};

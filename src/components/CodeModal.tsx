@@ -1,17 +1,26 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 export interface CodeModalProps {
-  code: string;
   show?: boolean;
   onHide?: () => void;
 }
 
-export interface CodeModalState {
-  code: string;
-}
+const CodeModal: React.FC<CodeModalProps> = ({ onHide, show }) => {
 
-const CodeModal: React.FC<CodeModalProps> = ({ code, onHide, show }) => {
+  const currentEditor = useSelector(
+    (state: RootState) => state.editors.currentEditor
+  );
+  const editors = useSelector((state: RootState) => state.editors.editors);
+
+  let code = '';
+
+  if (editors[currentEditor]) {
+    code = editors[currentEditor].code;
+  }
+
   return (
     <Modal
       show={show}
@@ -28,7 +37,7 @@ const CodeModal: React.FC<CodeModalProps> = ({ code, onHide, show }) => {
           readOnly={true}
           rows={10}
           style={{ width: '100%', height: '100%' }}
-          value={code || ''}
+          value={code}
         ></textarea>
       </Modal.Body>
       <Modal.Footer>

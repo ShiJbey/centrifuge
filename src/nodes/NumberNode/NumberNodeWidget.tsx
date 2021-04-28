@@ -3,7 +3,7 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { NumberNodeModel } from './NumberNodeModel';
 import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { ERROR_BORDER_COLOR, NUMBER_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../constants';
+import { ERROR_BORDER_COLOR, NUMBER_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../utility/constants';
 
 const Node = styled.div<{ selected: boolean, hasError?: boolean }>`
   display: grid;

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
+import { createMenu } from './main-process/menu';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
@@ -20,6 +21,8 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
     }
   });
+
+  Menu.setApplicationMenu(createMenu(mainWindow));
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -52,13 +55,14 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on('get-init-file', (event) => {
-  // let data = null;
-  // if (process.argv.length >= 2) {
-  //   const openFilePath = process.argv[1];
-  //   data = fs.readFileSync(openFilePath, 'utf-8');
-  // }
-  //
-  console.log('Pizza');
-  event.returnValue = 'Apples';
+ipcMain.on('get_init_file', (event) => {
+  console.log(process.argv);
+  if (process.argv.length >= 2) {
+    const openFilePath = process.argv[1];
+    if (fs.statSync(openFilePath).isFile()) {
+      const data = fs.readFileSync(openFilePath, 'utf-8');
+      event.returnValue = data;
+    }
+  }
+  event.returnValue = null;
 });

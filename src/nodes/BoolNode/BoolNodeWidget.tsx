@@ -3,7 +3,7 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { BoolNodeModel } from './BoolNodeModel';
 import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { VARIABLE_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../constants';
+import { VARIABLE_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../utility/constants';
 
 const Node = styled.div<{ selected: boolean }>`
   display: grid;

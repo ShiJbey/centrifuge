@@ -29,10 +29,18 @@ const EditorTabTitle: React.FC<EditorTabTitleProps> = ({
   const [showCloseBtn, setShowCloseBtn] = useState<boolean>(false);
 
   return (
-    <NavTab onMouseEnter={() => setShowCloseBtn(true)} onMouseLeave={() => setShowCloseBtn(false)}>
-      <TabTitle>{title}{dirty && <span>*</span>}</TabTitle>
-      <div style={{width: '100%', height:'100%'}}>
-        {showCloseBtn && <FaTimes onClick={onClose} style={{ color: 'black'}} />}
+    <NavTab
+      onMouseEnter={() => setShowCloseBtn(true)}
+      onMouseLeave={() => setShowCloseBtn(false)}
+    >
+      <TabTitle>
+        {title}
+        {dirty && <span>*</span>}
+      </TabTitle>
+      <div style={{ width: '100%', height: '100%' }}>
+        {showCloseBtn && (
+          <FaTimes onClick={onClose} style={{ color: 'black' }} />
+        )}
       </div>
     </NavTab>
   );

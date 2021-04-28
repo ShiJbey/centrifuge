@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import * as ReactDOM from 'react-dom';
-import { Tab, Nav, Col, Row, Button } from 'react-bootstrap';
+import { Tab, Nav, Button } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import styled from 'styled-components';
-import ToastData from './toast-data';
+import { useDispatch, useSelector } from 'react-redux';
+import AlertData from './utility/alertData';
 import CodeModal from './components/CodeModal';
-import EditorTab, { EditorTabProps } from './components/EditorTab';
+import HelpModal from './components/HelpModal';
 import EditorTabTitle from './components/EditorTabTitle';
+import ElectronAPI from './utility/electronApi';
+import { App } from 'electron';
+import {
+  addEditor,
+  deleteEditor,
+  updateEditor,
+  selectEditor,
+} from './redux/editors/editorActions';
+import { RootState } from './redux/store';
+import EditorWidget from './components/EditorWidget';
+import { processDiagram } from './utility/datascriptCoverter';
+
+declare const electron: ElectronAPI;
 
 const AppContainer = styled.div`
   height: 100vh;
@@ -17,51 +30,77 @@ const AppContainer = styled.div`
   grid-template-rows: 50px 1fr;
 `;
 
-interface EditorTabData {
-  title: string;
-  filepath?: string;
+export interface EditorState {
+  id: string;
   active: boolean;
+  title: string;
   dirty: boolean;
-  elem: JSX.Element;
+  model: { [key: string]: any };
+  code?: string;
+  filepath?: string;
 }
 
-interface AppState {
-  alerts: ToastData[];
+export interface AppState {
   showCode: boolean;
-  diagramCode: string;
-  currentTab: number;
-  tabs: EditorTabData[];
+  showHelp: boolean;
 }
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
-    alerts: [],
     showCode: false,
-    diagramCode: '',
-    currentTab: -1,
-    tabs: [],
+    showHelp: false,
   });
 
-  useEffect(() => {
-    console.log(state);
-  });
+  const currentEditor = useSelector(
+    (state: RootState) => state.editors.currentEditor
+  );
+  const editors = useSelector((state: RootState) => state.editors.editors);
+  const dispatch = useDispatch();
 
-  /** Add an alert to the stack */
-  const addAlert = (data: ToastData) => {
-    const modifiedAlerts = state.alerts;
-    modifiedAlerts.push(data);
-    setState({
-      ...state,
-      alerts: modifiedAlerts,
+  const registerElectronApi = (): void => {
+    electron.receive('diagram_data', (data: any) => {
+      console.log(data);
+    });
+
+    electron.receive('save_diagram', (path: string) => {
+      if (currentEditor) {
+        electron.send('save_diagram', path);
+      }
     });
   };
 
+  useEffect(() => {
+    if (Object.keys(editors).length === 0) {
+      // If this application was started from double-clicking
+      // an associated filetype then we need to load it.
+      // Otherwise or on error, open a blank editor tab.
+      const response: string = electron.sendSync('get_init_file');
+      try {
+        if (response) {
+          createNewTab(JSON.parse(response));
+        } else {
+          createNewTab();
+        }
+      } catch (error) {
+        console.error(error);
+        createNewTab();
+      }
+    }
+
+    registerElectronApi();
+  }, []);
+
   /** Show the given code in the code modal */
-  const showCode = (code: string) => {
+  const showCode = () => {
+    console.log(editors[currentEditor]);
+    dispatch(updateEditor({
+      ...editors[currentEditor],
+      code: processDiagram(editors[currentEditor].model as any)[1],
+    }))
     setState({
       ...state,
       showCode: true,
-      diagramCode: code,
+      showHelp: false,
     });
   };
 
@@ -70,97 +109,70 @@ const App: React.FC = () => {
     setState({
       ...state,
       showCode: false,
+      showHelp: false,
     });
   };
 
-  const setActiveTab = (index: number) => {
-    const modifiedTabs = [...state.tabs];
-
-    if (state.currentTab >= 0 && state.currentTab < state.tabs.length) {
-      modifiedTabs[state.currentTab].active = false;
-    }
-
-    modifiedTabs[index].active = true;
-
+  const showHelp = () => {
     setState({
       ...state,
-      tabs: modifiedTabs,
-      currentTab: index,
+      showHelp: true,
+      showCode: false,
     });
+  };
+
+  const hideHelp = () => {
+    setState({
+      ...state,
+      showHelp: false,
+      showCode: false,
+    });
+  };
+
+  const setActiveTab = (id: string) => {
+    dispatch(selectEditor(id));
   };
 
   /** Create a new tab and set it as active */
-  const createNewTab = () => {
-    const modifiedTabs = [...state.tabs];
-
-    for (const tab of modifiedTabs) {
-      tab.active = false;
-    }
-
-    modifiedTabs.push({
-      title: 'New Diagram',
-      dirty: false,
-      active: true,
-      elem: <EditorTab />,
-    });
-
-    setState({
-      ...state,
-      tabs: modifiedTabs,
-      currentTab: modifiedTabs.length - 1,
-    });
+  const createNewTab = (model?: any) => {
+    dispatch(addEditor('New Diagram'));
   };
 
-  const closeTab = (index: number) => {
-    const modifiedTabs = [...state.tabs].filter(
-      (tab, tabIndex) => tabIndex !== index
-    );
-
-    if (state.currentTab === index && modifiedTabs.length > 0) {
-      modifiedTabs[0].active = true;
-      setState({
-        ...state,
-        tabs: modifiedTabs,
-        currentTab: 0,
-      });
-    } else {
-      setState({
-        ...state,
-        tabs: modifiedTabs,
-        currentTab:
-          state.currentTab >= index ? state.currentTab - 1 : state.currentTab,
-      });
-    }
+  const closeTab = (id: string) => {
+    dispatch(deleteEditor(id));
   };
 
   return (
     <AppContainer>
-      <CodeModal
-        code={state.diagramCode}
-        show={state.showCode}
-        onHide={hideCode}
-      />
+      <CodeModal show={state.showCode} onHide={hideCode} />
+
+      <HelpModal show={state.showHelp} onHide={hideHelp} />
+
       <Nav
         className="scroll-nav"
-        activeKey={state.currentTab}
-        onSelect={(selectedKey: string) => setActiveTab(parseInt(selectedKey))}
+        activeKey={currentEditor}
+        onSelect={(selectedKey: string) => setActiveTab(selectedKey)}
       >
-        {state.tabs.map((tab, index) => {
+        {Object.keys(editors).map((editorID) => {
+          const editor = editors[editorID];
           return (
             <Nav.Item
-              key={`NavItem${index}`}
+              key={editor.id}
               style={{
-                background: `${tab.active ? '#ffffff' : 'hsl(0, 0%, 100%, 0.5)'}`,
+                background: `${
+                  editor.active ? '#ffffff' : 'hsl(0, 0%, 100%, 0.5)'
+                }`,
                 borderRadius: '6px 6px 0px 0px',
                 marginLeft: '4px',
               }}
             >
-              <Nav.Link eventKey={index.toString()}>
+              <Nav.Link eventKey={editor.id}>
                 <EditorTabTitle
-                  title={tab.title}
+                  isDirty={editor.dirty}
+                  title={editor.title}
                   onClose={(event) => {
                     event.stopPropagation();
-                    closeTab(index);
+                    closeTab(editor.id);
                   }}
                 />
               </Nav.Link>
@@ -170,7 +182,7 @@ const App: React.FC = () => {
         <div className="px-1">
           <Button
             variant="outline-light"
-            onClick={createNewTab}
+            onClick={() => createNewTab()}
             style={{ width: '5rem' }}
           >
             <span>
@@ -180,31 +192,49 @@ const App: React.FC = () => {
           </Button>
         </div>
       </Nav>
-      <div style={{ display: 'relative', height: '100%', width: '100%', background: 'hsl(0, 0%, 100%)' }}>
+
+      <div
+        style={{
+          display: 'relative',
+          height: '100%',
+          width: '100%',
+          background: 'hsl(0, 0%, 100%)',
+        }}
+      >
         <Tab.Container
           transition={false}
           id="editor-tab-container"
-          defaultActiveKey="-1"
-          activeKey={state.currentTab}
+          activeKey={currentEditor}
         >
-          <Tab.Content as='div' style={{height: '100%', width: '100%'}} >
-            {state.tabs.map((tab, index) => {
+          <Tab.Content as="div" style={{ height: '100%', width: '100%' }}>
+            {Object.keys(editors).map((editorID) => {
+              const editor = editors[editorID];
               return (
                 <Tab.Pane
-                  as='div'
-                  style={{height: '100%', width: '100%'}}
-                  key={`TabItem${index}`}
-                  eventKey={index.toString()}
+                  as="div"
+                  style={{ height: '100%', width: '100%' }}
+                  key={editorID}
+                  eventKey={editorID}
                 >
-                  {tab.elem}
+                  <EditorWidget
+                    onUpdate={(data: any) => {
+                      dispatch(
+                        updateEditor({
+                          ...editor,
+                          model: data,
+                          dirty: true,
+                        })
+                      );
+                    }}
+                    onShowCode={() => showCode()}
+                    onShowHelp={() => showHelp()}
+                  />
                 </Tab.Pane>
               );
             })}
-            <Tab.Pane as='div' eventKey="-1">
-              <div>
-                <h1 style={{ color: 'black' }}>No Open Diagrams</h1>
-              </div>
-            </Tab.Pane>
+            <div>
+              <h1 style={{ color: 'black' }}>No Open Diagrams</h1>
+            </div>
           </Tab.Content>
         </Tab.Container>
       </div>
@@ -212,6 +242,4 @@ const App: React.FC = () => {
   );
 };
 
-(() => {
-  ReactDOM.render(<App />, document.getElementById('application'));
-})();
+export default App;

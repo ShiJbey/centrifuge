@@ -8,7 +8,7 @@ import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
 import {
   LIKES_NODE_COLOR,
   SELECTION_BORDER_COLOR,
-} from '../../constants';
+} from '../../utility/constants';
 
 const Node = styled.div<{ background: string; selected: boolean }>`
   background-color: ${(p) => p.background ?? LIKES_NODE_COLOR};

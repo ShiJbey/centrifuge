@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface TrayWidgetItemProps {
-  model: {[key:string]: string};
+  model: { [key: string]: string };
   color?: string;
   name: string;
   enabled?: boolean;
@@ -32,7 +32,7 @@ const TrayWidgetItem: React.FC<TrayWidgetItemProps> = (props) => {
       color={props.color}
       draggable={props?.enabled ?? true}
       onDragStart={onDragStart}
-      className='tray-item'
+      className="tray-item"
     >
       {props.name}
     </Tray>
