@@ -3,21 +3,21 @@ import { Tab, Nav, Button } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import AlertData from './utility/alertData';
-import CodeModal from './components/CodeModal';
-import HelpModal from './components/HelpModal';
-import EditorTabTitle from './components/EditorTabTitle';
-import ElectronAPI from './utility/electronApi';
+import AlertData from '../utility/alertData';
+import CodeModal from './CodeModal';
+import HelpModal from './HelpModal';
+import EditorTabTitle from './EditorTabTitle';
+import ElectronAPI from '../utility/electronApi';
 import { App } from 'electron';
 import {
   addEditor,
   deleteEditor,
   updateEditor,
   selectEditor,
-} from './redux/editors/editorActions';
-import { RootState } from './redux/store';
-import EditorWidget from './components/EditorWidget';
-import { processDiagram } from './utility/datascriptCoverter';
+} from '../redux/editors/editorActions';
+import { RootState } from '../redux/store';
+import EditorWidget from './EditorWidget';
+import { processDiagram } from '../utility/datascriptCoverter';
 
 declare const electron: ElectronAPI;
 
@@ -218,13 +218,14 @@ const App: React.FC = () => {
                 >
                   <EditorWidget
                     onUpdate={(data: any) => {
-                      dispatch(
-                        updateEditor({
-                          ...editor,
-                          model: data,
-                          dirty: true,
-                        })
-                      );
+                      console.log('Editor updated');
+                      // dispatch(
+                      //   updateEditor({
+                      //     ...editor,
+                      //     model: data,
+                      //     dirty: true,
+                      //   })
+                      // );
                     }}
                     onShowCode={() => showCode()}
                     onShowHelp={() => showHelp()}

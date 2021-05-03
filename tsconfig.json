@@ -8,6 +8,7 @@
     "incremental": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "rootDir": "src",
     "outDir": "dist",
     "target": "ES6",
     "moduleResolution": "node",
@@ -23,5 +24,8 @@
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    ".webpack/**/*"
   ]
 }

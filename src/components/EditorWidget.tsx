@@ -1,7 +1,11 @@
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 import Application from '../Application';
-import { NodeModel } from '@projectstorm/react-diagrams';
+import {
+  DiagramModel,
+  DiagramModelGenerics,
+  NodeModel,
+} from '@projectstorm/react-diagrams';
 import {
   CanvasWidget,
   BaseModel,
@@ -25,6 +29,7 @@ import { NumberNodeModel } from '../nodes/NumberNode';
 import { StringNodeModel } from '../nodes/StringNode';
 import { ModifierNodeModel } from '../nodes/ModifierNode';
 import NodeTray from './NodeTray';
+import debounce from 'lodash/debounce';
 
 const WidgetBody = styled.div`
   position: relative;
@@ -62,8 +67,13 @@ export class EditorWidget extends React.Component<
   EditorWidgetProps,
   EditorWidgetState
 > {
-
   app: Application;
+
+  debounceUpdate = debounce(
+    (diagram: DiagramModel<DiagramModelGenerics>) =>
+      this.props.onUpdate(diagram.serialize()),
+    500
+  );
 
   constructor(props: EditorWidgetProps) {
     super(props);
@@ -74,125 +84,106 @@ export class EditorWidget extends React.Component<
 
     this.app.getDiagramEngine().registerListener({
       repaintCanvas: () => {
-        console.log('Canvas repainted');
-        // This editor should be marked dirty
-        if (this.props.onUpdate) {
-          this.props.onUpdate(this.app.getActiveDiagram().serialize())
-        }
-      }
+        this.handleUpdate();
+      },
     });
 
     this.app.getActiveDiagram().registerListener({
       eventDidFire: () => {
-        // This editor shold be marked dirty
-        console.log('Model event fired');
-        if (this.props.onUpdate) {
-          this.props.onUpdate(this.app.getActiveDiagram().serialize())
-        }
-      }
+        this.handleUpdate();
+      },
     });
   }
 
-  componentDidMount(): void {
-      if (this.props.model) {
-        this.app.getActiveDiagram().deserializeModel(this.props.model, this.app.getDiagramEngine());
-      }
+  handleUpdate(): void {
+    // This editor should be marked dirty
+    if (this.props.onUpdate) {
+      this.debounceUpdate(this.app.getActiveDiagram());
+    }
   }
+
+  componentDidMount(): void {
+    if (this.props.model) {
+      this.app
+        .getActiveDiagram()
+        .deserializeModel(this.props.model, this.app.getDiagramEngine());
+    }
+  }
+
+  onDrop(event: React.DragEvent): void {
+    const data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
+
+    let node: NodeModel = null;
+
+    if (data.type === 'person') {
+      node = new PersonNodeModel();
+    } else if (data.type === 'relationship') {
+      node = new RelationshipNodeModel();
+    } else if (data.type === 'event') {
+      node = new EventNodeModel();
+    } else if (data.type === 'asymmetric-friendship') {
+      node = new AsymmetricFriendshipNodeModel();
+    } else if (data.type === 'love-triangle') {
+      node = new LoveTriangleNodeModel();
+    } else if (data.type === 'business-rivalry') {
+      node = new BusinessRivalryNodeModel();
+    } else if (data.type === 'jealous-uncle') {
+      node = new JealousUncleNodeModel();
+    } else if (data.type === 'likes') {
+      node = new LikesNodeModel();
+    } else if (data.type === 'dislikes') {
+      node = new DislikesNodeModel();
+    } else if (data.type === 'variable') {
+      node = new VariableNodeModel();
+    } else if (data.type === 'string') {
+      node = new StringNodeModel();
+    } else if (data.type === 'number') {
+      node = new NumberNodeModel();
+    } else if (data.type === 'boolean') {
+      node = new BoolNodeModel();
+    } else if (data.type === 'modifier') {
+      node = new ModifierNodeModel();
+    } else {
+      return;
+    }
+
+    const point = this.app.getDiagramEngine().getRelativeMousePoint(event);
+    node.setPosition(point);
+
+    this.app.getDiagramEngine().getModel().addNode(node);
+    this.forceUpdate();
+  }
+
+  onDragOver(event: React.DragEvent): void {
+    event.preventDefault();
+  }
+
+  onSearch(): void {
+    if (this.props.onSearch) {
+      this.props.onSearch('code');
+    }
+  }
+
+  onShowCode(): void {
+    if (this.props.onShowCode) {
+      this.props.onShowCode('code');
+    }
+  }
+
+  onShowHelp(): void {
+    if (this.props.onShowHelp) {
+      this.props.onShowHelp();
+    }
+  }
+
   render(): ReactNode {
-
-    const onDrop = (event: React.DragEvent) => {
-      const data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
-
-      let node: NodeModel = null;
-
-      if (data.type === 'person') {
-        node = new PersonNodeModel();
-      } else if (data.type === 'relationship') {
-        node = new RelationshipNodeModel();
-      } else if (data.type === 'event') {
-        node = new EventNodeModel();
-      } else if (data.type === 'asymmetric-friendship') {
-        node = new AsymmetricFriendshipNodeModel();
-      } else if (data.type === 'love-triangle') {
-        node = new LoveTriangleNodeModel();
-      } else if (data.type === 'business-rivalry') {
-        node = new BusinessRivalryNodeModel();
-      } else if (data.type === 'jealous-uncle') {
-        node = new JealousUncleNodeModel();
-      } else if (data.type === 'likes') {
-        node = new LikesNodeModel();
-      } else if (data.type === 'dislikes') {
-        node = new DislikesNodeModel();
-      } else if (data.type === 'variable') {
-        node = new VariableNodeModel();
-      } else if (data.type === 'string') {
-        node = new StringNodeModel();
-      } else if (data.type === 'number') {
-        node = new NumberNodeModel();
-      } else if (data.type === 'boolean') {
-        node = new BoolNodeModel();
-      } else if (data.type === 'modifier') {
-        node = new ModifierNodeModel();
-      } else {
-        return;
-      }
-
-      node.registerListener({
-        selectionChanged: (event) => {
-          if (this.state.selectedNode) {
-            this.state.selectedNode.setLocked(false);
-          }
-
-          if (event.isSelected) {
-            this.setState({
-              selectedNode: event.entity,
-            });
-          } else {
-            this.setState({
-              selectedNode: null,
-            });
-          }
-        },
-      });
-
-      const point = this.app
-        .getDiagramEngine()
-        .getRelativeMousePoint(event);
-      node.setPosition(point);
-
-      this.app.getDiagramEngine().getModel().addNode(node);
-      this.forceUpdate();
-    };
-
-    const onDragOver = (event: React.DragEvent) => {
-      event.preventDefault();
-    };
-
-    const onSearch = () => {
-      if (this.props.onSearch) {
-        this.props.onSearch('code');
-      }
-    };
-
-    const onShowCode = () => {
-      if (this.props.onShowCode) {
-        this.props.onShowCode('code');
-      }
-    };
-
-    const onShowHelp = () => {
-      if (this.props.onShowHelp) {
-        this.props.onShowHelp();
-      }
-    };
-
     return (
       <>
         <WidgetBody onContextMenu={() => console.log('open context menu')}>
           {/* <ContextMenu /> */}
           <WidgetContent>
             <NodeTray />
-            <WidgetLayer onDrop={onDrop} onDragOver={onDragOver}>
+            <WidgetLayer onDrop={this.onDrop} onDragOver={this.onDragOver}>
               <AppCanvasWidget>
                 <CanvasWidget engine={this.app.getDiagramEngine()} />
               </AppCanvasWidget>
@@ -204,13 +195,13 @@ export class EditorWidget extends React.Component<
                   width: 'fit-content',
                 }}
               >
-                <Button variant="primary" onClick={onSearch}>
+                <Button variant="primary" onClick={this.onSearch}>
                   Search
                 </Button>
-                <Button variant="primary" onClick={onShowCode}>
+                <Button variant="primary" onClick={this.onShowCode}>
                   ShowCode
                 </Button>
-                <Button variant="primary" onClick={onShowHelp}>
+                <Button variant="primary" onClick={this.onShowHelp}>
                   Help
                 </Button>
               </ButtonGroup>

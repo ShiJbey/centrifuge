@@ -1,4 +1,4 @@
-import { EditorState } from '../../App';
+import { EditorState } from '../../components/App';
 import {
   ADD_EDITOR,
   DELETE_EDITOR,
