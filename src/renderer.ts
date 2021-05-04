@@ -1,3 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-import './index.tsx';
+import {renderApp} from './components/App';
+
+(() => {
+   renderApp();
+})();

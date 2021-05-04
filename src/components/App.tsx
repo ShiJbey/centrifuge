@@ -1,3 +1,4 @@
+import './App.module.scss';
 import React, { useState, useEffect } from 'react';
 import { Tab, Nav, Button } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
@@ -18,6 +19,10 @@ import {
 import { RootState } from '../redux/store';
 import EditorWidget from './EditorWidget';
 import { processDiagram } from '../utility/datascriptCoverter';
+import SideNavbar from './SideNavbar';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import store from '../redux/store';
 
 declare const electron: ElectronAPI;
 
@@ -148,7 +153,9 @@ const App: React.FC = () => {
 
       <HelpModal show={state.showHelp} onHide={hideHelp} />
 
-      <Nav
+      <SideNavbar />
+
+      {/* <Nav
         className="scroll-nav"
         activeKey={currentEditor}
         onSelect={(selectedKey: string) => setActiveTab(selectedKey)}
@@ -238,9 +245,18 @@ const App: React.FC = () => {
             </div>
           </Tab.Content>
         </Tab.Container>
-      </div>
+      </div> */}
     </AppContainer>
   );
 };
+
+export function renderApp(): void {
+    ReactDOM.render(
+      <Provider store={store}>
+        <App />
+      </Provider>,
+      document.getElementById('application')
+    );
+}
 
 export default App;

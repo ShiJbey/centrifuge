@@ -1,17 +1,6 @@
 const rules = require('./webpack.rules');
 const plugins = require('./webpack.plugins');
 
-rules.push({
-  test: /\.ts?$/,
-  exclude: /(node_modules|\.webpack)/,
-  use: {
-    loader: 'ts-loader',
-    options: {
-      transpileOnly: true
-    }
-  }
-});
-
 module.exports = {
   /**
    * This is the main entry point for your application, it's the first file

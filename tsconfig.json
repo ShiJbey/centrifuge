@@ -5,12 +5,9 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
-    "incremental": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "rootDir": "src",
     "outDir": "dist",
-    "target": "ES6",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
@@ -19,13 +16,13 @@
     "jsx": "react",
     "lib": [
 			"DOM",
-			"ES6"
+			"ES2020"
 		]
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
-    ".webpack/**/*"
+    "dist"
   ]
 }
