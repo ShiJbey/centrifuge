@@ -9,7 +9,7 @@ rules.push({
     },
     {
       loader: "css-loader",
-      options: { modules: true }
+      options: { modules: {localIdentName: '[local]_[hash:base64:5]' } }
     },
   ],
 });
@@ -22,7 +22,7 @@ rules.push({
     },
     {
       loader: "css-loader",
-      options: { modules: true }
+      options: { modules: {localIdentName: '[local]_[hash:base64:5]' } }
     },
     {
       loader: "sass-loader"

@@ -1,31 +1,41 @@
-:root {
-  --bg:  #242526;
-  --bg-accent: #484a4d;
-  --text-color: #dadce1;
-  --nav-size: 60px;
-  --border: 1px solid #474a4d;
-  --border-radius: 8px;
-  --speed: 500ms;
-}
-
 html,
 body {
-	height: 100%;
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  min-height: 100%;
+  min-width: 100%;
 }
 
-.node {
-	color: white;
+body::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+body::-webkit-scrollbar-track {
+  background: #1e1e24;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #6649b8;
+}
+
+body {
+  background-color: steelblue;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100%;
+  width: 100vw;
 }
 
 .scroll-nav {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
-	padding: 8px 8px 0px 8px;
-	gap: '2px';
-	overflow-x: scroll;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  padding: 8px 8px 0px 8px;
+  gap: "2px";
+  overflow-x: scroll;
 }
 
 .scroll-nav::-webkit-scrollbar {

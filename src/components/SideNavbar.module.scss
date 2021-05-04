@@ -1,3 +1,78 @@
+$sidebarWidth: 4rem;
+$font-size: 16px;
+$font-family: "Open Sans";
+$textPrimary: #b6b6b6;
+$textSecondary: #ececec;
+$bgPrimary: #222222;
+$bgSecondary: #141418;
+$transitionSpeed: 600ms;
+
+.SideNavBar {
+  font-size: 16px;
+  font-family: "Open Sans";
+  width: $sidebarWidth;
+  height: 100vh;
+  top: 0;
+  position: fixed;
+  background-color: $bgPrimary;
+  transition: width 600ms ease;
+  overflow: hidden;
+  overflow-y: scroll;
+  color: $textPrimary;
+}
+
+.SideNavBar_Nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.NavLink {
+  display: flex;
+  align-items: center;
+  height: $sidebarWidth;
+  color: $textPrimary;
+  text-decoration: none;
+  filter: grayscale(100%) opacity(0.7);
+  transition: $transitionSpeed;
+}
+
+.NavLink:hover {
+  filter: grayscale(0%) opacity(1);
+  background: $bgSecondary;
+  color: $textSecondary;
+  text-decoration: none;
+}
+
+.SideNavBar:hover {
+  width: 10rem;
+
+  .LinkText {
+    display: inline;
+  }
+}
+
+
+.NavItem {
+  width: 100%;
+}
+
+.NavItem:last-child {
+  margin-top: auto;
+}
+
+.NavIcon {
+  width: 2rem;
+  min-width: 2rem;
+  margin: 0 1rem;
+}
+
 .LinkText {
-    color: blue;
+  display: none;
+  text-decoration: none;
+  margin-left: 0.5rem;
 }

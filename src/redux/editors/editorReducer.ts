@@ -1,5 +1,5 @@
 import { AddEditorAction, SELECT_EDITOR, ADD_EDITOR, DELETE_EDITOR, EditorActionTypes, UPDATE_EDITOR } from './editorTypes';
-import { EditorState } from '../../components/App';
+import { EditorState } from '../../components/PatternEditor';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface EditorsReduxState {
