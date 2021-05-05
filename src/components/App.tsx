@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, HashRouter } from "react-router-dom";
+import { Switch, Route, HashRouter, Redirect } from "react-router-dom";
 import { Provider } from "react-redux";
 import ReactDOM from "react-dom";
 import { App } from "electron";
@@ -18,9 +18,12 @@ const App: React.FC = () => {
           <SideNavbar />
           <div className={styles.Main}>
             <Switch>
-              <Route exact path="/" component={MetricsDashboard} />
               <Route exact path="/editor" component={PatternEditor} />
+              <Route exact path="/metrics" component={MetricsDashboard} />
               <Route exact path="/help" component={Help} />
+              <Route exact path="/">
+                <Redirect to="/editor"/>
+              </Route>
             </Switch>
           </div>
         </div>

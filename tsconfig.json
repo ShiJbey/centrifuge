@@ -7,7 +7,9 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "rootDir": "src",
     "outDir": "dist",
+    "target": "ES6",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
@@ -16,13 +18,13 @@
     "jsx": "react",
     "lib": [
 			"DOM",
-			"ES2020"
+			"ES6"
 		]
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
-    "dist"
+    ".webpack/**/*"
   ]
 }

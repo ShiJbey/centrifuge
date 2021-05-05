@@ -1,4 +1,4 @@
-import { EditorState } from '../../components/App';
+import { EditorState } from '../../components/PatternEditor';
 import {
   ADD_EDITOR,
   DELETE_EDITOR,

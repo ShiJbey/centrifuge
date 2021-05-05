@@ -12,20 +12,20 @@ const SideNavbar: React.FC = () => {
   return (
     <div className={styles.SideNavBar}>
       <ul className={styles.SideNavBar_Nav}>
-        <li className={styles.NavItem}>
-          <Link to="/" className={styles.NavLink}>
-            <IconContext.Provider value={{className:styles.NavIcon}}>
-              <FaChartLine className={styles.NavIcon} />
-            </IconContext.Provider>
-            <span className={styles.LinkText}>Metrics</span>
-          </Link>
-        </li>
-        <li className={styles.NavItem}>
+      <li className={styles.NavItem}>
           <Link to="/editor" className={styles.NavLink}>
             <IconContext.Provider value={{className:styles.NavIcon}}>
               <FaProjectDiagram className={styles.NavIcon} />
             </IconContext.Provider>
             <span className={styles.LinkText}>Patterns</span>
+          </Link>
+        </li>
+        <li className={styles.NavItem}>
+          <Link to="/metrics" className={styles.NavLink}>
+            <IconContext.Provider value={{className:styles.NavIcon}}>
+              <FaChartLine className={styles.NavIcon} />
+            </IconContext.Provider>
+            <span className={styles.LinkText}>Metrics</span>
           </Link>
         </li>
         <li className={styles.NavItem}>

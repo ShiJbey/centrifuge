@@ -1,41 +1,42 @@
-import React, { ReactNode } from 'react';
-import styled from 'styled-components';
-import Application from '../Application';
+import React, { ReactNode } from "react";
+import styled from "styled-components";
+import Application from "../Application";
 import {
   DiagramModel,
   DiagramModelGenerics,
   NodeModel,
-} from '@projectstorm/react-diagrams';
+} from "@projectstorm/react-diagrams";
 import {
   CanvasWidget,
   BaseModel,
   BaseModelGenerics,
-} from '@projectstorm/react-canvas-core';
-import { Button, ButtonGroup } from 'react-bootstrap';
-import AppCanvasWidget from './AppCanvasWidget';
-import { PersonNodeModel } from '../nodes/PersonNode/PersonNodeModel';
-import { RelationshipNodeModel } from '../nodes/RelationshipNode';
-import { EventNodeModel } from '../nodes/EventNode';
-import { AsymmetricFriendshipNodeModel } from '../nodes/AsymmetricFriendshipNode';
-import { LoveTriangleNodeModel } from '../nodes/LoveTriangleNode';
-import { BusinessRivalryNodeModel } from '../nodes/BusinessRivalryNode';
-import { JealousUncleNodeModel } from '../nodes/JealousUncleNode';
-import { LikesNodeModel } from '../nodes/LikesNode';
-import { DislikesNodeModel } from '../nodes/DislikesNode';
-import { VariableNodeModel } from '../nodes/VariableNode';
-import ToastData from '../utility/alertData';
-import { BoolNodeModel } from '../nodes/BoolNode';
-import { NumberNodeModel } from '../nodes/NumberNode';
-import { StringNodeModel } from '../nodes/StringNode';
-import { ModifierNodeModel } from '../nodes/ModifierNode';
-import NodeTray from './NodeTray';
-import debounce from 'lodash/debounce';
+} from "@projectstorm/react-canvas-core";
+import { Button, ButtonGroup } from "react-bootstrap";
+import AppCanvasWidget from "./AppCanvasWidget";
+import { PersonNodeModel } from "../nodes/PersonNode/PersonNodeModel";
+import { RelationshipNodeModel } from "../nodes/RelationshipNode";
+import { EventNodeModel } from "../nodes/EventNode";
+import { AsymmetricFriendshipNodeModel } from "../nodes/AsymmetricFriendshipNode";
+import { LoveTriangleNodeModel } from "../nodes/LoveTriangleNode";
+import { BusinessRivalryNodeModel } from "../nodes/BusinessRivalryNode";
+import { JealousUncleNodeModel } from "../nodes/JealousUncleNode";
+import { LikesNodeModel } from "../nodes/LikesNode";
+import { DislikesNodeModel } from "../nodes/DislikesNode";
+import { VariableNodeModel } from "../nodes/VariableNode";
+import ToastData from "../utility/alertData";
+import { BoolNodeModel } from "../nodes/BoolNode";
+import { NumberNodeModel } from "../nodes/NumberNode";
+import { StringNodeModel } from "../nodes/StringNode";
+import { ModifierNodeModel } from "../nodes/ModifierNode";
+import NodeTray from "./NodeTray";
+import debounce from "lodash/debounce";
 
 const WidgetBody = styled.div`
   position: relative;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
 `;
 
@@ -111,37 +112,37 @@ export class EditorWidget extends React.Component<
   }
 
   onDrop(event: React.DragEvent): void {
-    const data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
+    const data = JSON.parse(event.dataTransfer.getData("storm-diagram-node"));
 
     let node: NodeModel = null;
 
-    if (data.type === 'person') {
+    if (data.type === "person") {
       node = new PersonNodeModel();
-    } else if (data.type === 'relationship') {
+    } else if (data.type === "relationship") {
       node = new RelationshipNodeModel();
-    } else if (data.type === 'event') {
+    } else if (data.type === "event") {
       node = new EventNodeModel();
-    } else if (data.type === 'asymmetric-friendship') {
+    } else if (data.type === "asymmetric-friendship") {
       node = new AsymmetricFriendshipNodeModel();
-    } else if (data.type === 'love-triangle') {
+    } else if (data.type === "love-triangle") {
       node = new LoveTriangleNodeModel();
-    } else if (data.type === 'business-rivalry') {
+    } else if (data.type === "business-rivalry") {
       node = new BusinessRivalryNodeModel();
-    } else if (data.type === 'jealous-uncle') {
+    } else if (data.type === "jealous-uncle") {
       node = new JealousUncleNodeModel();
-    } else if (data.type === 'likes') {
+    } else if (data.type === "likes") {
       node = new LikesNodeModel();
-    } else if (data.type === 'dislikes') {
+    } else if (data.type === "dislikes") {
       node = new DislikesNodeModel();
-    } else if (data.type === 'variable') {
+    } else if (data.type === "variable") {
       node = new VariableNodeModel();
-    } else if (data.type === 'string') {
+    } else if (data.type === "string") {
       node = new StringNodeModel();
-    } else if (data.type === 'number') {
+    } else if (data.type === "number") {
       node = new NumberNodeModel();
-    } else if (data.type === 'boolean') {
+    } else if (data.type === "boolean") {
       node = new BoolNodeModel();
-    } else if (data.type === 'modifier') {
+    } else if (data.type === "modifier") {
       node = new ModifierNodeModel();
     } else {
       return;
@@ -160,13 +161,13 @@ export class EditorWidget extends React.Component<
 
   onSearch(): void {
     if (this.props.onSearch) {
-      this.props.onSearch('code');
+      this.props.onSearch("code");
     }
   }
 
   onShowCode(): void {
     if (this.props.onShowCode) {
-      this.props.onShowCode('code');
+      this.props.onShowCode("code");
     }
   }
 
@@ -178,37 +179,38 @@ export class EditorWidget extends React.Component<
 
   render(): ReactNode {
     return (
-      <>
-        <WidgetBody onContextMenu={() => console.log('open context menu')}>
-          {/* <ContextMenu /> */}
-          <WidgetContent>
-            <NodeTray />
-            <WidgetLayer onDrop={this.onDrop} onDragOver={this.onDragOver}>
-              <AppCanvasWidget>
-                <CanvasWidget engine={this.app.getDiagramEngine()} />
-              </AppCanvasWidget>
-              <ButtonGroup
-                style={{
-                  position: 'absolute',
-                  bottom: '10px',
-                  left: '10px',
-                  width: 'fit-content',
-                }}
-              >
-                <Button variant="primary" onClick={this.onSearch}>
-                  Search
-                </Button>
-                <Button variant="primary" onClick={this.onShowCode}>
-                  ShowCode
-                </Button>
-                <Button variant="primary" onClick={this.onShowHelp}>
-                  Help
-                </Button>
-              </ButtonGroup>
-            </WidgetLayer>
-          </WidgetContent>
-        </WidgetBody>
-      </>
+      <WidgetBody onContextMenu={() => console.log("open context menu")}>
+        {/* <ContextMenu /> */}
+        <WidgetContent>
+          <NodeTray />
+          <WidgetLayer
+            onDrop={this.onDrop.bind(this)}
+            onDragOver={this.onDragOver}
+          >
+            <AppCanvasWidget>
+              <CanvasWidget engine={this.app.getDiagramEngine()} />
+            </AppCanvasWidget>
+            {/* <ButtonGroup
+              style={{
+                position: "absolute",
+                bottom: "10px",
+                left: "10px",
+                width: "fit-content",
+              }}
+            >
+              <Button variant="primary" onClick={this.onSearch}>
+                Search
+              </Button>
+              <Button variant="primary" onClick={this.onShowCode}>
+                ShowCode
+              </Button>
+              <Button variant="primary" onClick={this.onShowHelp}>
+                Help
+              </Button>
+            </ButtonGroup> */}
+          </WidgetLayer>
+        </WidgetContent>
+      </WidgetBody>
     );
   }
 }

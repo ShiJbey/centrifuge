@@ -1,31 +1,30 @@
-const rules = require('./webpack.rules');
-const plugins = require('./webpack.plugins');
+const rules = require("./webpack.rules");
+const plugins = require("./webpack.plugins");
 
 rules.push({
-  test: /\.css/,
+  test: /\.css$/,
   use: [
     {
-      loader: "style-loader"
+      loader: "style-loader",
     },
     {
       loader: "css-loader",
-      options: { modules: {localIdentName: '[local]_[hash:base64:5]' } }
-    },
+    }
   ],
 });
 
 rules.push({
-  test: /\.scss/,
+  test: /\.module.scss/,
   use: [
     {
-      loader: "style-loader"
+      loader: "style-loader",
     },
     {
       loader: "css-loader",
-      options: { modules: {localIdentName: '[local]_[hash:base64:5]' } }
+      options: { modules: { localIdentName: "[local]_[hash:base64:5]" } },
     },
     {
-      loader: "sass-loader"
+      loader: "sass-loader",
     },
   ],
 });
@@ -36,6 +35,6 @@ module.exports = {
   },
   plugins: plugins,
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.scss', '.sass']
+    extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".scss", ".sass"],
   },
 };

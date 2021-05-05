@@ -2,7 +2,7 @@ import React from 'react';
 
 const MetricsDashboard: React.FC = () => {
   return (
-    <div>
+    <div className="container">
       <h1>Metrics</h1>
     </div>
   );

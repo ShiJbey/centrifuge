@@ -3,7 +3,7 @@ $font-size: 16px;
 $font-family: "Open Sans";
 $textPrimary: #b6b6b6;
 $textSecondary: #ececec;
-$bgPrimary: #222222;
+$bgPrimary: hsl(0, 0%, 20%);
 $bgSecondary: #141418;
 $transitionSpeed: 600ms;
 
@@ -19,6 +19,8 @@ $transitionSpeed: 600ms;
   overflow: hidden;
   overflow-y: scroll;
   color: $textPrimary;
+  border-right: 2px solid $textPrimary;
+  z-index: 100;
 }
 
 .SideNavBar_Nav {

@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
+import { IconContext } from 'react-icons';
 import { FaTimes } from 'react-icons/fa';
-import styled from 'styled-components';
-
-const NavTab = styled.div`
-  width: 10rem;
-  display: grid;
-  grid-template-columns: 8rem 2rem;
-`;
-
-const TabTitle = styled.div`
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`;
+import styles from './EditorTab.module.scss';
 
 interface EditorTabTitleProps {
   title: string;
@@ -20,7 +9,7 @@ interface EditorTabTitleProps {
   onClose?: React.MouseEventHandler;
 }
 
-const EditorTabTitle: React.FC<EditorTabTitleProps> = ({
+const EditorTab: React.FC<EditorTabTitleProps> = ({
   title,
   isDirty,
   onClose,
@@ -29,21 +18,24 @@ const EditorTabTitle: React.FC<EditorTabTitleProps> = ({
   const [showCloseBtn, setShowCloseBtn] = useState<boolean>(false);
 
   return (
-    <NavTab
+    <div
+      className={styles.EditorTab}
       onMouseEnter={() => setShowCloseBtn(true)}
       onMouseLeave={() => setShowCloseBtn(false)}
     >
-      <TabTitle>
+      <div className={styles.Title}>
         {title}
         {dirty && <span>*</span>}
-      </TabTitle>
-      <div style={{ width: '100%', height: '100%' }}>
+      </div>
+      <div>
         {showCloseBtn && (
-          <FaTimes onClick={onClose} style={{ color: 'black' }} />
+          <IconContext.Provider value={{className:styles.CloseBtn}}>
+            <FaTimes onClick={onClose} />
+          </IconContext.Provider>
         )}
       </div>
-    </NavTab>
+    </div>
   );
 };
 
-export default EditorTabTitle;
+export default EditorTab;

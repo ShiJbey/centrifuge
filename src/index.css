@@ -1,3 +1,5 @@
+@import'~bootstrap/dist/css/bootstrap.min.css';
+
 html,
 body {
   padding: 0;
@@ -20,24 +22,10 @@ body::-webkit-scrollbar-thumb {
 }
 
 body {
-  background-color: steelblue;
   min-height: 100vh;
 }
 
 #app {
   min-height: 100%;
   width: 100vw;
-}
-
-.scroll-nav {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  padding: 8px 8px 0px 8px;
-  gap: "2px";
-  overflow-x: scroll;
-}
-
-.scroll-nav::-webkit-scrollbar {
-  display: none;
 }
