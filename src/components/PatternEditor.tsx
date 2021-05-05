@@ -65,9 +65,11 @@ const PatternEditor: React.FC = () => {
     });
 
     electron.receive("save_diagram", (path: string) => {
-      if (currentEditor) {
-        electron.send("save_diagram", path);
-      }
+      console.log(path);
+      // if (currentEditor) {
+        
+      //   // electron.send("save_diagram", path);
+      // }
     });
   };
 

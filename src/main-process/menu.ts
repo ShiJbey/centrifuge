@@ -18,8 +18,8 @@ export function createMenu(win: BrowserWindow): Menu {
               buttonLabel: 'Save',
               filters: [
                 {
-                  name: 'Diagram Files',
-                  extensions: ['json', 'JSON', 'centi']
+                  name: 'centrifuge diagram',
+                  extensions: ['ctr']
                 }
               ]
             });
