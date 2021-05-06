@@ -101,6 +101,7 @@
     "closest": "^0.0.1",
     "css-loader": "^4.2.1",
     "dagre": "^0.8.5",
+    "datascript": "^1.1.0",
     "electron": "12.0.2",
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",

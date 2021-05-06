@@ -17,7 +17,6 @@ $transitionSpeed: 600ms;
   background-color: $bgPrimary;
   transition: width 600ms ease;
   overflow: hidden;
-  overflow-y: scroll;
   color: $textPrimary;
   border-right: 2px solid $textPrimary;
   z-index: 100;
@@ -56,6 +55,16 @@ $transitionSpeed: 600ms;
   .LinkText {
     display: inline;
   }
+}
+
+.ActiveIndicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  border-radius: 0 50% 50% 0;
+  background: lightgreen;
 }
 
 

@@ -1,6 +1,7 @@
 import * as fs from "fs";
-import { app, BrowserWindow, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import { createMenu } from "./main-process/menu";
+import { GET_INIT_DATA, OPEN_SAVE_AS } from "./utility/electronChannels";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
@@ -19,8 +20,10 @@ const createWindow = (): void => {
     minWidth: 800,
     // frame: false,
     webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      enableRemoteModule: true,
     },
   });
 
@@ -57,7 +60,7 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-ipcMain.on("get_init_file", (event) => {
+ipcMain.on(GET_INIT_DATA, (event) => {
   if (process.argv.length >= 2) {
     const openFilePath = process.argv[1];
     if (fs.statSync(openFilePath).isFile()) {
@@ -66,4 +69,20 @@ ipcMain.on("get_init_file", (event) => {
     }
   }
   event.returnValue = null;
+});
+
+ipcMain.handle(OPEN_SAVE_AS, () => {
+  const path = dialog.showSaveDialogSync({
+    title: 'Save Diagram As...',
+    buttonLabel: 'Save',
+    defaultPath: './New Diagram',
+    filters: [
+      {
+        name: 'Centrifuge Diagram',
+        extensions: ['ctr']
+      }
+    ]
+  });
+
+  return path;
 });

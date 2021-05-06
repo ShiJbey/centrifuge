@@ -1,41 +1,53 @@
-import { AddEditorAction, SELECT_EDITOR, ADD_EDITOR, DELETE_EDITOR, EditorActionTypes, UPDATE_EDITOR } from './editorTypes';
-import { EditorState } from '../../components/PatternEditor';
-import { v4 as uuidv4 } from 'uuid';
+import { SELECT_EDITOR, ADD_EDITOR, DELETE_EDITOR, EditorActionTypes, UPDATE_EDITOR } from './editorTypes';
+import { Reducer } from 'react';
+
+export interface EditorState {
+  /** Unique ID for this editor instance */
+  id: string;
+  /** Is this editor currently active in the GUI */
+  active: boolean;
+  /** Title displayed in the editor's tab */
+  title: string;
+  /** Has this diagram been edited since its last save */
+  dirty: boolean;
+  /** Serialized react-diagram model */
+  model?: { [key: string]: any };
+  /** Datascript query representation of the current model */
+  code?: string;
+  /** The path that this diagram is saved at (undefined if not saved) */
+  filepath?: string;
+}
 
 export interface EditorsReduxState {
-  currentEditor?: string;
+  activeEditor?: string;
   editors: {[key: string]: EditorState};
 }
 
 const initialState: EditorsReduxState = {
   editors: {},
+  activeEditor: '',
 };
 
-const editorsReducer = (state = initialState, action: EditorActionTypes): EditorsReduxState => {
+const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = initialState, action: EditorActionTypes): EditorsReduxState => {
   switch(action.type) {
     case ADD_EDITOR: {
-      let id = uuidv4();
-      if (Object.keys(state.editors).includes(id)) {
-        console.warn('Conflicting UUIDs');
-        id = uuidv4();
-      }
+      const id = action.payload.id;
 
       const modifiedEditors = {...state.editors};
 
-      for (const key of Object.keys(modifiedEditors)) {
-        modifiedEditors[key].active = false;
+      if (state.activeEditor) {
+        modifiedEditors[state.activeEditor].active = false;
       }
 
       const newState = {
-        currentEditor: id,
+        activeEditor: id,
         editors: {
-          ...modifiedEditors,
+          ...state.editors,
           [id]: {
-            ...action.payload,
-            id,
             active: true,
             dirty: false,
             model: {},
+            ...action.payload,
           }
         }
       };
@@ -46,16 +58,16 @@ const editorsReducer = (state = initialState, action: EditorActionTypes): Editor
       const selectedId = action.payload.id;
       const modifiedEditors = {...state.editors};
       delete modifiedEditors[selectedId];
-      if (state.currentEditor === selectedId &&  Object.keys(modifiedEditors).length > 0) {
+      if (state.activeEditor === selectedId &&  Object.keys(modifiedEditors).length > 0) {
         const [newSelection] = Object.keys(modifiedEditors);
         modifiedEditors[newSelection].active = true;
         return {
-          currentEditor: newSelection,
+          activeEditor: newSelection,
           editors: modifiedEditors,
         }
       } else {
         return {
-          currentEditor: null,
+          activeEditor: null,
           editors: modifiedEditors,
         }
       }
@@ -76,11 +88,11 @@ const editorsReducer = (state = initialState, action: EditorActionTypes): Editor
       const selectedId = action.payload.id;
       const modifiedEditors = {...state.editors};
       modifiedEditors[selectedId].active = true;
-      if (state.currentEditor) {
-        modifiedEditors[state.currentEditor].active = false;
+      if (state.activeEditor) {
+        modifiedEditors[state.activeEditor].active = false;
       }
       return {
-        currentEditor: selectedId,
+        activeEditor: selectedId,
         editors: modifiedEditors,
       }
     }

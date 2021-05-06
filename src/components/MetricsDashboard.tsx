@@ -1,16 +1,51 @@
 import React from "react";
-import { Line } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import { Button, Navbar } from 'react-bootstrap';
+import _ from 'lodash';
+
+const startYear = 1939
+const binSize = 5; // years per bin
+const yearRange = 1979 - startYear;
+const numBins = Math.ceil(yearRange / binSize);
+const labels = _.range(numBins).map((x) => x * binSize + startYear);
 
 const state = {
-  labels: ["January", "February", "March", "April", "May"],
+  labels,
   datasets: [
     {
-      label: "Rainfall",
+      label: "Birth",
       backgroundColor: "rgba(75,192,192,1)",
-      borderColor: "rgba(0,0,0,1)",
-      borderWidth: 2,
-      data: [65, 59, 80, 81, 56],
+      borderColor: "rgba(75,192,192,1)",
+      borderWidth: 3,
+      data: _.range(numBins).map(() => _.random(100)),
+    },
+    {
+      label: "LayOff",
+      backgroundColor: "#c06c4b",
+      borderColor: "#c06c4b",
+      borderWidth: 3,
+      data: _.range(numBins).map(() => _.random(100)),
+    },
+    {
+      label: "Business Construction",
+      backgroundColor: "#4bc064",
+      borderColor: "#4bc064",
+      borderWidth: 3,
+      data: _.range(numBins).map(() => _.random(100)),
+    },
+    {
+      label: "Hiring",
+      backgroundColor: "#8f90c5",
+      borderColor: "#8f90c5",
+      borderWidth: 3,
+      data: _.range(numBins).map(() => _.random(100)),
+    },
+    {
+      label: "Divorce",
+      backgroundColor: "#d63939",
+      borderColor: "#da4949",
+      borderWidth: 3,
+      data: _.range(numBins).map(() => _.random(100)),
     },
   ],
 };
@@ -25,8 +60,8 @@ const MetricsDashboard: React.FC = () => {
         <Button>Load Sim</Button>
       </Navbar>
       <div className="container">
-        <Line
-          type="line"
+        <Bar
+          type="bar"
           data={state}
           options={{
             title: {

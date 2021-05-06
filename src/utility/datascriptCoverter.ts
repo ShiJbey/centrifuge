@@ -33,7 +33,7 @@ function convertPersonNode(
   node: SerializedNodeModel & { [key: string]: any },
   lvar: string
 ) {
-  const ret = `(actor ${lvar})`;
+  const ret = `(person ${lvar})`;
 
   for (const port of node.ports) {
     for (const link of port.links) {
@@ -66,7 +66,7 @@ export function processDiagram(diagram: SerializedDiagram): [string[], string] {
   for (const node of Object.values<SerializedNodeModel>(nodes)) {
     if (node.type === 'person-node') {
       personCount++;
-      const lvar = `?actor${personCount}`;
+      const lvar = `?person${personCount}`;
       nodeIDToLvarMap[node.id] = lvar;
     } else if (node.type === 'relationship-node') {
       relationshipCount++;

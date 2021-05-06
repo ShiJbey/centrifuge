@@ -1,4 +1,4 @@
-import { EditorState } from '../../components/PatternEditor';
+import { EditorState } from './editorReducer';
 import {
   ADD_EDITOR,
   DELETE_EDITOR,
@@ -11,6 +11,7 @@ import {
 } from './editorTypes';
 
 export const addEditor = (
+  id: string,
   title: string,
   path?: string,
   model?: any
@@ -18,6 +19,7 @@ export const addEditor = (
   return {
     type: ADD_EDITOR,
     payload: {
+      id,
       title,
       path,
       model,
