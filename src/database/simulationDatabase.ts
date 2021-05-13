@@ -38,15 +38,15 @@ class SimulationDatabase {
   }
 
   getPersonEntityID(personId: number): number {
-    const [person] = ds.q<number>(`[
+    const person = ds.q<number>(`[
       :find
         [?e]
       :where
-        [?e "sim/type" "person"]
         [?e "person/id" ${personId}]
       ]`,
       ds.db(this.conn));
-    return person;
+    // console.log(person);
+    return 1;
   }
 
   addAttribute(entityID: number, attrName: string, value: any): void {
@@ -71,11 +71,11 @@ class SimulationDatabase {
   insertPerson(person: AttributeMap): void {
     const modifiedPerson = appendNamespace(PERSON_NAMESPACE, person);
 
-    person['sim/type'] = 'person';
+    modifiedPerson['sim/type'] = 'person';
 
     // add the occupations to the database
     if (modifiedPerson['person/occupations'] && modifiedPerson['person/occupations'].length) {
-      const occupations = (person['person/occupations'] as AttributeMap[]).map((occupation, index) => {
+      const occupations = (modifiedPerson['person/occupations'] as AttributeMap[]).map((occupation, index) => {
         appendNamespace(OCCUPATION_NAMESPACE, occupation);
         occupation[':db/id'] = -1 * (index + 1);
         occupation['sim/type'] = 'occupation';
@@ -87,17 +87,17 @@ class SimulationDatabase {
       // get the entity IDs from the transaction report
       const occupationIDs = _.range(1, occupations.length + 1).map(x => tx_report.tempids[`${-1 * x}`]);
 
-      person['person/occupations'] = occupationIDs;
+      modifiedPerson['person/occupations'] = occupationIDs;
 
       // Do not set the reference if the occupation is just an empty object
-      if (Object.keys(person['person/occupation']).length) {
-        person['person/occupation'] = occupationIDs[occupationIDs.length - 1];
+      if (Object.keys(modifiedPerson['person/occupation']).length) {
+        modifiedPerson['person/occupation'] = occupationIDs[occupationIDs.length - 1];
       }
     }
 
     // add the relationships to the database
     if (modifiedPerson['person/relationships']) {
-      const relationships = Object.values<AttributeMap>(person['person/relationships']).map((relationship, index) => {
+      const relationships = Object.values<AttributeMap>(modifiedPerson['person/relationships']).map((relationship, index) => {
         appendNamespace(RELATIONSHIP_NAMESPACE, relationship);
         relationship[':db/id'] = -1 * (index + 1);
         relationship['sim/type'] = 'relationship';
@@ -109,7 +109,7 @@ class SimulationDatabase {
       // get the entity IDs from the transaction report
       const relationshipIDs = _.range(1, relationships.length + 1).map(x => tx_report.tempids[`${-1 * x}`]);
 
-      person['person/relationships'] = relationshipIDs;
+      modifiedPerson['person/relationships'] = relationshipIDs;
     }
 
     ds.transact(this.conn, [person]);

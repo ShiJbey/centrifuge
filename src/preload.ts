@@ -1,8 +1,8 @@
-import { ipcRenderer, contextBridge, dialog } from 'electron';
+import { ipcRenderer, contextBridge } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import ElectronAPI from './utility/electronApi';
-import { OPEN_SAVE_AS } from './utility/electronChannels';
+import { OpenFileResponse, OPEN_SAVE_AS } from './utility/electronChannels';
 
 const api: ElectronAPI = {
   listDirectory: (dir: string): string[] => {
@@ -40,17 +40,8 @@ const api: ElectronAPI = {
       return null;
     }
   },
-  openFile: () => {
-    return dialog.showSaveDialog({
-      title: 'Save Diagram',
-      buttonLabel: 'Save',
-      filters: [
-        {
-          name: 'Diagram Files',
-          extensions: ['json', 'JSON', 'centi'],
-        },
-      ],
-    });
+  openFile: (channel: string): Promise<OpenFileResponse> => {
+    return ipcRenderer.invoke(channel);
   },
   send: (channel: string, ...data: any[]): void => {
     ipcRenderer.send(channel, data);
@@ -66,7 +57,6 @@ const api: ElectronAPI = {
   },
   removeListener: (channel: string, cb: (...args: any[]) => void) => ipcRenderer.removeListener(channel, cb),
   removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel),
-  on: ipcRenderer.on,
 };
 
 contextBridge.exposeInMainWorld('electron', api);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaChartLine, FaProjectDiagram, FaQuestion } from 'react-icons/fa';
+import { FaChartLine, FaProjectDiagram, FaQuestion, FaVial } from 'react-icons/fa';
 import { IconContext } from 'react-icons';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './SideNavbar.module.scss';
@@ -9,6 +9,14 @@ const SideNavbar: React.FC = () => {
   return (
     <div className={styles.SideNavBar}>
       <ul className={styles.SideNavBar_Nav}>
+        <li className={styles.NavItem} style={{background: 'rgba(255, 255, 255, 0.137)'}}>
+          <div className={styles.AppLogo}>
+            <IconContext.Provider value={{ className: styles.NavIcon }}>
+              <FaVial className={styles.NavIcon} />
+            </IconContext.Provider>
+            <span className={styles.LinkText}>Centrifuge</span>
+          </div>
+        </li>
         <li className={styles.NavItem}>
           <Link to="/editor" className={styles.NavLink}>
             {location.pathname === '/editor' && <div className={styles.ActiveIndicator}></div>}

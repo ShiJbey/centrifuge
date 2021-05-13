@@ -1,7 +1,7 @@
-import * as fs from "fs";
+import fs from "fs";
 import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import { createMenu } from "./main-process/menu";
-import { GET_INIT_DATA, OPEN_SAVE_AS } from "./utility/electronChannels";
+import { GET_INIT_DATA, OpenFileResponse, OPEN_SAVE_AS, OPEN_SIM_FILE } from "./utility/electronChannels";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
@@ -85,4 +85,38 @@ ipcMain.handle(OPEN_SAVE_AS, () => {
   });
 
   return path;
+});
+
+ipcMain.handle(OPEN_SIM_FILE, (): OpenFileResponse => {
+  try {
+    const [path] = dialog.showOpenDialogSync({
+      title: 'Open Simulation File',
+      buttonLabel: 'Open',
+      filters: [
+        {
+          name: 'Talktown Simulation Data',
+          extensions: ['json']
+        }
+      ]
+    });
+
+    if (path) {
+      const data = fs.readFileSync(path, {encoding: 'utf-8'});
+      return {
+        status: 'ok',
+        payload: data,
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 'error',
+      msg: error.message,
+      payload: error,
+    };
+  }
+
+  return {
+    status: 'cancel',
+  };
 });

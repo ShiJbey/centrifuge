@@ -75,21 +75,21 @@ export class PatternEditor extends Component<
     console.log('Registering electron handlers');
     electron.receive(SAVE_DIAGRAM, this.handleSaveFile.bind(this));
 
-    // electron.receive(OPEN_DIAGRAM_FILE, (event: Electron.IpcRendererEvent, data: any) => {
-    //   console.log(data);
-    // });
+    electron.receive(OPEN_DIAGRAM_FILE, (event: Electron.IpcRendererEvent, data: any) => {
+      this.createNewTab(data);
+    });
 
-    // electron.receive(OPEN_FILE_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
-    //   console.error(error);
-    // });
+    electron.receive(OPEN_FILE_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
+      console.error(error);
+    });
 
-    // electron.receive(SAVE_DIAGRAM_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
-    //   console.error(error);
-    // });
+    electron.receive(SAVE_DIAGRAM_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
+      console.error(error);
+    });
 
-    // electron.receive(OPEN_DIR_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
-    //   console.error(error);
-    // });
+    electron.receive(OPEN_DIR_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
+      console.error(error);
+    });
   }
 
   unregisterElectronListeners() {
@@ -151,14 +151,8 @@ export class PatternEditor extends Component<
         />
 
         <div className={styles.Container}>
-          <div className={styles.FileExplorer}>
-            <div className={styles.DirectoryName}>Directory</div>
-            <div className={styles.FileListContainer}>
-              <ul>
-                <li>diagram_1.ctr</li>
-                <li>diagram_2.ctr</li>
-              </ul>
-            </div>
+          <div>
+            {/* <FileExplorer /> */}
           </div>
           <div className={styles.PatternEditor}>
             <Nav

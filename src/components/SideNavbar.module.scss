@@ -40,6 +40,8 @@ $transitionSpeed: 600ms;
   text-decoration: none;
   filter: grayscale(100%) opacity(0.7);
   transition: $transitionSpeed;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 .NavLink:hover {
@@ -50,10 +52,16 @@ $transitionSpeed: 600ms;
 }
 
 .SideNavBar:hover {
-  width: 10rem;
+  width: 15rem;
+  // width: fit-content;
 
   .LinkText {
     display: inline;
+  }
+
+  .AppLogo .NavIcon {
+    transform: rotate(720deg);
+    transition: 0.9s;
   }
 }
 
@@ -65,6 +73,19 @@ $transitionSpeed: 600ms;
   height: 100%;
   border-radius: 0 50% 50% 0;
   background: lightgreen;
+}
+
+.AppLogo {
+  display: flex;
+  align-items: center;
+  height: $sidebarWidth;
+  color: white;
+  text-decoration: none;
+  transition: $transitionSpeed;
+  background-image: rgba(0, 0, 0, 0.829);
+  font-weight: bold;
+  font-size: large;
+  text-transform: uppercase;
 }
 
 

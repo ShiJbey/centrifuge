@@ -7,3 +7,9 @@ export const SAVE_DIAGRAM_ERROR = 'SAVE_DIAGRAM_ERROR';
 export const OPEN_SIM_FILE = 'OPEN_FILE';
 export const GET_INIT_DATA = 'GET_INIT_DATA';
 export const OPEN_SAVE_AS = 'OPEN_SAVE_AS';
+
+export interface OpenFileResponse {
+  msg?: string;
+  payload?: any;
+  status: 'ok' | 'error' | 'cancel';
+}
