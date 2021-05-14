@@ -1,31 +1,25 @@
 import React, { Component, Dispatch } from 'react';
 import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
-import { RootState } from '../redux/store';
+import { RootState } from '../../redux/store';
 import {
   selectEditor,
   addEditor,
   deleteEditor,
   updateEditor,
-} from '../redux/editors/editorActions';
+} from '../../redux/editors/editorActions';
 import {
-  SAVE_DIAGRAM,
-  SAVE_DIAGRAM_ERROR,
-  OPEN_DIR_ERROR,
-  OPEN_DIAGRAM_FILE,
-  OPEN_FILE_ERROR,
-  GET_INIT_DATA,
-} from '../utility/electronChannels';
-import ElectronAPI from '../utility/electronApi';
-import { EditorState } from '../redux/editors/editorReducer';
-import { EditorActionTypes } from '../redux/editors/editorTypes';
+  SAVE_PATTERN,
+} from '../../utility/electronChannels';
+import ElectronAPI, { SaveFileRequest } from '../../utility/electronApi';
+import { EditorState } from '../../redux/editors/editorReducer';
+import { EditorActionTypes } from '../../redux/editors/editorTypes';
 import { Nav, Tab, Button } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import classnames from 'classnames';
-import CodeModal from './CodeModal';
-import EditorTab from './EditorTab';
-import EditorWidget from './EditorWidget';
-import { processDiagram } from '../utility/datascriptCoverter';
+import CodeModal from '../CodeModal/CodeModal';
+import EditorTab from '../EditorTab';
+import EditorWidget from '../EditorWidget/EditorWidget';
 import styles from './PatternEditor.module.scss';
 
 declare const electron: ElectronAPI;
@@ -56,15 +50,15 @@ export class PatternEditor extends Component<
 
   componentDidMount() {
     this.registerElectronListeners();
-    if (Object.keys(this.props.editors).length === 0) {
-      // If this application was started from double-clicking
-      // an associated filetype then we need to load it.
-      // Otherwise or on error, open a blank editor tab.
-      const response = electron.sendSync(GET_INIT_DATA);
-      if (!response) {
-        this.createNewTab();
-      }
-    }
+    // if (Object.keys(this.props.editors).length === 0) {
+    //   // If this application was started from double-clicking
+    //   // an associated filetype then we need to load it.
+    //   // Otherwise or on error, open a blank editor tab.
+    //   const response = electron.sendSync(GET_INIT_DATA);
+    //   if (!response) {
+    //     this.createNewTab();
+    //   }
+    // }
   }
 
   componentWillUnmount() {
@@ -72,43 +66,27 @@ export class PatternEditor extends Component<
   }
 
   registerElectronListeners() {
-    console.log('Registering electron handlers');
-    electron.receive(SAVE_DIAGRAM, this.handleSaveFile.bind(this));
-
-    electron.receive(OPEN_DIAGRAM_FILE, (event: Electron.IpcRendererEvent, data: any) => {
-      this.createNewTab(data);
-    });
-
-    electron.receive(OPEN_FILE_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
-      console.error(error);
-    });
-
-    electron.receive(SAVE_DIAGRAM_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
-      console.error(error);
-    });
-
-    electron.receive(OPEN_DIR_ERROR, (event: Electron.IpcRendererEvent, error: any) => {
-      console.error(error);
-    });
+    electron.receive(SAVE_PATTERN, this.handleSaveFile.bind(this));
   }
 
   unregisterElectronListeners() {
-    console.log('De-Registering electron handlers');
-    electron.removeAllListeners(SAVE_DIAGRAM);
+    electron.removeAllListeners(SAVE_PATTERN);
   }
 
-  async handleSaveFile(event: Electron.IpcRendererEvent, path: string) {
+  async handleSaveFile(event: Electron.IpcRendererEvent, req: SaveFileRequest) {
     if (!this.props.activeEditor) {
       console.log('No active editors');
       return;
     }
 
-    let savePath = path ?? this.props.editors[this.props.activeEditor].filepath;
+    let savePath = req.path ?? this.props.editors[this.props.activeEditor].filepath;
     if (!savePath) {
-      savePath = await electron.saveAs();
-      if (!savePath) {
+      const {path} = await electron.saveAs();
+      if (!path) {
         console.log("Save canceled");
         return;
+      } else {
+        savePath = path;
       }
     }
 
@@ -133,7 +111,7 @@ export class PatternEditor extends Component<
       id = uuidv4();
     }
 
-    this.props.addEditor(id, 'New Diagram', null, model);
+    this.props.addEditor(id, 'New Pattern', null, model);
   }
 
   closeTab(id: string) {

@@ -9,8 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "clean": "rimraf ./.webpack ./out yarn-error.log ./dist",
-    "lint": "eslint --ext ./src"
+    "clean": "rimraf ./.webpack ./out yarn-error.log ./dist ./tsconfig.tsbuildinfo",
+    "lint": "eslint ./src/"
   },
   "keywords": [],
   "author": {
@@ -106,7 +106,7 @@
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",
     "fork-ts-checker-webpack-plugin": "^5.0.14",
-    "fs-extra": "^9.1.0",
+    "fs-extra": "^10.0.0",
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.1",
     "jquery": "1.9.1",

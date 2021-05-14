@@ -1,8 +1,8 @@
 import { ipcRenderer, contextBridge } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import ElectronAPI from './utility/electronApi';
-import { OpenFileResponse, OPEN_SAVE_AS } from './utility/electronChannels';
+import ElectronAPI, { OpenFileResponse, SaveFileRequest } from './utility/electronApi';
+import { OPEN_SAVE_AS, OPEN_TOWN_FILE } from './utility/electronChannels';
 
 const api: ElectronAPI = {
   listDirectory: (dir: string): string[] => {
@@ -23,7 +23,7 @@ const api: ElectronAPI = {
       return null;
     }
   },
-  saveAs: async (): Promise<string> => {
+  saveAs: async (): Promise<SaveFileRequest> => {
     try {
       const path = await ipcRenderer.invoke(OPEN_SAVE_AS);
       return path;
@@ -34,14 +34,14 @@ const api: ElectronAPI = {
   writeFile: (filename: string, data: any): void => {
     try {
       fs.writeFileSync(filename, data);
-      console.log("Write Done");
+      console.log('Write Done');
     } catch (error) {
       console.error(error);
       return null;
     }
   },
-  openFile: (channel: string): Promise<OpenFileResponse> => {
-    return ipcRenderer.invoke(channel);
+  openTownFile: (): Promise<OpenFileResponse> => {
+    return ipcRenderer.invoke(OPEN_TOWN_FILE);
   },
   send: (channel: string, ...data: any[]): void => {
     ipcRenderer.send(channel, data);
@@ -55,8 +55,10 @@ const api: ElectronAPI = {
   ): void => {
     ipcRenderer.on(channel, func);
   },
-  removeListener: (channel: string, cb: (...args: any[]) => void) => ipcRenderer.removeListener(channel, cb),
-  removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel),
+  removeListener: (channel: string, cb: (...args: any[]) => void) =>
+    ipcRenderer.removeListener(channel, cb),
+  removeAllListeners: (channel: string) =>
+    ipcRenderer.removeAllListeners(channel),
 };
 
 contextBridge.exposeInMainWorld('electron', api);

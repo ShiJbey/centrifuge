@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import Application from "../Application";
+import Application from "../../Application";
 import {
   DiagramModel,
   DiagramModelGenerics,
@@ -12,23 +12,23 @@ import {
   BaseModelGenerics,
 } from "@projectstorm/react-canvas-core";
 import { Button, ButtonGroup } from "react-bootstrap";
-import AppCanvasWidget from "./AppCanvasWidget";
-import { PersonNodeModel } from "../nodes/PersonNode/PersonNodeModel";
-import { RelationshipNodeModel } from "../nodes/RelationshipNode";
-import { EventNodeModel } from "../nodes/EventNode";
-import { AsymmetricFriendshipNodeModel } from "../nodes/AsymmetricFriendshipNode";
-import { LoveTriangleNodeModel } from "../nodes/LoveTriangleNode";
-import { BusinessRivalryNodeModel } from "../nodes/BusinessRivalryNode";
-import { JealousUncleNodeModel } from "../nodes/JealousUncleNode";
-import { LikesNodeModel } from "../nodes/LikesNode";
-import { DislikesNodeModel } from "../nodes/DislikesNode";
-import { VariableNodeModel } from "../nodes/VariableNode";
-import ToastData from "../utility/alertData";
-import { BoolNodeModel } from "../nodes/BoolNode";
-import { NumberNodeModel } from "../nodes/NumberNode";
-import { StringNodeModel } from "../nodes/StringNode";
-import { ModifierNodeModel } from "../nodes/ModifierNode";
-import NodeTray from "./NodeTray";
+import AppCanvasWidget from "../AppCanvasWidget/AppCanvasWidget";
+import { PersonNodeModel } from "../../nodes/PersonNode/PersonNodeModel";
+import { RelationshipNodeModel } from "../../nodes/RelationshipNode";
+import { EventNodeModel } from "../../nodes/EventNode";
+import { AsymmetricFriendshipNodeModel } from "../../nodes/AsymmetricFriendshipNode";
+import { LoveTriangleNodeModel } from "../../nodes/LoveTriangleNode";
+import { BusinessRivalryNodeModel } from "../../nodes/BusinessRivalryNode";
+import { JealousUncleNodeModel } from "../../nodes/JealousUncleNode";
+import { LikesNodeModel } from "../../nodes/LikesNode";
+import { DislikesNodeModel } from "../../nodes/DislikesNode";
+import { VariableNodeModel } from "../../nodes/VariableNode";
+import ToastData from "../../utility/alertData";
+import { BoolNodeModel } from "../../nodes/BoolNode";
+import { NumberNodeModel } from "../../nodes/NumberNode";
+import { StringNodeModel } from "../../nodes/StringNode";
+import { ModifierNodeModel } from "../../nodes/ModifierNode";
+import NodeTray from "../NodeTray/NodeTray";
 import debounce from "lodash/debounce";
 
 const WidgetBody = styled.div`

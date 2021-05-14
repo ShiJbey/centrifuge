@@ -1,6 +1,6 @@
 import React from 'react';
-import TrayWidget from './TrayWidget';
-import TrayWidgetItem from './TrayWidgetItem';
+import TrayWidget from '../TrayWidget';
+import TrayWidgetItem from '../TrayWidget/TrayWidgetItem';
 import {
   ASYMMETRIC_FRIENDSHIP_NODE_COLOR,
   EVENT_NODE_COLOR,
@@ -16,7 +16,7 @@ import {
   STRING_NODE_COLOR,
   BOOL_NODE_COLOR,
   MODIFIER_NODE_COLOR,
-} from '../utility/constants';
+} from '../../utility/constants';
 
 const NodeTray: React.FC = () => {
   return (

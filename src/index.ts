@@ -1,7 +1,9 @@
 import fs from "fs";
-import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, Menu, ipcMain, dialog } from "electron";
 import { createMenu } from "./main-process/menu";
-import { GET_INIT_DATA, OpenFileResponse, OPEN_SAVE_AS, OPEN_SIM_FILE } from "./utility/electronChannels";
+import { GET_INIT_DATA, OPEN_SAVE_AS, OPEN_TOWN_FILE } from "./utility/electronChannels";
+import * as io from './main-process/io';
+import { OpenFileResponse } from "./main-process/io";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
@@ -71,23 +73,12 @@ ipcMain.on(GET_INIT_DATA, (event) => {
   event.returnValue = null;
 });
 
-ipcMain.handle(OPEN_SAVE_AS, () => {
-  const path = dialog.showSaveDialogSync({
-    title: 'Save Diagram As...',
-    buttonLabel: 'Save',
-    defaultPath: './New Diagram',
-    filters: [
-      {
-        name: 'Centrifuge Diagram',
-        extensions: ['ctr']
-      }
-    ]
-  });
-
-  return path;
+ipcMain.handle(OPEN_SAVE_AS, async () => {
+  const res = await io.savePatternAs(null);
+  return res;
 });
 
-ipcMain.handle(OPEN_SIM_FILE, (): OpenFileResponse => {
+ipcMain.handle(OPEN_TOWN_FILE, (): OpenFileResponse => {
   try {
     const [path] = dialog.showOpenDialogSync({
       title: 'Open Simulation File',
