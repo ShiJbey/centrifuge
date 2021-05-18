@@ -19,14 +19,16 @@ import { FaPlus } from 'react-icons/fa';
 import classnames from 'classnames';
 import CodeModal from '../CodeModal/CodeModal';
 import EditorTab from '../EditorTab';
+import FileExplorer from '../FileExplorer';
 import EditorWidget from '../EditorWidget/EditorWidget';
 import styles from './PatternEditor.module.scss';
+import { SerializedDiagram } from '../../utility/serialization';
 
 declare const electron: ElectronAPI;
 
 export interface PatternEditorProps {
-  editors: { [key: string]: EditorState };
-  activeEditor: string;
+  editors: EditorState[];
+  activeEditor: number;
   selectEditor: typeof selectEditor;
   addEditor: typeof addEditor;
   deleteEditor: typeof deleteEditor;
@@ -50,15 +52,6 @@ export class PatternEditor extends Component<
 
   componentDidMount() {
     this.registerElectronListeners();
-    // if (Object.keys(this.props.editors).length === 0) {
-    //   // If this application was started from double-clicking
-    //   // an associated filetype then we need to load it.
-    //   // Otherwise or on error, open a blank editor tab.
-    //   const response = electron.sendSync(GET_INIT_DATA);
-    //   if (!response) {
-    //     this.createNewTab();
-    //   }
-    // }
   }
 
   componentWillUnmount() {
@@ -75,7 +68,6 @@ export class PatternEditor extends Component<
 
   async handleSaveFile(event: Electron.IpcRendererEvent, req: SaveFileRequest) {
     if (!this.props.activeEditor) {
-      console.log('No active editors');
       return;
     }
 
@@ -83,39 +75,29 @@ export class PatternEditor extends Component<
     if (!savePath) {
       const {path} = await electron.saveAs();
       if (!path) {
-        console.log("Save canceled");
         return;
       } else {
         savePath = path;
       }
     }
 
-    const data = this.props.editors[this.props.activeEditor].model;
+    const data = this.props.editors[this.props.activeEditor].app.getActiveDiagram().serialize();
     if (data) {
-      electron.writeFile(savePath, JSON.stringify(data));
-    } else {
-      console.error('No model to save');
+      const response = electron.invoke(SAVE_PATTERN, savePath, data);
     }
   }
 
-  setActiveTab(id: string) {
-    this.props.selectEditor(id);
+  setActiveTab(eventKey: number) {
+    this.props.selectEditor(eventKey);
   }
 
   /** Create a new tab and set it as active */
   createNewTab(model?: any) {
-    let id = uuidv4();
-
-    while (Object.keys(this.props.editors).includes(id)) {
-      console.warn('Conflicting UUIDs');
-      id = uuidv4();
-    }
-
-    this.props.addEditor(id, 'New Pattern', null, model);
+    this.props.addEditor('New Pattern', null, model);
   }
 
-  closeTab(id: string) {
-    this.props.deleteEditor(id);
+  closeTab(eventKey: number) {
+    this.props.deleteEditor(eventKey);
   }
 
   render() {
@@ -130,30 +112,29 @@ export class PatternEditor extends Component<
 
         <div className={styles.Container}>
           <div>
-            {/* <FileExplorer /> */}
+            <FileExplorer />
           </div>
           <div className={styles.PatternEditor}>
             <Nav
               className={styles.EditorTabNav}
               activeKey={this.props.activeEditor}
-              onSelect={(tabID: string) => this.setActiveTab(tabID)}
+              onSelect={(tabID) => this.setActiveTab(parseInt(tabID))}
             >
-              {Object.keys(this.props.editors).map((editorID) => {
-                const editor = this.props.editors[editorID];
+              {this.props.editors.map((editor, index) => {
                 return (
                   <Nav.Item
-                    key={editor.id}
+                    key={index}
                     className={classnames(styles.EditorTab, {
                       [styles.ActiveTab]: editor.active,
                     })}
                   >
-                    <Nav.Link eventKey={editor.id}>
+                    <Nav.Link eventKey={index}>
                       <EditorTab
                         isDirty={editor.dirty}
                         title={editor.title}
                         onClose={(event) => {
                           event.stopPropagation();
-                          this.closeTab(editor.id);
+                          this.closeTab(index);
                         }}
                       />
                     </Nav.Link>
@@ -186,26 +167,22 @@ export class PatternEditor extends Component<
                 activeKey={this.props.activeEditor}
               >
                 <Tab.Content as="div" style={{ height: '100%', width: '100%' }}>
-                  {Object.keys(this.props.editors).map((editorID) => {
-                    const editor = this.props.editors[editorID];
+                  {this.props.editors.map((editor, index) => {
                     return (
                       <Tab.Pane
                         as="div"
                         style={{ height: '100%', width: '100%' }}
-                        key={editorID}
-                        eventKey={editorID}
+                        key={index}
+                        eventKey={index}
                       >
                         <EditorWidget
+                          editor={editor}
                           onUpdate={(data: any) => {
-                            console.log('Editor updated');
                             this.props.updateEditor({
                               ...editor,
                               model: data,
                               dirty: true,
                             });
-                          }}
-                          onShowCode={() => {
-                            this.state = { ...this.state, showCode: true };
                           }}
                         />
                       </Tab.Pane>
@@ -227,10 +204,10 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<EditorActionTypes>) => ({
-  selectEditor: (id: string) => dispatch(selectEditor(id)),
-  addEditor: (id: string, title: string, path?: string, model?: any) =>
-    dispatch(addEditor(id, title, path, model)),
-  deleteEditor: (id: string) => dispatch(deleteEditor(id)),
+  selectEditor: (index: number) => dispatch(selectEditor(index)),
+  addEditor: (title: string, path?: string, model?: SerializedDiagram) =>
+    dispatch(addEditor(title, path, model)),
+  deleteEditor: (index: number) => dispatch(deleteEditor(index)),
   updateEditor: (newState?: EditorState) => dispatch(updateEditor(newState)),
 });
 

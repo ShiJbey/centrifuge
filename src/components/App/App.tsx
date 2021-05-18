@@ -1,24 +1,26 @@
 import React, { Component } from 'react';
 import { Switch, Route, HashRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { RootState } from '../../redux/store';
 import AppNavbar from '../AppNavbar';
 import styles from './App.module.scss';
 import MetricsDashboard from '../MetricsDashboard';
 import PatternEditor from '../PatternEditor';
 import Help from '../Help';
-import { OPEN_DIR, OPEN_PATTERN_FILE, OPEN_TOWN_FILE } from '../../utility/electronChannels';
+import { CLOSE_DIR, DIR_CHANGE, OPEN_DIR, OPEN_PATTERN_FILE, OPEN_TOWN_FILE } from '../../utility/electronChannels';
 import ElectronAPI, { OpenDirectoryResponse, OpenFileResponse } from '../../utility/electronApi';
-import { DatabaseAction } from '../../redux/database/databaseTypes';
 import { Dispatch } from 'redux';
 import { loadData, clearData } from '../../redux/database/databaseActions';
 import TownToolbar from '../TownToolbar';
+import { DirectoryTree } from 'directory-tree';
+import { updateDirectoryTree, clearDirectoryTree  } from '../../redux/fileTree/fileTreeActions';
 
 declare const electron: ElectronAPI;
 
 interface AppProps {
   loadTown: typeof loadData;
   clearTown: typeof clearData;
+  updateFileTree: typeof updateDirectoryTree;
+  clearFileTree: typeof clearDirectoryTree;
 }
 
 export class App extends Component<AppProps> {
@@ -33,7 +35,17 @@ export class App extends Component<AppProps> {
 
   registerElectronListeners() {
     electron.receive(OPEN_DIR, (_, res: OpenDirectoryResponse) => {
-      console.log(res);
+      if (res.status === 'ok' && res.payload) {
+        this.props.updateFileTree(res.payload);
+      }
+    });
+
+    electron.receive(CLOSE_DIR, () => {
+      this.props.clearFileTree();
+    });
+
+    electron.receive(DIR_CHANGE, (_, change: DirectoryTree) => {
+      this.props.updateFileTree(change);
     });
 
     electron.receive(OPEN_PATTERN_FILE, (_, res: OpenFileResponse) => {
@@ -47,6 +59,8 @@ export class App extends Component<AppProps> {
 
   unregisterElectronListeners() {
     electron.removeAllListeners(OPEN_DIR);
+    electron.removeAllListeners(CLOSE_DIR);
+    electron.removeAllListeners(DIR_CHANGE);
     electron.removeAllListeners(OPEN_PATTERN_FILE);
     electron.removeAllListeners(OPEN_TOWN_FILE);
   }
@@ -75,11 +89,13 @@ export class App extends Component<AppProps> {
   }
 }
 
-const mapStateToProps = (state: RootState) => ({});
+const mapStateToProps = () => ({});
 
-const mapDispatchToProps = (dispatch: Dispatch<DatabaseAction>) => ({
+const mapDispatchToProps = (dispatch: Dispatch) => ({
   loadTown: (data: { [attr: string]: any }) => dispatch(loadData(data)),
   clearTown: () => dispatch(clearData()),
+  updateFileTree: (tree: DirectoryTree) => dispatch(updateDirectoryTree(tree)),
+  clearFileTree: () => dispatch(clearDirectoryTree()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

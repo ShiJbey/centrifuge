@@ -67,6 +67,6 @@ export class ModifierNodeModel extends NodeModel<
   }
 
   public deserialize(event: DeserializeEvent<this>): void {
-    this.deserialize(event);
+    super.deserialize(event);
   }
 }

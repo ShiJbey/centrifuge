@@ -1,12 +1,16 @@
-import {
-  BrowserWindow,
-  dialog,
-} from 'electron';
+import { BrowserWindow, dialog, WebContents } from 'electron';
 import * as fs from 'fs';
+import dirTree, { DirectoryTree } from 'directory-tree';
+import chokidar from 'chokidar';
+import { DIR_CHANGE } from '../utility/electronChannels';
+
+// Map watcher objects to windows
+const watchers: {
+  [key: number]: { watcher: chokidar.FSWatcher; path: string };
+} = {};
 
 export interface OpenDirectoryResponse {
-  path: string;
-  files: string[];
+  payload?: DirectoryTree;
   status: 'ok' | 'error' | 'canceled';
   msg?: string;
 }
@@ -21,7 +25,15 @@ export interface SaveFileRequest {
   path?: string;
 }
 
-export async function openDirectory(win: BrowserWindow): Promise<OpenDirectoryResponse> {
+export interface SaveFileResponse {
+  msg?: string;
+  payload?: any;
+  status: 'ok' | 'error';
+}
+
+export async function openDirectory(
+  win?: BrowserWindow
+): Promise<OpenDirectoryResponse> {
   try {
     const ret = await dialog.showOpenDialog(win, {
       properties: ['openDirectory'],
@@ -30,31 +42,31 @@ export async function openDirectory(win: BrowserWindow): Promise<OpenDirectoryRe
     if (!ret.canceled) {
       const [path] = ret.filePaths;
 
-      const files = fs.readdirSync(path);
+      const payload = dirTree(path);
 
       const response: OpenDirectoryResponse = {
-        path,
-        files,
+        payload,
         status: 'ok',
       };
 
-      return response
+      return response;
     }
   } catch (error) {
     return {
       status: 'error',
-      path: '',
-      files: [],
       msg: error.message ?? 'Error encountered while opening folder',
     };
   }
 }
 
-export async function openFile(win: BrowserWindow, filters?: Electron.FileFilter[]): Promise<OpenFileResponse> {
+export async function openFile(
+  win?: BrowserWindow,
+  filters?: Electron.FileFilter[]
+): Promise<OpenFileResponse> {
   try {
     const ret = await dialog.showOpenDialog(win, {
       properties: ['openFile'],
-      filters
+      filters,
     });
 
     if (!ret.canceled) {
@@ -82,7 +94,9 @@ export async function saveFile(): Promise<SaveFileRequest> {
   return request;
 }
 
-export async function savePatternAs(win: BrowserWindow): Promise<SaveFileRequest> {
+export async function savePatternAs(
+  win?: BrowserWindow
+): Promise<SaveFileRequest> {
   try {
     const ret = await dialog.showSaveDialog(win, {
       title: 'Save Pattern',
@@ -105,4 +119,20 @@ export async function savePatternAs(win: BrowserWindow): Promise<SaveFileRequest
   } catch (error) {
     return null;
   }
+}
+
+export function watchDirectory(path: string, renderer: WebContents): void {
+  const watcher = chokidar.watch(path).on('all', () => {
+    renderer.send(DIR_CHANGE, dirTree(path));
+  });
+
+  watchers[renderer.getProcessId()] = { watcher, path };
+}
+
+export function unWatchDirectory(renderer: WebContents): void {
+  const processId = renderer.getProcessId();
+  const path = watchers[processId].path;
+  const watcher = watchers[processId].watcher;
+  watcher.unwatch(path);
+  delete watchers[processId];
 }

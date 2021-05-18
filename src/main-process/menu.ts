@@ -1,5 +1,5 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron';
-import { OPEN_DIR, OPEN_PATTERN_FILE, SAVE_PATTERN } from '../utility/electronChannels';
+import { CLOSE_DIR, OPEN_DIR, OPEN_PATTERN_FILE, SAVE_PATTERN } from '../utility/electronChannels';
 import * as io from './io';
 
 const isMac = process.platform === 'darwin';
@@ -66,8 +66,19 @@ export function createMenu(win: BrowserWindow): Menu {
             io.openDirectory(win)
               .then((res) => {
                 win.webContents.send(OPEN_DIR, res);
+                // Watch the directory
+                if (res.payload) {
+                  io.watchDirectory(res.payload.path, win.webContents);
+                }
               })
               .catch(console.error);
+          },
+        },
+        {
+          label: 'Close Folder',
+          click: () => {
+            io.unWatchDirectory(win.webContents);
+            win.webContents.send(CLOSE_DIR);
           },
         },
         isMac ? { role: 'close' } : { role: 'quit' },

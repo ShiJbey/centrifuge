@@ -1,9 +1,11 @@
 export const OPEN_FILE_ERROR = 'OPEN_FILE_ERROR';
 export const OPEN_DIR_ERROR = 'OPEN_DIR_ERROR';
 export const OPEN_DIR = 'OPEN_DIR';
+export const CLOSE_DIR = 'CLOSE_DIR';
 export const OPEN_PATTERN_FILE = 'OPEN_PATTERN_FILE';
 export const SAVE_PATTERN = 'SAVE_PATTERN';
 export const SAVE_PATTERN_ERROR = 'SAVE_PATTERN_ERROR';
 export const OPEN_TOWN_FILE = 'OPEN_TOWN_FILE';
 export const GET_INIT_DATA = 'GET_INIT_DATA';
 export const OPEN_SAVE_AS = 'OPEN_SAVE_AS';
+export const DIR_CHANGE = 'DIR_CHANGE';

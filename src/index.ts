@@ -1,9 +1,10 @@
 import fs from "fs";
 import { app, BrowserWindow, Menu, ipcMain, dialog } from "electron";
 import { createMenu } from "./main-process/menu";
-import { GET_INIT_DATA, OPEN_SAVE_AS, OPEN_TOWN_FILE } from "./utility/electronChannels";
+import { CLOSE_DIR, GET_INIT_DATA, OPEN_DIR, OPEN_PATTERN_FILE, OPEN_SAVE_AS, OPEN_TOWN_FILE, SAVE_PATTERN } from "./utility/electronChannels";
 import * as io from './main-process/io';
 import { OpenFileResponse } from "./main-process/io";
+import { DirectoryTree } from "directory-tree";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
@@ -71,6 +72,47 @@ ipcMain.on(GET_INIT_DATA, (event) => {
     }
   }
   event.returnValue = null;
+});
+
+ipcMain.on(OPEN_DIR, async (event) => {
+  const res = await io.openDirectory(null);
+  io.watchDirectory(res.payload.path, event.sender);
+  event.sender.send(OPEN_DIR, res);
+});
+
+ipcMain.on(CLOSE_DIR, async (event) => {
+  io.unWatchDirectory(event.sender);
+});
+
+ipcMain.handle(OPEN_PATTERN_FILE, async (_, args: any[]): Promise<OpenFileResponse> => {
+  try {
+    const path = args[0]
+    return {
+      status: 'ok',
+      payload: JSON.parse(fs.readFileSync(path, {encoding: 'utf-8'})),
+    };
+  } catch (error) {
+    return {
+      status: 'error',
+      msg: error.message,
+      payload: error,
+    };
+  }
+});
+
+ipcMain.handle(SAVE_PATTERN, async (_, path: string, data: string): Promise<io.SaveFileResponse> => {
+  try {
+    fs.writeFileSync(path, data, {encoding: 'utf-8'});
+    return {
+      status: 'ok',
+    }
+  } catch (error) {
+    return {
+      status: 'error',
+      msg: error.message,
+      payload: error
+    }
+  }
 });
 
 ipcMain.handle(OPEN_SAVE_AS, async () => {

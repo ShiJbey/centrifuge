@@ -43,6 +43,9 @@ const api: ElectronAPI = {
   openTownFile: (): Promise<OpenFileResponse> => {
     return ipcRenderer.invoke(OPEN_TOWN_FILE);
   },
+  invoke: (channel: string, ...data: any[]): Promise<any> => {
+    return ipcRenderer.invoke(channel, data);
+  },
   send: (channel: string, ...data: any[]): void => {
     ipcRenderer.send(channel, data);
   },

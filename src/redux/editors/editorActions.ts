@@ -1,3 +1,4 @@
+import { SerializedDiagram } from '../../utility/serialization';
 import { EditorState } from './editorReducer';
 import {
   ADD_EDITOR,
@@ -11,15 +12,13 @@ import {
 } from './editorTypes';
 
 export const addEditor = (
-  id: string,
   title: string,
   path?: string,
-  model?: any
+  model?: SerializedDiagram
 ): AddEditorAction => {
   return {
     type: ADD_EDITOR,
     payload: {
-      id,
       title,
       path,
       model,
@@ -28,22 +27,18 @@ export const addEditor = (
 };
 
 export const selectEditor = (
-  id: string,
+  index: number,
 ): SelectEditorAction => {
   return {
     type: SELECT_EDITOR,
-    payload: {
-      id
-    },
+    payload: { index },
   };
 };
 
-export const deleteEditor = (id: string): DeleteEditorAction => {
+export const deleteEditor = (index: number): DeleteEditorAction => {
   return {
     type: DELETE_EDITOR,
-    payload: {
-      id,
-    },
+    payload: { index },
   };
 };
 

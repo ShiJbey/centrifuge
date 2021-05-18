@@ -1,9 +1,8 @@
 import { SELECT_EDITOR, ADD_EDITOR, DELETE_EDITOR, EditorActionTypes, UPDATE_EDITOR } from './editorTypes';
 import { Reducer } from 'react';
+import Application from '../../Application';
 
 export interface EditorState {
-  /** Unique ID for this editor instance */
-  id: string;
   /** Is this editor currently active in the GUI */
   active: boolean;
   /** Title displayed in the editor's tab */
@@ -16,83 +15,110 @@ export interface EditorState {
   code?: string;
   /** The path that this diagram is saved at (undefined if not saved) */
   filepath?: string;
+  /** Application running the editor */
+  app: Application;
 }
 
 export interface EditorsReduxState {
-  activeEditor?: string;
-  editors: {[key: string]: EditorState};
+  activeEditor?: number;
+  editors: EditorState[];
 }
 
 const initialState: EditorsReduxState = {
-  editors: {},
-  activeEditor: '',
+  editors: [],
 };
 
-const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = initialState, action: EditorActionTypes): EditorsReduxState => {
+const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = initialState, action) => {
   switch(action.type) {
     case ADD_EDITOR: {
-      const id = action.payload.id;
+      const modifiedEditors = [...state.editors];
+      let editorExists = false;
+      let activeEditor = state.activeEditor;
 
-      const modifiedEditors = {...state.editors};
-
-      if (state.activeEditor) {
-        modifiedEditors[state.activeEditor].active = false;
+      // Unselect all existing editors
+      // Check if the desired file is already open
+      for (let i = 0; i < modifiedEditors.length; i++) {
+        const editor = modifiedEditors[i];
+        editor.active = false;
+        if (editor.filepath && editor.filepath === action.payload.path) {
+          editorExists = true;
+          editor.active = true;
+          activeEditor = i;
+        }
       }
 
-      const newState = {
-        activeEditor: id,
-        editors: {
-          ...state.editors,
-          [id]: {
-            active: true,
-            dirty: false,
-            model: {},
-            ...action.payload,
-          }
-        }
-      };
-
-      return newState;
-    }
-    case DELETE_EDITOR: {
-      const selectedId = action.payload.id;
-      const modifiedEditors = {...state.editors};
-      delete modifiedEditors[selectedId];
-      if (state.activeEditor === selectedId &&  Object.keys(modifiedEditors).length > 0) {
-        const [newSelection] = Object.keys(modifiedEditors);
-        modifiedEditors[newSelection].active = true;
+      if (editorExists) {
         return {
-          activeEditor: newSelection,
+          activeEditor,
           editors: modifiedEditors,
         }
       } else {
-        return {
-          activeEditor: null,
-          editors: modifiedEditors,
+        const app = new Application();
+
+        if (action.payload.model) {
+          app.getActiveDiagram().deserializeModel(action.payload.model as any, app.getDiagramEngine());
         }
+
+        // Create a new editor and push it to the array
+        modifiedEditors.push({
+          active: true,
+          dirty: false,
+          model: action.payload.model,
+          filepath: action.payload.path,
+          title: action.payload.title,
+          app,
+        });
+
+
+        const newState = {
+          activeEditor: modifiedEditors.length - 1,
+          editors: modifiedEditors,
+        };
+
+        return newState;
+      }
+    }
+    case DELETE_EDITOR: {
+      const modifiedEditors = [...state.editors];
+      modifiedEditors.splice(action.payload.index, 1);
+
+      if (modifiedEditors.length) {
+        const activeEditor = Math.max(0, Math.min(state.activeEditor ?? -1, modifiedEditors.length - 1))
+        return {
+          activeEditor,
+          editors: modifiedEditors,
+        };
+      } else {
+        return {
+          editors: modifiedEditors,
+        };
       }
     }
     case UPDATE_EDITOR: {
-      const selectedId = action.payload.id;
-      const modifiedEditors = {...state.editors};
-      modifiedEditors[selectedId] = {
-        ...modifiedEditors[selectedId],
+      const modifiedEditors = [...state.editors];
+
+      modifiedEditors[state.activeEditor] = {
+        ...modifiedEditors[state.activeEditor],
         ...action.payload,
       }
+
       return {
         ...state,
         editors: modifiedEditors,
       };
     }
     case SELECT_EDITOR: {
-      const selectedId = action.payload.id;
-      const modifiedEditors = {...state.editors};
-      modifiedEditors[selectedId].active = true;
-      if (state.activeEditor) {
-        modifiedEditors[state.activeEditor].active = false;
+      const modifiedEditors = [...state.editors];
+
+      // Unselect all existing editors
+      for (const editor of modifiedEditors) {
+        editor.active = false;
       }
+
+      modifiedEditors[action.payload.index].active = true;
+
       return {
-        activeEditor: selectedId,
+        activeEditor: action.payload.index,
         editors: modifiedEditors,
       }
     }
