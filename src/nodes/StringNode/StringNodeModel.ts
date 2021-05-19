@@ -6,7 +6,10 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+export const STRING_NODE_TYPE = 'string-node';
+
 export interface StringNodeModelOptions {
+  type: typeof STRING_NODE_TYPE
   label: string;
   value: string;
 }
@@ -22,13 +25,13 @@ export class StringNodeModel extends NodeModel<
 
   constructor(
     options: StringNodeModelOptions = {
+      type: STRING_NODE_TYPE,
       label: 'String',
       value: 'new string',
     }
   ) {
     super({
       ...options,
-      type: 'string-node',
     });
 
     this.outPort = new DefaultPortModel({

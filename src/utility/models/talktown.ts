@@ -64,7 +64,7 @@ export interface Person {
   name_suffix: string;
   maiden_name: string;
   age: number;
-  sex: string;
+  gender: string;
   spouse: number;
   attracted_to: string[];
   parents: number[];

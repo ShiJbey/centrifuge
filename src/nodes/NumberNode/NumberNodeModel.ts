@@ -6,7 +6,10 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+export const NUMBER_NODE_TYPE = 'number-node';
+
 export interface NumberNodeModelOptions {
+  type: typeof NUMBER_NODE_TYPE;
   label: string;
   value: number;
 }
@@ -22,13 +25,13 @@ export class NumberNodeModel extends NodeModel<
 
   constructor(
     options: NumberNodeModelOptions = {
-      label: 'Variable',
+      type: NUMBER_NODE_TYPE,
+      label: 'Number',
       value: 0,
     }
   ) {
     super({
       ...options,
-      type: 'number-node',
     });
 
     this.outPort = new DefaultPortModel({

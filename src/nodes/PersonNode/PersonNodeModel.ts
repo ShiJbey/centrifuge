@@ -9,12 +9,15 @@ import {
   DeserializeEvent,
 } from '@projectstorm/react-canvas-core';
 
+export const PERSON_NODE_TYPE = 'person-node'
+
 export interface PersonNodeModelOptions extends BaseModelOptions {
+  type: typeof PERSON_NODE_TYPE,
   label?: string;
   color?: string;
   age?: string;
   occupation?: string;
-  sex?: string;
+  gender?: string;
   alive?: boolean;
 }
 
@@ -27,20 +30,19 @@ export class PersonNodeModel extends NodeModel<
 > {
 
   public outPort: DefaultPortModel;
-  public sexPort: DefaultPortModel;
+  public genderPort: DefaultPortModel;
   public alivePort: DefaultPortModel;
   public adultPort: DefaultPortModel;
 
-  constructor(options: PersonNodeModelOptions = { label: 'Person' }) {
+  constructor(options: PersonNodeModelOptions = { type: PERSON_NODE_TYPE, label: 'Person' }) {
     super({
       ...options,
-      type: 'person-node',
     });
 
-    this.sexPort = new DefaultPortModel({
+    this.genderPort = new DefaultPortModel({
       in: true,
-      name: 'sex',
-      label: 'sex',
+      name: 'gender',
+      label: 'gender',
       alignment: PortModelAlignment.LEFT,
     });
 
@@ -65,7 +67,7 @@ export class PersonNodeModel extends NodeModel<
       alignment: PortModelAlignment.RIGHT,
     });
 
-    this.addPort(this.sexPort);
+    this.addPort(this.genderPort);
     this.addPort(this.alivePort);
     this.addPort(this.adultPort);
     this.addPort(this.outPort);

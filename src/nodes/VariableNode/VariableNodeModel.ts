@@ -6,7 +6,10 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+export const VARIABLE_NODE_TYPE = 'variable-node';
+
 export interface VariableNodeModelOptions {
+  type: typeof VARIABLE_NODE_TYPE;
   label: string;
   name: string;
 }
@@ -22,13 +25,13 @@ export class VariableNodeModel extends NodeModel<
 
   constructor(
     options: VariableNodeModelOptions = {
+      type: VARIABLE_NODE_TYPE,
       label: 'Variable',
       name: 'X',
     }
   ) {
     super({
       ...options,
-      type: 'variable-node',
     });
 
     this.outPort = new DefaultPortModel({

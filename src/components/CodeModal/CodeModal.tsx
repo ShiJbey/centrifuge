@@ -13,10 +13,10 @@ const CodeModal: React.FC<CodeModalProps> = ({ onHide, show }) => {
   const code = useSelector((state: RootState) => {
     for (const x of state.editor.editors) {
       if (x.id === state.editor.activeEditor) {
-        return x.code;
+        return x.code ?? '';
       }
     }
-    return null;
+    return '';
   });
 
   return (

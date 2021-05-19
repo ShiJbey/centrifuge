@@ -6,7 +6,10 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+export const RELATIONSHIP_NODE_TYPE = 'relationship-node';
+
 export interface RelationshipNodeModelOptions {
+  type: typeof RELATIONSHIP_NODE_TYPE
   label?: string;
   color?: string;
 }
@@ -23,25 +26,25 @@ export class RelationshipNodeModel extends NodeModel<
 
   constructor(
     options: RelationshipNodeModelOptions = {
+      type: RELATIONSHIP_NODE_TYPE,
       label: 'Relationship'
     }
   ) {
     super({
       ...options,
-      type: 'relationship-node',
     });
 
     this.person1Port = new DefaultPortModel({
       in: true,
-      name: 'person_1',
-      label: 'Person 1',
+      name: 'owner',
+      label: 'owner',
       alignment: PortModelAlignment.LEFT,
     });
 
     this.person2Port = new DefaultPortModel({
       in: true,
-      name: 'person_2',
-      label: 'Person 2',
+      name: 'target',
+      label: 'target',
       alignment: PortModelAlignment.LEFT,
     });
 

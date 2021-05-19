@@ -56,7 +56,7 @@ export const motherAndChildRule = `[
   (motherAndChild ?mother ?child)
     (person ?mother)
     (person ?child)
-    [?mother "person/sex" "female"]
+    [?mother "person/gender" "female"]
     [?mother "person/kids" ?childID]
     [?child  "person/id" ?childID]
 ]`;

@@ -91,8 +91,8 @@ export class PersonNodeWidget extends React.Component<PersonNodeWidgetProps> {
           <PortsContainer>
             <DefaultPortLabel
               engine={this.props.engine}
-              port={this.props.node.sexPort}
-              key={this.props.node.sexPort.getID()}
+              port={this.props.node.genderPort}
+              key={this.props.node.genderPort.getID()}
             />
             <DefaultPortLabel
               engine={this.props.engine}

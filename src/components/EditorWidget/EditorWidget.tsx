@@ -10,7 +10,6 @@ import {
   BaseModel,
   BaseModelGenerics,
 } from "@projectstorm/react-canvas-core";
-import { Button, ButtonGroup } from "react-bootstrap";
 import AppCanvasWidget from "../AppCanvasWidget/AppCanvasWidget";
 import { PersonNodeModel } from "../../nodes/PersonNode/PersonNodeModel";
 import { RelationshipNodeModel } from "../../nodes/RelationshipNode";
@@ -22,7 +21,6 @@ import { JealousUncleNodeModel } from "../../nodes/JealousUncleNode";
 import { LikesNodeModel } from "../../nodes/LikesNode";
 import { DislikesNodeModel } from "../../nodes/DislikesNode";
 import { VariableNodeModel } from "../../nodes/VariableNode";
-import ToastData from "../../utility/alertData";
 import { BoolNodeModel } from "../../nodes/BoolNode";
 import { NumberNodeModel } from "../../nodes/NumberNode";
 import { StringNodeModel } from "../../nodes/StringNode";
@@ -114,14 +112,6 @@ export class EditorWidget extends React.Component<
     }
   }
 
-  // componentDidMount(): void {
-  //   if (this.props.editor.model) {
-  //     this.props.editor.app
-  //       .getActiveDiagram()
-  //       .deserializeModel(this.props.editor.model as any, this.props.editor.app.getDiagramEngine());
-  //   }
-  // }
-
   onDrop(event: React.DragEvent): void {
     const data = JSON.parse(event.dataTransfer.getData("storm-diagram-node"));
 
@@ -207,24 +197,6 @@ export class EditorWidget extends React.Component<
             <AppCanvasWidget>
               <CanvasWidget engine={this.props.editor.app.getDiagramEngine()} />
             </AppCanvasWidget>
-            {/* <ButtonGroup
-              style={{
-                position: "absolute",
-                bottom: "10px",
-                left: "10px",
-                width: "fit-content",
-              }}
-            >
-              <Button variant="primary" onClick={this.onSearch}>
-                Search
-              </Button>
-              <Button variant="primary" onClick={this.onShowCode}>
-                ShowCode
-              </Button>
-              <Button variant="primary" onClick={this.onShowHelp}>
-                Help
-              </Button>
-            </ButtonGroup> */}
           </WidgetLayer>
         </WidgetContent>
       </WidgetBody>

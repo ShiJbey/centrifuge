@@ -6,7 +6,10 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+export const BOOL_NODE_TYPE = 'bool-node'
+
 export interface BoolNodeModelOptions {
+  type: typeof BOOL_NODE_TYPE;
   label: string;
   value: boolean;
 }
@@ -22,13 +25,13 @@ export class BoolNodeModel extends NodeModel<
 
   constructor(
     options: BoolNodeModelOptions = {
+      type: BOOL_NODE_TYPE,
       label: 'Boolean',
       value: false,
     }
   ) {
     super({
       ...options,
-      type: 'bool-node',
     });
 
     this.outPort = new DefaultPortModel({

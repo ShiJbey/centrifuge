@@ -6,7 +6,10 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+export const EVENT_NODE_TYPE = 'event-node';
+
 export interface EventNodeModelOptions {
+  type: typeof EVENT_NODE_TYPE;
   label?: string;
   color?: string;
   eventType?: string;
@@ -27,12 +30,12 @@ export class EventNodeModel extends NodeModel<
 
   constructor(
     options: EventNodeModelOptions = {
+      type: EVENT_NODE_TYPE,
       label: 'Event'
     }
   ) {
     super({
       ...options,
-      type: 'event-node',
     });
 
     this.subjectPort = new DefaultPortModel({

@@ -2,6 +2,7 @@ import { SELECT_EDITOR, ADD_EDITOR, DELETE_EDITOR, EditorActionTypes, UPDATE_EDI
 import { Reducer } from 'react';
 import Application from '../../Application';
 import ElectronAPI from '../../utility/electronApi';
+import { compilePattern } from '../../utility/patternCompiler/patternCompiler';
 
 declare const electron: ElectronAPI;
 
@@ -62,9 +63,11 @@ const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = i
         }
       } else {
         const app = new Application();
+        let code = '';
 
         if (action.payload.model) {
-          app.getActiveDiagram().deserializeModel(action.payload.model as any, app.getDiagramEngine());
+          app.getActiveDiagram().deserializeModel(action.payload.model, app.getDiagramEngine());
+          code = compilePattern(action.payload.model);
         }
 
         // Give the editor a title
@@ -90,6 +93,7 @@ const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = i
           filepath: action.payload.path,
           title,
           app,
+          code
         });
 
 

@@ -13,7 +13,7 @@ import {
 import ElectronAPI, { SaveFileRequest, SaveFileResponse } from '../../utility/electronApi';
 import { EditorState } from '../../redux/editors/editorReducer';
 import { EditorActionTypes } from '../../redux/editors/editorTypes';
-import { Nav, Tab, Button } from 'react-bootstrap';
+import { Nav, Tab, Button, ButtonGroup } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import CodeModal from '../CodeModal/CodeModal';
 import EditorTab from '../EditorTab';
@@ -22,6 +22,7 @@ import EditorWidget from '../EditorWidget/EditorWidget';
 import styles from './PatternEditor.module.scss';
 import { SerializedDiagram } from '../../utility/serialization';
 import classNames from 'classnames';
+import { compilePattern } from '../../utility/patternCompiler/patternCompiler';
 
 declare const electron: ElectronAPI;
 
@@ -92,6 +93,7 @@ export class PatternEditor extends Component<
             filepath: savePath,
             id: newID,
             title: electron.getFileBasename(savePath),
+            code: compilePattern(data),
           });
           this.props.selectEditor(newID);
         }
@@ -112,13 +114,17 @@ export class PatternEditor extends Component<
     this.props.deleteEditor(eventKey);
   }
 
+  showCode() {
+    this.setState({...this.state, showCode: true});
+  }
+
   render() {
     return (
       <>
         <CodeModal
           show={this.state.showCode}
           onHide={() => {
-            this.state = { ...this.state, showCode: false };
+            this.setState({...this.state, showCode: false});
           }}
         />
 
@@ -210,6 +216,22 @@ export class PatternEditor extends Component<
                   })}
                 </Tab.Content>
               </Tab.Container>
+              <ButtonGroup
+              style={{
+                position: "absolute",
+                marginLeft: "10rem",
+                bottom: "10px",
+                left: "10px",
+                width: "fit-content",
+              }}
+            >
+              <Button variant="primary">
+                Search
+              </Button>
+              <Button variant="primary" onClick={this.showCode.bind(this)}>
+                ShowCode
+              </Button>
+            </ButtonGroup>
             </div>
           </div>
         </div>
