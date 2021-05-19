@@ -6,13 +6,25 @@ import styles from './App.module.scss';
 import MetricsDashboard from '../MetricsDashboard';
 import PatternEditor from '../PatternEditor';
 import Help from '../Help';
-import { CLOSE_DIR, DIR_CHANGE, OPEN_DIR, OPEN_PATTERN_FILE, OPEN_TOWN_FILE } from '../../utility/electronChannels';
-import ElectronAPI, { OpenDirectoryResponse, OpenFileResponse } from '../../utility/electronApi';
+import {
+  CLOSE_DIR,
+  DIR_CHANGE,
+  OPEN_DIR,
+  OPEN_PATTERN_FILE,
+  OPEN_TOWN_FILE,
+} from '../../utility/electronChannels';
+import ElectronAPI, {
+  OpenDirectoryResponse,
+  OpenFileResponse,
+} from '../../utility/electronApi';
 import { Dispatch } from 'redux';
 import { loadData, clearData } from '../../redux/database/databaseActions';
 import TownToolbar from '../TownToolbar';
 import { DirectoryTree } from 'directory-tree';
-import { updateDirectoryTree, clearDirectoryTree  } from '../../redux/fileTree/fileTreeActions';
+import {
+  updateDirectoryTree,
+  clearDirectoryTree,
+} from '../../redux/fileTree/fileTreeActions';
 import { addEditor } from '../../redux/editors/editorActions';
 import { SerializedDiagram } from '../../utility/serialization';
 
@@ -27,7 +39,6 @@ interface AppProps {
 }
 
 export class App extends Component<AppProps> {
-
   componentDidMount() {
     this.registerElectronListeners();
   }
@@ -57,8 +68,8 @@ export class App extends Component<AppProps> {
         this.props.loadPattern({
           title: res.payload.name,
           path: res.payload.path,
-          model: res.payload.data
-        })
+          model: res.payload.data,
+        });
       }
     });
 
