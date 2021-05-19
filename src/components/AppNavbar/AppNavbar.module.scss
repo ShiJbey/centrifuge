@@ -1,13 +1,14 @@
 $sidebarWidth: 4rem;
+$sidebarWidthFull: 15rem;
 $font-size: 16px;
 $font-family: "Open Sans";
 $textPrimary: #b6b6b6;
 $textSecondary: #ececec;
-$bgPrimary: hsl(0, 0%, 20%);
+$bgPrimary: hsl(207, 44%, 15%); //hsl(0, 0%, 20%);
 $bgSecondary: #141418;
 $transitionSpeed: 600ms;
 
-.SideNavBar {
+.AppNavbar {
   font-size: 16px;
   font-family: "Open Sans";
   width: $sidebarWidth;
@@ -15,15 +16,15 @@ $transitionSpeed: 600ms;
   top: 0;
   position: fixed;
   background-color: $bgPrimary;
-  transition: width 600ms ease;
+  transition: width $transitionSpeed ease;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   color: $textPrimary;
   border-right: 2px solid $textPrimary;
   z-index: 100;
 }
 
-.SideNavBar_Nav {
+.AppNavbarNav {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -41,6 +42,13 @@ $transitionSpeed: 600ms;
   text-decoration: none;
   filter: grayscale(100%) opacity(0.7);
   transition: $transitionSpeed;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.NavLink.active {
+  filter: grayscale(0%) opacity(1);
 }
 
 .NavLink:hover {
@@ -50,12 +58,48 @@ $transitionSpeed: 600ms;
   text-decoration: none;
 }
 
-.SideNavBar:hover {
-  width: 10rem;
+.AppNavbar:hover {
+  width: $sidebarWidthFull;
 
   .LinkText {
     display: inline;
   }
+
+  .LogoText {
+    left: 0px;
+  }
+
+  .Logo .NavIcon {
+    margin-left: 11.75rem;
+    transform: rotate(720deg);
+    transition: 0.9s;
+  }
+}
+
+.ActiveIndicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  border-radius: 0 50% 50% 0;
+  background: lightgreen;
+}
+
+.Logo {
+  display: flex;
+  text-align: center;
+  height: $sidebarWidth;
+  color: $textSecondary;
+  text-decoration: none;
+  transition: $transitionSpeed;
+  background: $bgSecondary;
+  font-weight: bold;
+  font-size: 1.4rem;
+  letter-spacing: 0.3ch;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
 
@@ -67,7 +111,7 @@ $transitionSpeed: 600ms;
   margin-top: auto;
 }
 
-.NavIcon {
+.NavLink .NavIcon {
   width: 2rem;
   min-width: 2rem;
   margin: 0 1rem;
@@ -77,4 +121,11 @@ $transitionSpeed: 600ms;
   display: none;
   text-decoration: none;
   margin-left: 0.5rem;
+}
+
+.LogoText {
+  display: inline;
+  position: absolute;
+  left: -999px;
+  transition: $transitionSpeed;
 }

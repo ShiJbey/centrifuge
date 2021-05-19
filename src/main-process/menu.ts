@@ -1,44 +1,92 @@
-import {BrowserWindow, Menu, MenuItemConstructorOptions, dialog} from 'electron';
-import { openDataFile } from './utils';
+import { BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron';
+import { CLOSE_DIR, OPEN_DIR, OPEN_PATTERN_FILE, OPEN_TOWN_FILE, SAVE_PATTERN } from '../utility/electronChannels';
+import * as io from './io';
 
 const isMac = process.platform === 'darwin';
 
 export function createMenu(win: BrowserWindow): Menu {
   const template: MenuItemConstructorOptions[] = [
-    ...(isMac ? [{role: 'appMenu'}] as  MenuItemConstructorOptions[]: []),
+    ...(isMac ? ([{ role: 'appMenu' }] as MenuItemConstructorOptions[]) : []),
     {
       role: 'fileMenu',
       label: 'File',
       submenu: [
         {
-          label: 'Save As',
+          label: 'Save Pattern',
+          accelerator: 'CmdOrCtrl+S',
+          click: () => {
+            io.saveFile()
+              .then((res) => {
+                win.webContents.send(SAVE_PATTERN, res);
+              })
+              .catch(console.error);
+          },
+        },
+        {
+          label: 'Save Pattern As...',
+          accelerator: 'CmdOrCtrl+Shift+S',
           click: async () => {
-            const path = dialog.showSaveDialogSync({
-              title: 'Save Diagram',
-              buttonLabel: 'Save',
-              filters: [
-                {
-                  name: 'centrifuge diagram',
-                  extensions: ['ctr']
+            io.savePatternAs(win)
+              .then((res) => {
+                win.webContents.send(SAVE_PATTERN, res);
+              })
+              .catch(console.error);
+          },
+        },
+        {
+          label: 'Open Pattern...',
+          accelerator: 'CmdOrCtrl+O',
+          click: () => {
+            io.openFile(win, [
+              { name: 'Centrifuge Pattern', extensions: ['ctr'] },
+            ])
+              .then((res) => {
+                if (res.status === 'ok')
+                  res.payload.data = JSON.parse(res.payload.data);
+                win.webContents.send(OPEN_PATTERN_FILE, res);
+              })
+              .catch(console.error);
+          },
+        },
+        {
+          label: 'Open Town...',
+          accelerator: 'CmdOrCtrl+Shift+O',
+          click: () => {
+            io.openFile(win, [
+              { name: 'Talktown Town', extensions: ['town'] },
+            ])
+              .then((res) => {
+                if (res.status === 'ok')
+                  res.payload.data = JSON.parse(res.payload.data);
+                win.webContents.send(OPEN_TOWN_FILE, res);
+              })
+              .catch(console.error);
+          },
+        },
+        {
+          label: 'Open Folder...',
+          accelerator: 'CmdOrCtrl+Alt+O',
+          click: () => {
+            io.openDirectory(win)
+              .then((res) => {
+                win.webContents.send(OPEN_DIR, res);
+                // Watch the directory
+                if (res.payload) {
+                  io.watchDirectory(res.payload.path, win.webContents);
                 }
-              ]
-            });
-            win.webContents.send('save_diagram', path);
-          }
+              })
+              .catch(console.error);
+          },
         },
         {
-          label: 'open file',
-          click: async () => {
-            const data = await openDataFile();
-            console.log('sending data')
-            win.webContents.send('diagram_data', data);
-          }
+          label: 'Close Folder',
+          click: () => {
+            io.unWatchDirectory(win.webContents);
+            win.webContents.send(CLOSE_DIR);
+          },
         },
-        {
-          label: 'export metrics as JSON'
-        },
-        isMac ? { role: 'close' } : { role: 'quit' }
-      ]
+        isMac ? { role: 'close' } : { role: 'quit' },
+      ],
     },
     { role: 'editMenu' },
     { role: 'viewMenu' },

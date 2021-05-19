@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import Application from "../Application";
 import {
   DiagramModel,
   DiagramModelGenerics,
@@ -12,24 +11,25 @@ import {
   BaseModelGenerics,
 } from "@projectstorm/react-canvas-core";
 import { Button, ButtonGroup } from "react-bootstrap";
-import AppCanvasWidget from "./AppCanvasWidget";
-import { PersonNodeModel } from "../nodes/PersonNode/PersonNodeModel";
-import { RelationshipNodeModel } from "../nodes/RelationshipNode";
-import { EventNodeModel } from "../nodes/EventNode";
-import { AsymmetricFriendshipNodeModel } from "../nodes/AsymmetricFriendshipNode";
-import { LoveTriangleNodeModel } from "../nodes/LoveTriangleNode";
-import { BusinessRivalryNodeModel } from "../nodes/BusinessRivalryNode";
-import { JealousUncleNodeModel } from "../nodes/JealousUncleNode";
-import { LikesNodeModel } from "../nodes/LikesNode";
-import { DislikesNodeModel } from "../nodes/DislikesNode";
-import { VariableNodeModel } from "../nodes/VariableNode";
-import ToastData from "../utility/alertData";
-import { BoolNodeModel } from "../nodes/BoolNode";
-import { NumberNodeModel } from "../nodes/NumberNode";
-import { StringNodeModel } from "../nodes/StringNode";
-import { ModifierNodeModel } from "../nodes/ModifierNode";
-import NodeTray from "./NodeTray";
+import AppCanvasWidget from "../AppCanvasWidget/AppCanvasWidget";
+import { PersonNodeModel } from "../../nodes/PersonNode/PersonNodeModel";
+import { RelationshipNodeModel } from "../../nodes/RelationshipNode";
+import { EventNodeModel } from "../../nodes/EventNode";
+import { AsymmetricFriendshipNodeModel } from "../../nodes/AsymmetricFriendshipNode";
+import { LoveTriangleNodeModel } from "../../nodes/LoveTriangleNode";
+import { BusinessRivalryNodeModel } from "../../nodes/BusinessRivalryNode";
+import { JealousUncleNodeModel } from "../../nodes/JealousUncleNode";
+import { LikesNodeModel } from "../../nodes/LikesNode";
+import { DislikesNodeModel } from "../../nodes/DislikesNode";
+import { VariableNodeModel } from "../../nodes/VariableNode";
+import ToastData from "../../utility/alertData";
+import { BoolNodeModel } from "../../nodes/BoolNode";
+import { NumberNodeModel } from "../../nodes/NumberNode";
+import { StringNodeModel } from "../../nodes/StringNode";
+import { ModifierNodeModel } from "../../nodes/ModifierNode";
+import NodeTray from "../NodeTray/NodeTray";
 import debounce from "lodash/debounce";
+import { EditorState } from "../../redux/editors/editorReducer";
 
 const WidgetBody = styled.div`
   position: relative;
@@ -51,13 +51,13 @@ const WidgetLayer = styled.div`
 `;
 
 export interface EditorWidgetProps {
-  model?: any;
+  editor: EditorState;
   onUpdate?: (data: any) => void;
-  onClose?: () => void;
-  onNodeAlert?: (data: ToastData) => void;
-  onShowCode?: (code: string) => void;
-  onSearch?: (code: string) => void;
-  onShowHelp?: () => void;
+  // onClose?: () => void;
+  // onNodeAlert?: (data: ToastData) => void;
+  // onShowCode?: (code: string) => void;
+  // onSearch?: (code: string) => void;
+  // onShowHelp?: () => void;
 }
 
 export interface EditorWidgetState {
@@ -68,7 +68,6 @@ export class EditorWidget extends React.Component<
   EditorWidgetProps,
   EditorWidgetState
 > {
-  app: Application;
 
   debounceUpdate = debounce(
     (diagram: DiagramModel<DiagramModelGenerics>) =>
@@ -78,19 +77,31 @@ export class EditorWidget extends React.Component<
 
   constructor(props: EditorWidgetProps) {
     super(props);
-    this.app = new Application();
     this.state = {
       selectedNode: null,
     };
 
-    this.app.getDiagramEngine().registerListener({
-      repaintCanvas: () => {
+    this.props.editor.app.getActiveDiagram()
+
+    this.props.editor.app.getActiveDiagram().getNodes().map((node) => {
+      node.registerListener({
+        eventDidFire: () => {
+          this.handleUpdate();
+        },
+      });
+    })
+
+    this.props.editor.app.getActiveDiagram().registerListener({
+      eventDidFire: () => {
         this.handleUpdate();
       },
-    });
-
-    this.app.getActiveDiagram().registerListener({
-      eventDidFire: () => {
+      nodesUpdated: () => {
+        this.handleUpdate();
+      },
+      linksUpdated: () => {
+        this.handleUpdate();
+      },
+      lockChanged:  () => {
         this.handleUpdate();
       },
     });
@@ -99,17 +110,17 @@ export class EditorWidget extends React.Component<
   handleUpdate(): void {
     // This editor should be marked dirty
     if (this.props.onUpdate) {
-      this.debounceUpdate(this.app.getActiveDiagram());
+      this.debounceUpdate(this.props.editor.app.getActiveDiagram());
     }
   }
 
-  componentDidMount(): void {
-    if (this.props.model) {
-      this.app
-        .getActiveDiagram()
-        .deserializeModel(this.props.model, this.app.getDiagramEngine());
-    }
-  }
+  // componentDidMount(): void {
+  //   if (this.props.editor.model) {
+  //     this.props.editor.app
+  //       .getActiveDiagram()
+  //       .deserializeModel(this.props.editor.model as any, this.props.editor.app.getDiagramEngine());
+  //   }
+  // }
 
   onDrop(event: React.DragEvent): void {
     const data = JSON.parse(event.dataTransfer.getData("storm-diagram-node"));
@@ -148,10 +159,16 @@ export class EditorWidget extends React.Component<
       return;
     }
 
-    const point = this.app.getDiagramEngine().getRelativeMousePoint(event);
+    const point = this.props.editor.app.getDiagramEngine().getRelativeMousePoint(event);
     node.setPosition(point);
 
-    this.app.getDiagramEngine().getModel().addNode(node);
+    node.registerListener({
+      eventDidFire: () => {
+        this.handleUpdate();
+      },
+    });
+
+    this.props.editor.app.getDiagramEngine().getModel().addNode(node);
     this.forceUpdate();
   }
 
@@ -159,23 +176,23 @@ export class EditorWidget extends React.Component<
     event.preventDefault();
   }
 
-  onSearch(): void {
-    if (this.props.onSearch) {
-      this.props.onSearch("code");
-    }
-  }
+  // onSearch(): void {
+  //   if (this.props.onSearch) {
+  //     this.props.onSearch("code");
+  //   }
+  // }
 
-  onShowCode(): void {
-    if (this.props.onShowCode) {
-      this.props.onShowCode("code");
-    }
-  }
+  // onShowCode(): void {
+  //   if (this.props.onShowCode) {
+  //     this.props.onShowCode("code");
+  //   }
+  // }
 
-  onShowHelp(): void {
-    if (this.props.onShowHelp) {
-      this.props.onShowHelp();
-    }
-  }
+  // onShowHelp(): void {
+  //   if (this.props.onShowHelp) {
+  //     this.props.onShowHelp();
+  //   }
+  // }
 
   render(): ReactNode {
     return (
@@ -188,7 +205,7 @@ export class EditorWidget extends React.Component<
             onDragOver={this.onDragOver}
           >
             <AppCanvasWidget>
-              <CanvasWidget engine={this.app.getDiagramEngine()} />
+              <CanvasWidget engine={this.props.editor.app.getDiagramEngine()} />
             </AppCanvasWidget>
             {/* <ButtonGroup
               style={{

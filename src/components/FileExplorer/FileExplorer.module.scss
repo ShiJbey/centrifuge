@@ -1,0 +1,52 @@
+$explorerWidth: 10rem;
+
+.FileExplorer {
+  color: white;
+  width: $explorerWidth;
+  height: 100%;
+  background: linear-gradient(
+    hsl(0, 0%, 15%),
+    hsl(0, 0%, 13%) 10%,
+    hsl(0, 0%, 9%) 90%
+  );
+  border-right: 2px solid gray;
+}
+
+.DTreeContainer {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+
+  .DTreeNode:first .NodeName:first {
+    background: #777;
+  }
+}
+
+.DTreeNode {
+  width: 100%;
+
+  .NodeName {
+    width: 100%;
+    text-align: left;
+    text-overflow: ellipsis;
+    display: flex;
+    // white-space: nowrap;
+    cursor: pointer;
+
+    &.RootDir {
+      background: hsl(0, 0%, 50%);
+    }
+
+    &.RootDir:hover {
+      background: hsl(0, 0%, 45%);
+    }
+
+    &:hover {
+      background: hsl(0, 0%, 18%);
+    }
+  }
+}
+
+.DTreeToggler.active {
+  transform: rotate(90deg);
+}

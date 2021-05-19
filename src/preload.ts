@@ -1,37 +1,73 @@
-import { ipcRenderer, contextBridge, dialog } from 'electron';
+import { ipcRenderer, contextBridge } from 'electron';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import ElectronAPI, { OpenFileResponse, SaveFileRequest } from './utility/electronApi';
+import { OPEN_SAVE_AS, OPEN_TOWN_FILE } from './utility/electronChannels';
 
-contextBridge.exposeInMainWorld('electron', {
-  openFile: () => {
-    return dialog.showSaveDialog({
-      title: 'Save Diagram',
-      buttonLabel: 'Save',
-      filters: [
-        {
-          name: 'Diagram Files',
-          extensions: ['json', 'JSON', 'centi']
-        }
-      ]
-    })
-  },
-  send: (channel: string, ...data: any[]) => {
-    // whitelist channels
-    const validChannels = ['get_init_file'];
-    if (validChannels.includes(channel)) {
-      ipcRenderer.send(channel, data);
+const api: ElectronAPI = {
+  listDirectory: (dir: string): string[] => {
+    try {
+      return fs
+        .readdirSync(dir)
+        .filter((filename) => path.extname(filename) === '.ctr');
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   },
-  sendSync: (channel: string, ...data: any[]) => {
-    // whitelist channels
-    const validChannels = ['get_init_file'];
-    if (validChannels.includes(channel)) {
-      return ipcRenderer.sendSync(channel, data);
+  readDiagramFile: (filename: string): any => {
+    try {
+      return JSON.parse(fs.readFileSync(filename, { encoding: 'utf-8' }));
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   },
-  receive: (channel: string, func: (...v: any[]) => void) => {
-    const validChannels = ['diagram_data', 'save_diagram'];
-    if (validChannels.includes(channel)) {
-      // Deliberately strip event as it includes `sender`
-      ipcRenderer.on(channel, (event, ...args) => func(...args));
+  saveAs: async (): Promise<SaveFileRequest> => {
+    try {
+      return ipcRenderer.invoke(OPEN_SAVE_AS);
+    } catch (error) {
+      console.error(error);
     }
   },
-});
+  writeFile: (filename: string, data: any): void => {
+    try {
+      fs.writeFileSync(filename, data);
+      console.log('Write Done');
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
+  openTownFile: (): Promise<OpenFileResponse> => {
+    return ipcRenderer.invoke(OPEN_TOWN_FILE);
+  },
+  invoke: (channel: string, ...data: any[]): Promise<any> => {
+    return ipcRenderer.invoke(channel, data);
+  },
+  send: (channel: string, ...data: any[]): void => {
+    ipcRenderer.send(channel, data);
+  },
+  sendSync: (channel: string, ...data: any[]): any => {
+    return ipcRenderer.sendSync(channel, data);
+  },
+  receive: (
+    channel: string,
+    func: (event: Electron.IpcRendererEvent, ...v: any[]) => void
+  ): void => {
+    ipcRenderer.on(channel, func);
+  },
+  removeListener: (channel: string, cb: (...args: any[]) => void) =>
+    ipcRenderer.removeListener(channel, cb),
+  removeAllListeners: (channel: string) =>
+    ipcRenderer.removeAllListeners(channel),
+  createSHA1: (str: string) => {
+    return crypto.createHash('sha1').update(str).digest('hex')
+  },
+  getFileBasename: (filepath: string) => {
+    return path.basename(filepath);
+  }
+};
+
+contextBridge.exposeInMainWorld('electron', api);

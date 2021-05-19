@@ -9,8 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "clean": "rimraf ./.webpack ./out yarn-error.log ./dist",
-    "lint": "eslint --ext ./src"
+    "clean": "rimraf ./.webpack ./out yarn-error.log ./dist ./tsconfig.tsbuildinfo",
+    "lint": "eslint ./src/"
   },
   "keywords": [],
   "author": {
@@ -53,7 +53,7 @@
               "entryPoints": [
                 {
                   "html": "./src/index.html",
-                  "js": "./src/renderer.ts",
+                  "js": "./src/renderer.tsx",
                   "name": "main_window",
                   "preload": {
                     "js": "./src/preload.ts"
@@ -97,15 +97,18 @@
     "babel-loader": "^8.2.2",
     "bootstrap": "^4.6.0",
     "chart.js": "^3.2.1",
+    "chokidar": "^3.5.1",
     "classnames": "^2.3.1",
     "closest": "^0.0.1",
     "css-loader": "^4.2.1",
     "dagre": "^0.8.5",
+    "datascript": "^1.1.0",
+    "directory-tree": "^2.2.9",
     "electron": "12.0.2",
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",
     "fork-ts-checker-webpack-plugin": "^5.0.14",
-    "fs-extra": "^9.1.0",
+    "fs-extra": "^10.0.0",
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.1",
     "jquery": "1.9.1",
