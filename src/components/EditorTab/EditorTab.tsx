@@ -14,7 +14,6 @@ const EditorTab: React.FC<EditorTabTitleProps> = ({
   isDirty,
   onClose,
 }) => {
-  const [dirty] = useState<boolean>(isDirty || false);
   const [showCloseBtn, setShowCloseBtn] = useState<boolean>(false);
 
   return (
@@ -25,7 +24,7 @@ const EditorTab: React.FC<EditorTabTitleProps> = ({
     >
       <div className={styles.Title}>
         {title}
-        {dirty && <span>*</span>}
+        {isDirty && <span>*</span>}
       </div>
       <div>
         {showCloseBtn && (

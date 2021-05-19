@@ -11,42 +11,41 @@ import {
   SelectEditorAction,
 } from './editorTypes';
 
-export const addEditor = (
-  title: string,
+export const addEditor = (options?: {
+  title?: string,
   path?: string,
   model?: SerializedDiagram
-): AddEditorAction => {
+}): AddEditorAction => {
   return {
     type: ADD_EDITOR,
     payload: {
-      title,
-      path,
-      model,
+      ...options,
     },
   };
 };
 
 export const selectEditor = (
-  index: number,
+  id: string,
 ): SelectEditorAction => {
   return {
     type: SELECT_EDITOR,
-    payload: { index },
+    payload: { id },
   };
 };
 
-export const deleteEditor = (index: number): DeleteEditorAction => {
+export const deleteEditor = (id: string): DeleteEditorAction => {
   return {
     type: DELETE_EDITOR,
-    payload: { index },
+    payload: { id },
   };
 };
 
-export const updateEditor = (newState?: EditorState): UpdateEditorAction => {
+export const updateEditor = (id: string, newState?: EditorState): UpdateEditorAction => {
   return {
     type: UPDATE_EDITOR,
     payload: {
-      ...newState,
+      id,
+      changes: {...newState},
     },
   };
 };

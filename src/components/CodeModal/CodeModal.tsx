@@ -10,16 +10,14 @@ export interface CodeModalProps {
 
 const CodeModal: React.FC<CodeModalProps> = ({ onHide, show }) => {
 
-  const activeEditor = useSelector(
-    (state: RootState) => state.editor.activeEditor
-  );
-  const editors = useSelector((state: RootState) => state.editor.editors);
-
-  let code = '';
-
-  if (editors[activeEditor]) {
-    code = editors[activeEditor].code;
-  }
+  const code = useSelector((state: RootState) => {
+    for (const x of state.editor.editors) {
+      if (x.id === state.editor.activeEditor) {
+        return x.code;
+      }
+    }
+    return null;
+  });
 
   return (
     <Modal

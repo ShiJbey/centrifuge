@@ -1,8 +1,13 @@
 import { SELECT_EDITOR, ADD_EDITOR, DELETE_EDITOR, EditorActionTypes, UPDATE_EDITOR } from './editorTypes';
 import { Reducer } from 'react';
 import Application from '../../Application';
+import ElectronAPI from '../../utility/electronApi';
+
+declare const electron: ElectronAPI;
 
 export interface EditorState {
+  /** Unique identifier for this editor */
+  id: string;
   /** Is this editor currently active in the GUI */
   active: boolean;
   /** Title displayed in the editor's tab */
@@ -20,12 +25,14 @@ export interface EditorState {
 }
 
 export interface EditorsReduxState {
-  activeEditor?: number;
+  activeEditor?: string;
   editors: EditorState[];
+  tempEditors: number;
 }
 
 const initialState: EditorsReduxState = {
   editors: [],
+  tempEditors: 0,
 };
 
 const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = initialState, action) => {
@@ -43,12 +50,13 @@ const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = i
         if (editor.filepath && editor.filepath === action.payload.path) {
           editorExists = true;
           editor.active = true;
-          activeEditor = i;
+          activeEditor = editor.id;
         }
       }
 
       if (editorExists) {
         return {
+          ...state,
           activeEditor,
           editors: modifiedEditors,
         }
@@ -59,69 +67,114 @@ const editorsReducer: Reducer<EditorsReduxState, EditorActionTypes> = (state = i
           app.getActiveDiagram().deserializeModel(action.payload.model as any, app.getDiagramEngine());
         }
 
+        // Give the editor a title
+        let title = action.payload.title ?? 'NewPattern';
+        if (state.tempEditors > 0) {
+          title = `${title}_${state.tempEditors}`;
+        }
+
+        // Create an editor ID using the hash of the path
+        let id = '';
+        if (action.payload.path) {
+          id = electron.createSHA1(action.payload.path);
+        } else {
+          id = electron.createSHA1(title);
+        }
+
         // Create a new editor and push it to the array
         modifiedEditors.push({
+          id,
           active: true,
           dirty: false,
           model: action.payload.model,
           filepath: action.payload.path,
-          title: action.payload.title,
+          title,
           app,
         });
 
 
-        const newState = {
-          activeEditor: modifiedEditors.length - 1,
+        return {
+          ...state,
+          activeEditor: id,
           editors: modifiedEditors,
+          tempEditors: (action.payload.path) ? state.tempEditors : state.tempEditors + 1,
         };
-
-        return newState;
       }
     }
+
     case DELETE_EDITOR: {
-      const modifiedEditors = [...state.editors];
-      modifiedEditors.splice(action.payload.index, 1);
+      const modifiedEditors = [...state.editors]
+
+      let deletedEditorIndex = -1;
+
+      for (let i = 0; i < state.editors.length; i++) {
+        if (state.editors[i].id === action.payload.id) {
+          deletedEditorIndex = i;
+        }
+      }
+
+
+      modifiedEditors.splice(deletedEditorIndex, 1);
+
 
       if (modifiedEditors.length) {
-        const activeEditor = Math.max(0, Math.min(state.activeEditor ?? -1, modifiedEditors.length - 1))
+        if (state.activeEditor === action.payload.id) {
+          const activeEditorIndex = Math.max(0, Math.min(deletedEditorIndex, modifiedEditors.length - 1));
+          modifiedEditors[activeEditorIndex].active = true;
+          return {
+            ...state,
+            activeEditor: modifiedEditors[activeEditorIndex].id,
+            editors: modifiedEditors,
+          };
+        }
         return {
-          activeEditor,
+          ...state,
           editors: modifiedEditors,
-        };
+        }
       } else {
         return {
+          ...state,
           editors: modifiedEditors,
         };
       }
     }
-    case UPDATE_EDITOR: {
-      const modifiedEditors = [...state.editors];
 
-      modifiedEditors[state.activeEditor] = {
-        ...modifiedEditors[state.activeEditor],
-        ...action.payload,
-      }
+    case UPDATE_EDITOR: {
+      const modifiedEditors = [...state.editors]
+        .map((editor) => {
+          if (editor.id === action.payload.id) {
+            return {
+              ...editor,
+              ...action.payload.changes,
+            };
+          } else {
+            return editor;
+          }
+        });
 
       return {
         ...state,
         editors: modifiedEditors,
       };
     }
+
     case SELECT_EDITOR: {
       const modifiedEditors = [...state.editors];
 
-      // Unselect all existing editors
       for (const editor of modifiedEditors) {
         editor.active = false;
+        if (editor.id === action.payload.id) {
+          editor.active = true;
+        }
       }
 
-      modifiedEditors[action.payload.index].active = true;
-
       return {
-        activeEditor: action.payload.index,
+        ...state,
+        activeEditor: action.payload.id,
         editors: modifiedEditors,
       }
     }
+
     default:
       return state;
   }

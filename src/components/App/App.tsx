@@ -13,12 +13,15 @@ import { loadData, clearData } from '../../redux/database/databaseActions';
 import TownToolbar from '../TownToolbar';
 import { DirectoryTree } from 'directory-tree';
 import { updateDirectoryTree, clearDirectoryTree  } from '../../redux/fileTree/fileTreeActions';
+import { addEditor } from '../../redux/editors/editorActions';
+import { SerializedDiagram } from '../../utility/serialization';
 
 declare const electron: ElectronAPI;
 
 interface AppProps {
   loadTown: typeof loadData;
   clearTown: typeof clearData;
+  loadPattern: typeof addEditor;
   updateFileTree: typeof updateDirectoryTree;
   clearFileTree: typeof clearDirectoryTree;
 }
@@ -49,7 +52,13 @@ export class App extends Component<AppProps> {
     });
 
     electron.receive(OPEN_PATTERN_FILE, (_, res: OpenFileResponse) => {
-      console.log(res);
+      if (res.status === 'ok') {
+        this.props.loadPattern({
+          title: res.payload.name,
+          path: res.payload.path,
+          model: res.payload.data
+        })
+      }
     });
 
     electron.receive(OPEN_TOWN_FILE, (_, res: OpenFileResponse) => {
@@ -94,6 +103,11 @@ const mapStateToProps = () => ({});
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   loadTown: (data: { [attr: string]: any }) => dispatch(loadData(data)),
   clearTown: () => dispatch(clearData()),
+  loadPattern: (options?: {
+    title?: string;
+    path?: string;
+    model?: SerializedDiagram;
+  }) => dispatch(addEditor(options)),
   updateFileTree: (tree: DirectoryTree) => dispatch(updateDirectoryTree(tree)),
   clearFileTree: () => dispatch(clearDirectoryTree()),
 });

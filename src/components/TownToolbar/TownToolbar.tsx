@@ -12,7 +12,7 @@ export class TownToolbar extends Component {
     try {
       const res = await electron.openTownFile();
       if (res.status === 'ok') {
-        const sim = JSON.parse(res.payload);
+        const sim = JSON.parse(res.payload.data);
         console.log(sim);
         // this.props.loadTown(sim);
       }

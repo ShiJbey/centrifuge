@@ -1,5 +1,5 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron';
-import { CLOSE_DIR, OPEN_DIR, OPEN_PATTERN_FILE, SAVE_PATTERN } from '../utility/electronChannels';
+import { CLOSE_DIR, OPEN_DIR, OPEN_PATTERN_FILE, OPEN_TOWN_FILE, SAVE_PATTERN } from '../utility/electronChannels';
 import * as io from './io';
 
 const isMac = process.platform === 'darwin';
@@ -41,6 +41,8 @@ export function createMenu(win: BrowserWindow): Menu {
               { name: 'Centrifuge Pattern', extensions: ['ctr'] },
             ])
               .then((res) => {
+                if (res.status === 'ok')
+                  res.payload.data = JSON.parse(res.payload.data);
                 win.webContents.send(OPEN_PATTERN_FILE, res);
               })
               .catch(console.error);
@@ -54,7 +56,9 @@ export function createMenu(win: BrowserWindow): Menu {
               { name: 'Talktown Town', extensions: ['town'] },
             ])
               .then((res) => {
-                win.webContents.send(OPEN_PATTERN_FILE, res);
+                if (res.status === 'ok')
+                  res.payload.data = JSON.parse(res.payload.data);
+                win.webContents.send(OPEN_TOWN_FILE, res);
               })
               .catch(console.error);
           },

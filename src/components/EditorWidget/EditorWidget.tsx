@@ -81,14 +81,27 @@ export class EditorWidget extends React.Component<
       selectedNode: null,
     };
 
-    this.props.editor.app.getDiagramEngine().registerListener({
-      repaintCanvas: () => {
-        this.handleUpdate();
-      },
-    });
+    this.props.editor.app.getActiveDiagram()
+
+    this.props.editor.app.getActiveDiagram().getNodes().map((node) => {
+      node.registerListener({
+        eventDidFire: () => {
+          this.handleUpdate();
+        },
+      });
+    })
 
     this.props.editor.app.getActiveDiagram().registerListener({
       eventDidFire: () => {
+        this.handleUpdate();
+      },
+      nodesUpdated: () => {
+        this.handleUpdate();
+      },
+      linksUpdated: () => {
+        this.handleUpdate();
+      },
+      lockChanged:  () => {
         this.handleUpdate();
       },
     });
@@ -148,6 +161,12 @@ export class EditorWidget extends React.Component<
 
     const point = this.props.editor.app.getDiagramEngine().getRelativeMousePoint(event);
     node.setPosition(point);
+
+    node.registerListener({
+      eventDidFire: () => {
+        this.handleUpdate();
+      },
+    });
 
     this.props.editor.app.getDiagramEngine().getModel().addNode(node);
     this.forceUpdate();

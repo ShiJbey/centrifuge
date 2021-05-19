@@ -3,14 +3,13 @@ import React, { Component, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { FaChevronRight } from 'react-icons/fa';
-import ElectronAPI from '../../utility/electronApi';
+import ElectronAPI, { OpenFileResponse }from '../../utility/electronApi';
 import { RootState } from '../../redux/store';
 import styles from './FileExplorer.module.scss';
 import { OPEN_DIR, OPEN_PATTERN_FILE } from '../../utility/electronChannels';
 import classNames from 'classnames';
 import { SerializedDiagram } from '../../utility/serialization';
 import { addEditor } from '../../redux/editors/editorActions';
-import { OpenFileResponse } from '../../main-process/io';
 
 declare const electron: ElectronAPI;
 
@@ -32,7 +31,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, depth }) => {
   const openFile = async (path: string) => {
     const response: OpenFileResponse = await electron.invoke(OPEN_PATTERN_FILE, path);
     if (response.status === 'ok') {
-      dispatch(addEditor(node.name, node.path, response.payload));
+      dispatch(addEditor({title: node.name, path: node.path, model: response.payload.data}));
     } else {
       console.error(response.msg);
     }

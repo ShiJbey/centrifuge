@@ -1,4 +1,5 @@
-import { DirectoryTree } from "directory-tree";
+import { DirectoryTree } from 'directory-tree';
+import crypto from 'crypto';
 
 export default interface ElectronAPI {
   listDirectory: (dir: string) => string[];
@@ -9,23 +10,39 @@ export default interface ElectronAPI {
   invoke: (channel: string, ...data: any[]) => Promise<any>;
   send: (channel: string, ...data: any[]) => void;
   sendSync: (channel: string, ...data: any[]) => any;
-  receive: (channel: string, func: (event: Electron.IpcRendererEvent, ...v: any[]) => void) => void;
+  receive: (
+    channel: string,
+    func: (event: Electron.IpcRendererEvent, ...v: any[]) => void
+  ) => void;
   removeListener: (channel: string, cb: (...args: any[]) => void) => void;
   removeAllListeners: (channel: string) => void;
+  createSHA1: (str: string) => string;
+  getFileBasename: (path: string) => string;
 }
 
 export interface OpenDirectoryResponse {
-  payload?: DirectoryTree
+  payload?: DirectoryTree;
   status: 'ok' | 'error' | 'canceled';
   msg?: string;
 }
 
 export interface OpenFileResponse {
   msg?: string;
-  payload?: any;
+  payload?: {
+    data: any;
+    path: string;
+    name: string;
+    extension: string;
+  };
   status: 'ok' | 'error' | 'cancel';
 }
 
 export interface SaveFileRequest {
   path?: string;
+}
+
+export interface SaveFileResponse {
+  msg?: string;
+  payload?: any;
+  status: 'ok' | 'error';
 }

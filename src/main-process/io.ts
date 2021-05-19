@@ -1,35 +1,19 @@
 import { BrowserWindow, dialog, WebContents } from 'electron';
-import * as fs from 'fs';
-import dirTree, { DirectoryTree } from 'directory-tree';
+import fs from 'fs';
+import path from 'path';
+import dirTree from 'directory-tree';
 import chokidar from 'chokidar';
 import { DIR_CHANGE } from '../utility/electronChannels';
+import {
+  OpenDirectoryResponse,
+  OpenFileResponse,
+  SaveFileRequest,
+} from '../utility/electronApi';
 
 // Map watcher objects to windows
 const watchers: {
   [key: number]: { watcher: chokidar.FSWatcher; path: string };
 } = {};
-
-export interface OpenDirectoryResponse {
-  payload?: DirectoryTree;
-  status: 'ok' | 'error' | 'canceled';
-  msg?: string;
-}
-
-export interface OpenFileResponse {
-  msg?: string;
-  payload?: any;
-  status: 'ok' | 'error' | 'cancel';
-}
-
-export interface SaveFileRequest {
-  path?: string;
-}
-
-export interface SaveFileResponse {
-  msg?: string;
-  payload?: any;
-  status: 'ok' | 'error';
-}
 
 export async function openDirectory(
   win?: BrowserWindow
@@ -70,13 +54,18 @@ export async function openFile(
     });
 
     if (!ret.canceled) {
-      const [path] = ret.filePaths;
+      const [filepath] = ret.filePaths;
 
-      const data = JSON.parse(fs.readFileSync(path, { encoding: 'utf-8' }));
+      const data = fs.readFileSync(filepath, { encoding: 'utf-8' });
 
       const response: OpenFileResponse = {
         status: 'ok',
-        payload: data,
+        payload: {
+          data,
+          path: filepath,
+          name: path.basename(filepath),
+          extension: path.extname(filepath),
+        },
       };
 
       return response;
@@ -117,8 +106,9 @@ export async function savePatternAs(
       return request;
     }
   } catch (error) {
-    return null;
+    console.error(error);
   }
+  return {};
 }
 
 export function watchDirectory(path: string, renderer: WebContents): void {

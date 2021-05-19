@@ -1,6 +1,7 @@
 import { ipcRenderer, contextBridge } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import ElectronAPI, { OpenFileResponse, SaveFileRequest } from './utility/electronApi';
 import { OPEN_SAVE_AS, OPEN_TOWN_FILE } from './utility/electronChannels';
 
@@ -25,8 +26,7 @@ const api: ElectronAPI = {
   },
   saveAs: async (): Promise<SaveFileRequest> => {
     try {
-      const path = await ipcRenderer.invoke(OPEN_SAVE_AS);
-      return path;
+      return ipcRenderer.invoke(OPEN_SAVE_AS);
     } catch (error) {
       console.error(error);
     }
@@ -62,6 +62,12 @@ const api: ElectronAPI = {
     ipcRenderer.removeListener(channel, cb),
   removeAllListeners: (channel: string) =>
     ipcRenderer.removeAllListeners(channel),
+  createSHA1: (str: string) => {
+    return crypto.createHash('sha1').update(str).digest('hex')
+  },
+  getFileBasename: (filepath: string) => {
+    return path.basename(filepath);
+  }
 };
 
 contextBridge.exposeInMainWorld('electron', api);
