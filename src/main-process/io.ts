@@ -124,5 +124,7 @@ export function unWatchDirectory(renderer: WebContents): void {
   const path = watchers[processId].path;
   const watcher = watchers[processId].watcher;
   watcher.unwatch(path);
+  watcher.unwatch('*');
+  watcher.removeAllListeners();
   delete watchers[processId];
 }
