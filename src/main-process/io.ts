@@ -34,6 +34,10 @@ export async function openDirectory(
       };
 
       return response;
+    } else {
+      return {
+        status: 'canceled',
+      };
     }
   } catch (error) {
     return {

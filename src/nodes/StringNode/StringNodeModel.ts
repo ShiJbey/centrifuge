@@ -5,6 +5,7 @@ import {
 } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
+import { SerializedNodeModel } from '../../utility/serialization';
 
 export const STRING_NODE_TYPE = 'string-node';
 
@@ -44,7 +45,7 @@ export class StringNodeModel extends NodeModel<
     this.addPort(this.outPort);
   }
 
-  public serialize(): any {
+  public serialize(): SerializedNodeModel & StringNodeModelOptions  {
     return {
       ...super.serialize(),
       ...this.options,
@@ -53,5 +54,7 @@ export class StringNodeModel extends NodeModel<
 
   public deserialize(event: DeserializeEvent<this>): void {
     super.deserialize(event);
+    this.options.label = event.data.label;
+    this.options.value = event.data.value;
   }
 }

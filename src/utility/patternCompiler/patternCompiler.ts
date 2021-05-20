@@ -67,6 +67,10 @@ export function compilePattern(diagram: SerializedDiagram): string {
   const nodes = getNodes(diagram);
   const links = getLinks(diagram);
 
+  for (const link of Object.values(links)) {
+    syntaxTree.addDependency(link.id, link.source, link.target);
+  }
+
   for (const node of Object.values(nodes)) {
     switch (node.type) {
       case PERSON_NODE_TYPE: {
@@ -75,6 +79,16 @@ export function compilePattern(diagram: SerializedDiagram): string {
       }
       case RELATIONSHIP_NODE_TYPE: {
         const relationshipNode = node as SerializedNodeModel & RelationshipNodeModelOptions;
+        let owner: string;
+        let target: string;
+        for (const port of relationshipNode.ports) {
+          if (port.name === 'owner' && port.links.length) {
+            owner = port.links[0];
+          } else if (port.name === 'target' && port.links.length) {
+            target = port.links[0];
+          }
+        }
+        syntaxTree.insertRelationshipNode(relationshipNode.id, relationshipNode.label, owner, target);
         break;
       }
       case EVENT_NODE_TYPE: {
@@ -83,27 +97,30 @@ export function compilePattern(diagram: SerializedDiagram): string {
       }
       case VARIABLE_NODE_TYPE: {
         const variableNode = node as SerializedNodeModel & VariableNodeModelOptions;
-        // These have no dependencies so we bind their variable names first
-        syntaxTree.insertVariableNode(variableNode.id, variableNode.type);
+        syntaxTree.insertVariableNode(variableNode.id, variableNode.name);
         break;
       }
       case STRING_NODE_TYPE: {
         const stringNode = node as SerializedNodeModel & StringNodeModelOptions;
+        syntaxTree.insertStringNode(stringNode.id, stringNode.value);
         break;
       }
       case BOOL_NODE_TYPE: {
         const boolNode = node as SerializedNodeModel & BoolNodeModelOptions;
+        syntaxTree.insertBoolNode(boolNode.id, boolNode.value);
         break;
       }
       case NUMBER_NODE_TYPE: {
         const numberNode = node as SerializedNodeModel & NumberNodeModelOptions;
+        syntaxTree.insertNumberNode(numberNode.id, numberNode.value);
         break;
       }
       default:
         break;
     }
-
-    console.log(syntaxTree);
+  }
+  
+  console.log(syntaxTree.toString());
 
     // if (node.type === 'person-node') {
     //   personCount++;
@@ -118,7 +135,7 @@ export function compilePattern(diagram: SerializedDiagram): string {
     //   const lvar = `?event${eventCount}`;
     //   nodeIDToLvarMap[node.id] = lvar;
     // }
-  }
+  
 
   // Loop through all the links and map port IDs to source node IDs
   // for (const link of Object.values<SerializedLinkModel>(links)) {

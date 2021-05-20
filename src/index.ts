@@ -96,10 +96,15 @@ ipcMain.handle(
   OPEN_PATTERN_FILE,
   async (_, args: any[]): Promise<OpenFileResponse> => {
     try {
-      const path = args[0];
+      const filepath = args[0];
       return {
         status: 'ok',
-        payload: JSON.parse(fs.readFileSync(path, { encoding: 'utf-8' })),
+        payload: {
+          data: JSON.parse(fs.readFileSync(filepath, { encoding: 'utf-8' })),
+          path: filepath,
+          name: path.basename(filepath),
+          extension: path.extname(filepath),
+        },
       };
     } catch (error) {
       return {

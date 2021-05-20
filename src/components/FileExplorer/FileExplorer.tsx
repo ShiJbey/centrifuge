@@ -1,15 +1,14 @@
-import { DirectoryTree } from 'directory-tree';
-import React, { Component, useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { connect, useDispatch } from 'react-redux';
-import { FaChevronRight } from 'react-icons/fa';
-import ElectronAPI, { OpenFileResponse }from '../../utility/electronApi';
-import { RootState } from '../../redux/store';
-import styles from './FileExplorer.module.scss';
-import { OPEN_DIR, OPEN_PATTERN_FILE } from '../../utility/electronChannels';
-import classNames from 'classnames';
-import { SerializedDiagram } from '../../utility/serialization';
-import { addEditor } from '../../redux/editors/editorActions';
+import { DirectoryTree } from "directory-tree";
+import React, { Component, useState } from "react";
+import { Button } from "react-bootstrap";
+import { connect, useDispatch } from "react-redux";
+import { FaChevronRight } from "react-icons/fa";
+import ElectronAPI, { OpenFileResponse } from "../../utility/electronApi";
+import { RootState } from "../../redux/store";
+import styles from "./FileExplorer.module.scss";
+import { OPEN_DIR, OPEN_PATTERN_FILE } from "../../utility/electronChannels";
+import classNames from "classnames";
+import { addEditor } from "../../redux/editors/editorActions";
 
 declare const electron: ElectronAPI;
 
@@ -26,12 +25,21 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, depth }) => {
   const [collapsed, setCollapsed] = useState(false);
   const dispatch = useDispatch();
   const hasChildren = node?.children?.length ? true : false;
-  const isDirectory = node.type === 'directory';
+  const isDirectory = node.type === "directory";
 
   const openFile = async (path: string) => {
-    const response: OpenFileResponse = await electron.invoke(OPEN_PATTERN_FILE, path);
-    if (response.status === 'ok') {
-      dispatch(addEditor({title: node.name, path: node.path, model: response.payload.data}));
+    const response: OpenFileResponse = await electron.invoke(
+      OPEN_PATTERN_FILE,
+      path
+    );
+    if (response.status === "ok") {
+      dispatch(
+        addEditor({
+          title: node.name,
+          path: node.path,
+          model: response.payload.data,
+        })
+      );
     } else {
       console.error(response.msg);
     }
@@ -40,22 +48,24 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, depth }) => {
   return (
     <li className={classNames(styles.DTreeNode)}>
       <div
-        className={classNames(styles.NodeName, {[styles.RootDir]: depth === 0})}
-        style={{paddingLeft: `${10 * depth}px`}}
+        className={classNames(styles.NodeName, {
+          [styles.RootDir]: depth === 0,
+        })}
+        style={{ paddingLeft: `${10 * depth}px` }}
         onClick={() => {
           if (isDirectory) {
             setCollapsed(!collapsed);
           }
         }}
         onDoubleClick={() => {
-          if (node.extension === '.ctr') {
+          if (node.extension === ".ctr") {
             openFile(node.path);
           }
         }}
       >
         {isDirectory && (
           <div
-            className={classNames('d-inline', 'mx-1', styles.DTreeToggler, {
+            className={classNames("d-inline", "mx-1", styles.DTreeToggler, {
               [styles.active]: !collapsed,
             })}
           >
@@ -69,7 +79,11 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, depth }) => {
         <ul className={classNames(styles.DTreeContainer)}>
           {node.children.map((child, index) => {
             return (
-              <TreeNode key={node.name + '_child_' + index} node={child} depth={depth + 1}/>
+              <TreeNode
+                key={node.name + "_child_" + index}
+                node={child}
+                depth={depth + 1}
+              />
             );
           })}
         </ul>
@@ -91,7 +105,7 @@ export class FileExplorer extends Component<FileExplorerProps> {
             <TreeNode node={this.props.directoryTree} depth={0} />
           </ul>
         ) : (
-          <div style={{ padding: '16px' }}>
+          <div style={{ padding: "16px" }}>
             <p>No Open Folder</p>
             <Button variant="primary" onClick={this.openDirectory}>
               Open Folder

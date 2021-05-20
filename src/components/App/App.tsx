@@ -59,7 +59,6 @@ export class App extends Component<AppProps> {
     });
 
     electron.receive(DIR_CHANGE, (_, change: DirectoryTree) => {
-      console.log(change);
       this.props.updateFileTree(change);
     });
 

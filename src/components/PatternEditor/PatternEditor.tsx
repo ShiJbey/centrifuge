@@ -200,7 +200,6 @@ export class PatternEditor extends Component<
                         <EditorWidget
                           editor={editor}
                           onUpdate={(data: any) => {
-                            console.log('Updating editor:', editor.title);
                             this.props.updateEditor(
                               editor.id,
                               {
