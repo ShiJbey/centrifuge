@@ -65,9 +65,6 @@ export class RelationshipNodeWidget extends React.Component<RelationshipNodeWidg
 
   public render(): React.ReactNode {
     const nodeOptions = this.props.node.getOptions();
-    const person1Port = this.props.node.person1Port;
-    const person2Port = this.props.node.person2Port;
-
     return (
       <Node
         data-person-node-name={nodeOptions.label}
@@ -81,17 +78,30 @@ export class RelationshipNodeWidget extends React.Component<RelationshipNodeWidg
           <PortsContainer>
             <DefaultPortLabel
               engine={this.props.engine}
-              port={person1Port}
-              key={person1Port.getID()}
+              port={this.props.node.ownerPort}
+              key={this.props.node.ownerPort.getID()}
+            />
+            <DefaultPortLabel
+              engine={this.props.engine}
+              port={this.props.node.targetPort}
+              key={this.props.node.targetPort.getID()}
+            />
+            <DefaultPortLabel
+              engine={this.props.engine}
+              port={this.props.node.chargePort}
+              key={this.props.node.chargePort.getID()}
+            />
+            <DefaultPortLabel
+              engine={this.props.engine}
+              port={this.props.node.sparkPort}
+              key={this.props.node.sparkPort.getID()}
             />
           </PortsContainer>
-        </Ports>
-        <Ports>
           <PortsContainer>
             <DefaultPortLabel
               engine={this.props.engine}
-              port={person2Port}
-              key={person2Port.getID()}
+              port={this.props.node.outPort}
+              key={this.props.node.outPort.getID()}
             />
           </PortsContainer>
         </Ports>

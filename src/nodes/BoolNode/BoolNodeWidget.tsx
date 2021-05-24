@@ -101,14 +101,7 @@ export class BoolNodeWidget extends React.Component<
               event.currentTarget.contentEditable = 'true';
             }}
             onChange={onValueChange}
-            onDrag={(e) => e.preventDefault()}
-            onFocus={() => {
-              this.props.node.setLocked(true);
-            }}
-            onBlur={(event) => {
-              event.currentTarget.contentEditable = 'false';
-              this.props.node.setLocked(false);
-            }}
+            defaultValue={String(this.props.node.getOptions().value)}
           >
             <option value="true">True</option>
             <option value="false">False</option>

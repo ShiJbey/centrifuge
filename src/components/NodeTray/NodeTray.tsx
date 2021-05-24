@@ -76,7 +76,7 @@ const NodeTray: React.FC = () => {
           name="Event Node"
           color={EVENT_NODE_COLOR}
         />
-        <h3 className="text-center">Patterns</h3>
+        {/* <h3 className="text-center">Patterns</h3>
         <TrayWidgetItem
           model={{ type: 'asymmetric-friendship' }}
           name="Asymmetric Friendship"
@@ -106,7 +106,7 @@ const NodeTray: React.FC = () => {
           model={{ type: 'dislikes' }}
           name="Dislikes Node"
           color={DISLIKES_NODE_COLOR}
-        />
+        /> */}
       </TrayWidget>
     </div>
   );

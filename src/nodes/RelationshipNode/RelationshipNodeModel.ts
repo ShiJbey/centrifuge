@@ -21,8 +21,11 @@ export interface RelationshipNodeModelGenerics {
 export class RelationshipNodeModel extends NodeModel<
   RelationshipNodeModelGenerics & NodeModelGenerics
 > {
-  public person1Port: DefaultPortModel;
-  public person2Port: DefaultPortModel;
+  public outPort: DefaultPortModel;
+  public ownerPort: DefaultPortModel;
+  public targetPort: DefaultPortModel;
+  public chargePort: DefaultPortModel;
+  public sparkPort: DefaultPortModel;
 
   constructor(
     options: RelationshipNodeModelOptions = {
@@ -34,22 +37,46 @@ export class RelationshipNodeModel extends NodeModel<
       ...options,
     });
 
-    this.person1Port = new DefaultPortModel({
+    this.ownerPort = new DefaultPortModel({
       in: true,
       name: 'owner',
       label: 'owner',
       alignment: PortModelAlignment.LEFT,
     });
 
-    this.person2Port = new DefaultPortModel({
+    this.targetPort = new DefaultPortModel({
       in: true,
       name: 'target',
       label: 'target',
       alignment: PortModelAlignment.LEFT,
     });
 
-    this.addPort(this.person1Port);
-    this.addPort(this.person2Port);
+    this.chargePort = new DefaultPortModel({
+      in: true,
+      name: 'charge',
+      label: 'charge',
+      alignment: PortModelAlignment.LEFT,
+    });
+
+    this.sparkPort = new DefaultPortModel({
+      in: true,
+      name: 'spark',
+      label: 'spark',
+      alignment: PortModelAlignment.LEFT,
+    });
+
+    this.outPort = new DefaultPortModel({
+      in: false,
+      name: 'out',
+      label: 'Out',
+      alignment: PortModelAlignment.LEFT,
+    });
+
+    this.addPort(this.outPort);
+    this.addPort(this.ownerPort);
+    this.addPort(this.targetPort);
+    this.addPort(this.chargePort);
+    this.addPort(this.sparkPort);
   }
 
   public serialize(): any {
