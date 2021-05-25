@@ -100,6 +100,9 @@ export class VariableNodeWidget extends React.Component<
             key={outPort.getID()}
           />
         </PortContainer>
+        <div>
+          Public: <input type="checkbox" />
+        </div>
       </Node>
     );
   }

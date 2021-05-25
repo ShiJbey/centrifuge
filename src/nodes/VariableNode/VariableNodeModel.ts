@@ -13,6 +13,7 @@ export interface VariableNodeModelOptions {
   type: typeof VARIABLE_NODE_TYPE;
   label: string;
   name: string;
+  public: boolean;
 }
 
 export interface VariableNodeModelGenerics {
@@ -29,6 +30,7 @@ export class VariableNodeModel extends NodeModel<
       type: VARIABLE_NODE_TYPE,
       label: 'Variable',
       name: 'var',
+      public: false,
     }
   ) {
     super({
@@ -56,5 +58,6 @@ export class VariableNodeModel extends NodeModel<
     super.deserialize(event);
     this.options.label = event.data.label;
     this.options.name = event.data.name;
+    this.options.public = event.data.public;
   }
 }

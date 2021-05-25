@@ -1,6 +1,5 @@
 import React from 'react';
-import TrayWidget from '../TrayWidget';
-import TrayWidgetItem from '../TrayWidget/TrayWidgetItem';
+import TrayItem from './TrayItem';
 import {
   ASYMMETRIC_FRIENDSHIP_NODE_COLOR,
   EVENT_NODE_COLOR,
@@ -17,97 +16,85 @@ import {
   BOOL_NODE_COLOR,
   MODIFIER_NODE_COLOR,
 } from '../../utility/constants';
+// import styles from './NodeTray.module.scss';
 
 const NodeTray: React.FC = () => {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: '0px',
-        right: '0px',
-        height: '100%',
-        background: 'hsl(0, 0%, 12.549019607843137%)',
-        zIndex: 100,
-        overflow: 'hidden',
-        overflowY: 'auto',
-        color: 'white',
-      }}
-    >
-      <TrayWidget>
-        <h3 className="text-center">Primitives</h3>
-        <TrayWidgetItem
-          model={{ type: 'variable' }}
-          name="Variable Node"
-          color={VARIABLE_NODE_COLOR}
-        />
-        <TrayWidgetItem
-          model={{ type: 'number' }}
-          name="Number Node"
-          color={NUMBER_NODE_COLOR}
-        />
-        <TrayWidgetItem
-          model={{ type: 'string' }}
-          name="String Node"
-          color={STRING_NODE_COLOR}
-        />
-        <TrayWidgetItem
-          model={{ type: 'boolean' }}
-          name="Boolean Node"
-          color={BOOL_NODE_COLOR}
-        />
-        <TrayWidgetItem
-          model={{ type: 'modifier' }}
-          name="Modifier Node"
-          color={MODIFIER_NODE_COLOR}
-        />
-        <h3 className="text-center">Entities</h3>
-        <TrayWidgetItem
-          model={{ type: 'person' }}
-          name="Person Node"
-          color={PERSON_NODE_COLOR}
-        />
-        <TrayWidgetItem
-          model={{ type: 'relationship' }}
-          name="Relationship Node"
-          color={RELATIONSHIP_NODE_COLOR}
-        />
-        <TrayWidgetItem
-          model={{ type: 'event' }}
-          name="Event Node"
-          color={EVENT_NODE_COLOR}
-        />
-        {/* <h3 className="text-center">Patterns</h3>
-        <TrayWidgetItem
+    <div>
+      <h3 className="text-center">Primitives</h3>
+      <TrayItem
+        model={{ type: 'variable' }}
+        name="Variable Node"
+        color={VARIABLE_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'number' }}
+        name="Number Node"
+        color={NUMBER_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'string' }}
+        name="String Node"
+        color={STRING_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'boolean' }}
+        name="Boolean Node"
+        color={BOOL_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'modifier' }}
+        name="Modifier Node"
+        color={MODIFIER_NODE_COLOR}
+      />
+      <hr></hr>
+      <h3 className="text-center">Entities</h3>
+      <TrayItem
+        model={{ type: 'person' }}
+        name="Person Node"
+        color={PERSON_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'relationship' }}
+        name="Relationship Node"
+        color={RELATIONSHIP_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'event' }}
+        name="Event Node"
+        color={EVENT_NODE_COLOR}
+      />
+      {/* <h3 className="text-center">Patterns</h3>
+        <TrayItem
           model={{ type: 'asymmetric-friendship' }}
           name="Asymmetric Friendship"
           color={ASYMMETRIC_FRIENDSHIP_NODE_COLOR}
         />
-        <TrayWidgetItem
+        <TrayItem
           model={{ type: 'love-triangle' }}
           name="Love Triangle"
           color={LOVE_TRIANGLE_NODE_COLOR}
         />
-        <TrayWidgetItem
+        <TrayItem
           model={{ type: 'business-rivalry' }}
           name="Business Rivalry"
           color={BUSINESS_RIVALRY_NODE_COLOR}
         />
-        <TrayWidgetItem
+        <TrayItem
           model={{ type: 'jealous-uncle' }}
           name="Jealous Uncle"
           color={JEALOUS_UNCLE_NODE_COLOR}
         />
-        <TrayWidgetItem
+        <TrayItem
           model={{ type: 'likes' }}
           name="Likes Node"
           color={LIKES_NODE_COLOR}
         />
-        <TrayWidgetItem
+        <TrayItem
           model={{ type: 'dislikes' }}
           name="Dislikes Node"
           color={DISLIKES_NODE_COLOR}
         /> */}
-      </TrayWidget>
     </div>
   );
 };

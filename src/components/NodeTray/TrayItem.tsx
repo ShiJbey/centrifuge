@@ -8,18 +8,19 @@ interface TrayWidgetItemProps {
   enabled?: boolean;
 }
 
-const Tray = styled.div<{ color: string }>`
-  color: white;
+const Container = styled.div<{ color: string }>`
+  color: black;
   font-family: Helvetica, Arial;
   padding: 5px;
   margin: 0px 10px;
   border: solid 1px ${(p) => p.color};
+  background: ${(p) => p.color};
   border-radius: 5px;
   margin-bottom: 2px;
   cursor: pointer;
 `;
 
-const TrayWidgetItem: React.FC<TrayWidgetItemProps> = (props) => {
+const TrayItem: React.FC<TrayWidgetItemProps> = (props) => {
   const onDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData(
       'storm-diagram-node',
@@ -28,15 +29,15 @@ const TrayWidgetItem: React.FC<TrayWidgetItemProps> = (props) => {
   };
 
   return (
-    <Tray
+    <Container
       color={props.color}
       draggable={props?.enabled ?? true}
       onDragStart={onDragStart}
       className="tray-item"
     >
       {props.name}
-    </Tray>
+    </Container>
   );
 };
 
-export default TrayWidgetItem;
+export default TrayItem;

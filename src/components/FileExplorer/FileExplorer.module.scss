@@ -1,15 +1,23 @@
-$explorerWidth: 10rem;
-
 .FileExplorer {
-  color: white;
-  width: $explorerWidth;
+  color: black;
+  width: 100%;
   height: 100%;
-  background: linear-gradient(
-    hsl(0, 0%, 15%),
-    hsl(0, 0%, 13%) 10%,
-    hsl(0, 0%, 9%) 90%
-  );
-  border-right: 2px solid gray;
+  background: rgb(238, 238, 238);
+  padding-top: 1rem;
+
+
+  &::-webkit-scrollbar {
+    margin-top: 10px;
+    width: 0.3rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 0%, 0.10);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #008cff;
+  }
 }
 
 .DTreeContainer {
@@ -30,19 +38,18 @@ $explorerWidth: 10rem;
     text-align: left;
     text-overflow: ellipsis;
     display: flex;
-    // white-space: nowrap;
     cursor: pointer;
 
     &.RootDir {
-      background: hsl(0, 0%, 50%);
+      background: hsl(0, 0%, 70%);
     }
 
     &.RootDir:hover {
-      background: hsl(0, 0%, 45%);
+      background: hsl(0, 0%, 60%);
     }
 
     &:hover {
-      background: hsl(0, 0%, 18%);
+      background: hsl(0, 0%, 50%);
     }
   }
 }

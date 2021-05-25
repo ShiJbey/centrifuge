@@ -189,7 +189,6 @@ export class EditorWidget extends React.Component<
       <WidgetBody onContextMenu={() => console.log("open context menu")}>
         {/* <ContextMenu /> */}
         <WidgetContent>
-          <NodeTray />
           <WidgetLayer
             onDrop={this.onDrop.bind(this)}
             onDragOver={this.onDragOver}
