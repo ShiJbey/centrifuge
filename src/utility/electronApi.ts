@@ -1,5 +1,4 @@
 import { DirectoryTree } from 'directory-tree';
-import crypto from 'crypto';
 
 export default interface ElectronAPI {
   listDirectory: (dir: string) => string[];

@@ -141,41 +141,6 @@ ipcMain.handle(OPEN_SAVE_AS, async () => {
   return res;
 });
 
-ipcMain.handle(OPEN_TOWN_FILE, (): OpenFileResponse => {
-  try {
-    const [filepath] = dialog.showOpenDialogSync({
-      title: 'Open Simulation File',
-      buttonLabel: 'Open',
-      filters: [
-        {
-          name: 'Talktown Simulation Data',
-          extensions: ['json'],
-        },
-      ],
-    });
-
-    if (filepath) {
-      const data = fs.readFileSync(filepath, { encoding: 'utf-8' });
-      return {
-        status: 'ok',
-        payload: {
-          data,
-          name: path.basename(filepath),
-          path: filepath,
-          extension: path.extname(filepath),
-        },
-      };
-    }
-  } catch (error) {
-    console.error(error);
-    return {
-      status: 'error',
-      msg: error.message,
-      payload: error,
-    };
-  }
-
-  return {
-    status: 'cancel',
-  };
+ipcMain.handle(OPEN_TOWN_FILE, async (): Promise<OpenFileResponse> => {
+  return io.openFile(null, [{name: 'Talktown Town', extensions: ['town']}])
 });
