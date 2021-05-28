@@ -27,6 +27,7 @@ import {
 } from '../../redux/fileTree/fileTreeActions';
 import { addEditor } from '../../redux/editors/editorActions';
 import { SerializedDiagram } from '../../utility/serialization';
+import { wrap } from 'comlink';
 
 declare const electron: ElectronAPI;
 
@@ -41,10 +42,17 @@ interface AppProps {
 export class App extends Component<AppProps> {
   componentDidMount() {
     this.registerElectronListeners();
+    this.launchWorker();
   }
 
   componentWillUnmount() {
     this.unregisterElectronListeners();
+  }
+
+  async launchWorker() {
+    // const worker = new Worker('worker', {name: 'worker', type: 'module'});
+    // const {hello} = wrap<import('../../worker').HelloWorker>(worker);
+    // console.log(hello());
   }
 
   registerElectronListeners() {

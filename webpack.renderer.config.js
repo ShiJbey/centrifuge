@@ -1,5 +1,8 @@
+const WebWorkerPlugin = require("worker-plugin");
 const rules = require("./webpack.rules");
 const plugins = require("./webpack.plugins");
+
+plugins.push(new WebWorkerPlugin());
 
 rules.push({
   test: /\.css$/,
