@@ -61,7 +61,7 @@
                 },
                 {
                   "name": "worker",
-                  "js": "./src/worker.ts"
+                  "js": "./src/db.worker.ts"
                 }
               ]
             }

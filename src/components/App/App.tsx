@@ -27,7 +27,8 @@ import {
 } from '../../redux/fileTree/fileTreeActions';
 import { addEditor } from '../../redux/editors/editorActions';
 import { SerializedDiagram } from '../../utility/serialization';
-import { wrap } from 'comlink';
+// import { wrap } from 'comlink';
+// import DbWorker from 'worker-loader!/../../db.worker';
 
 declare const electron: ElectronAPI;
 
@@ -50,8 +51,13 @@ export class App extends Component<AppProps> {
   }
 
   async launchWorker() {
+    const worker = new Worker('worker/index.js');
+    worker.postMessage({ a: 1 });
+    worker.onmessage = (event) => console.log("App onMsg:", event);
+
+    worker.addEventListener("message", (event) => {console.log(event)});
     // const worker = new Worker('worker', {name: 'worker', type: 'module'});
-    // const {hello} = wrap<import('../../worker').HelloWorker>(worker);
+    // const {hello} = wrap<import('worker-loader!/../../db.worker.ts').default>(worker);
     // console.log(hello());
   }
 
