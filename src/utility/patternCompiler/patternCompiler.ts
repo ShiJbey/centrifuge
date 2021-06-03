@@ -85,8 +85,11 @@ export function compilePattern(diagram: SerializedDiagram): string {
     }
   }
 
-  const code = syntaxTree.getCode();
+  const code = syntaxTree.getQuery();
 
-  console.log(code);
   return code;
+}
+
+export function toQuery(diagram: SerializedDiagram): string {
+  throw new Error('Function Not Implemented');
 }

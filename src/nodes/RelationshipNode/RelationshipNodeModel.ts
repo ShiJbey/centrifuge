@@ -6,12 +6,20 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+
+export const RelationshipTypes = [
+  'Acquaintance',
+  'Enmity',
+  'Friendship',
+];
+
 export const RELATIONSHIP_NODE_TYPE = 'relationship-node';
 
 export interface RelationshipNodeModelOptions {
   type: typeof RELATIONSHIP_NODE_TYPE
   label?: string;
   color?: string;
+  relationshipType?: string;
 }
 
 export interface RelationshipNodeModelGenerics {
@@ -21,11 +29,9 @@ export interface RelationshipNodeModelGenerics {
 export class RelationshipNodeModel extends NodeModel<
   RelationshipNodeModelGenerics & NodeModelGenerics
 > {
+
+  protected inputPorts: DefaultPortModel[];
   public outPort: DefaultPortModel;
-  public ownerPort: DefaultPortModel;
-  public targetPort: DefaultPortModel;
-  public chargePort: DefaultPortModel;
-  public sparkPort: DefaultPortModel;
 
   constructor(
     options: RelationshipNodeModelOptions = {
@@ -37,46 +43,44 @@ export class RelationshipNodeModel extends NodeModel<
       ...options,
     });
 
-    this.ownerPort = new DefaultPortModel({
-      in: true,
-      name: 'owner',
-      label: 'owner',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.targetPort = new DefaultPortModel({
-      in: true,
-      name: 'target',
-      label: 'target',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.chargePort = new DefaultPortModel({
-      in: true,
-      name: 'charge',
-      label: 'charge',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.sparkPort = new DefaultPortModel({
-      in: true,
-      name: 'spark',
-      label: 'spark',
-      alignment: PortModelAlignment.LEFT,
-    });
+    this.inputPorts = [];
 
     this.outPort = new DefaultPortModel({
       in: false,
       name: 'out',
-      label: 'Out',
+      label: 'Out (R)',
       alignment: PortModelAlignment.LEFT,
     });
-
     this.addPort(this.outPort);
-    this.addPort(this.ownerPort);
-    this.addPort(this.targetPort);
-    this.addPort(this.chargePort);
-    this.addPort(this.sparkPort);
+
+    this.addInputPort('owner', 'Owner (P)');
+    this.addInputPort('subject', 'Subject (P)');
+    this.addInputPort('preceeded_by', 'Preceeded By (R)');
+    this.addInputPort('suceeded_by', 'Succeeded By (R)');
+    this.addInputPort('where_they_met', 'Where They Met (Pl)');
+    this.addInputPort('when_they_met', 'When they met (Str)');
+    this.addInputPort('where_they_last_met', 'Where Last Met (Pl)');
+    this.addInputPort('when_they_last_met', 'When Last Met (Str)');
+    this.addInputPort('total_interactions', 'Total Interactions (Num)');
+    this.addInputPort('compatibility', 'Compatibility (Num)');
+    this.addInputPort('spark', 'Spark (Num)');
+    this.addInputPort('charge', 'Charge (Num)');
+  }
+
+  private addInputPort(name: string, label: string): DefaultPortModel {
+    const port = new DefaultPortModel({
+      in: true,
+      name,
+      label,
+      alignment: PortModelAlignment.LEFT,
+    });
+    this.addPort(port);
+    this.inputPorts.push(port);
+    return port;
+  }
+
+  public getInPorts(): DefaultPortModel[] {
+    return this.inputPorts;
   }
 
   public serialize(): any {

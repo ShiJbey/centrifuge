@@ -56,7 +56,7 @@ export class RelationshipSyntaxNode implements TreeNode {
   params: {
     out: Param<string>;
     owner?: Param<string>;
-    target?: Param<string>;
+    subject?: Param<string>;
     spark?: Param<number>;
     charge?: Param<number>;
   };
@@ -72,7 +72,7 @@ export class RelationshipSyntaxNode implements TreeNode {
     if (this.params.owner) {
       str += `[${this.params.out.value} "relationship/owner" ...]\n`;
     }
-    if (this.params.target) {
+    if (this.params.subject) {
       str += `[${this.params.out.value} "relationship/target" ...]\n`;
     }
     if (this.params.spark) {
@@ -297,11 +297,11 @@ export class PatternSyntaxTree {
           this.freeVariables.set(port.id, freeVar);
           break;
         }
-        case 'target': {
+        case 'subject': {
           const freeVar: Param = {
             dependency: this.dependencies.get(port.links[0]).source,
           };
-          syntaxNode.params.target = freeVar;
+          syntaxNode.params.subject = freeVar;
           this.freeVariables.set(port.id, freeVar);
           break;
         }
@@ -335,65 +335,75 @@ export class PatternSyntaxTree {
     this.numRelationshipNodes += 1;
   }
 
-  getCode(): string {
-    let str = '';
+  parseTree(): { findSpec: string, withClause?: string, whereClause: string } {
+    let whereClause = '';
+    let findSpec = '';
     for (const [, node] of this.nodes) {
       if (node instanceof PersonSyntaxNode) {
-        str += `[${node.params.out.value} "sim/type" "person"]\n`;
+        findSpec += node.params.out.value + ' ';
+        whereClause += `[${node.params.out.value} "sim/type" "person"]\n`;
         if (node.params.gender) {
           const val = this.findDependency(node.params.gender);
-          str += `[${node.params.out.value} "person/gender" ${
+          whereClause += `[${node.params.out.value} "person/gender" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
         if (node.params.age) {
           const val = this.findDependency(node.params.age);
-          str += `[${node.params.out.value} "person/age" ${
+          whereClause += `[${node.params.out.value} "person/age" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
         if (node.params.occupation) {
           const val = this.findDependency(node.params.occupation);
-          str += `[${node.params.out.value} "person/occupation" ${
+          whereClause += `[${node.params.out.value} "person/occupation" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
         if (node.params.alive) {
           const val = this.findDependency(node.params.alive);
-          str += `[${node.params.out.value} "person/alive" ${
+          whereClause += `[${node.params.out.value} "person/alive" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
       }
       if (node instanceof RelationshipSyntaxNode) {
-        str += `[${node.params.out.value} "sim/type" "relationship"]\n`;
+        findSpec += node.params.out.value + ' ';
+        whereClause += `[${node.params.out.value} "sim/type" "relationship"]\n`;
         if (node.params.owner) {
           const val = this.findDependency(node.params.owner);
-          str += `[${node.params.out.value} "relationship/owner" ${
+          whereClause += `[${node.params.out.value} "relationship/owner" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
-        if (node.params.target) {
-          const val = this.findDependency(node.params.target);
-          str += `[${node.params.out.value} "relationship/target" ${
+        if (node.params.subject) {
+          const val = this.findDependency(node.params.subject);
+          whereClause += `[${node.params.out.value} "relationship/target" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
         if (node.params.spark) {
           const val = this.findDependency(node.params.spark);
-          str += `[${node.params.out.value} "relationship/spark" ${
+          whereClause += `[${node.params.out.value} "relationship/spark" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
         if (node.params.charge) {
           const val = this.findDependency(node.params.charge);
-          str += `[${node.params.out.value} "relationship/charge" ${
+          whereClause += `[${node.params.out.value} "relationship/charge" ${
             val !== undefined ? val : '_'
           }]\n`;
         }
       }
     }
-    return str;
+    return {
+      whereClause, findSpec
+    };
+  }
+
+  getQuery(): string {
+    const {findSpec, whereClause} = this.parseTree();
+    return `[:find\n${findSpec}\n:in $ %\n:where\n${whereClause}]`;
   }
 
   findDependency(param: Param): string | boolean | number {

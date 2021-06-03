@@ -1,33 +1,37 @@
-import React, { ReactNode } from "react";
-import styled from "styled-components";
+import React, { ReactNode } from 'react';
+import styled from 'styled-components';
 import {
   DiagramModel,
   DiagramModelGenerics,
   NodeModel,
-} from "@projectstorm/react-diagrams";
+} from '@projectstorm/react-diagrams';
 import {
   CanvasWidget,
   BaseModel,
   BaseModelGenerics,
-} from "@projectstorm/react-canvas-core";
-import AppCanvasWidget from "../AppCanvasWidget/AppCanvasWidget";
-import { PersonNodeModel } from "../../nodes/PersonNode/PersonNodeModel";
-import { RelationshipNodeModel } from "../../nodes/RelationshipNode";
-import { EventNodeModel } from "../../nodes/EventNode";
-import { AsymmetricFriendshipNodeModel } from "../../nodes/AsymmetricFriendshipNode";
-import { LoveTriangleNodeModel } from "../../nodes/LoveTriangleNode";
-import { BusinessRivalryNodeModel } from "../../nodes/BusinessRivalryNode";
-import { JealousUncleNodeModel } from "../../nodes/JealousUncleNode";
-import { LikesNodeModel } from "../../nodes/LikesNode";
-import { DislikesNodeModel } from "../../nodes/DislikesNode";
-import { VariableNodeModel } from "../../nodes/VariableNode";
-import { BoolNodeModel } from "../../nodes/BoolNode";
-import { NumberNodeModel } from "../../nodes/NumberNode";
-import { StringNodeModel } from "../../nodes/StringNode";
-import { ModifierNodeModel } from "../../nodes/ModifierNode";
-import NodeTray from "../NodeTray/NodeTray";
-import debounce from "lodash/debounce";
-import { EditorState } from "../../redux/editors/editorReducer";
+} from '@projectstorm/react-canvas-core';
+import debounce from 'lodash/debounce';
+import AppCanvasWidget from '../AppCanvasWidget/AppCanvasWidget';
+import { PersonNodeModel } from '../../nodes/PersonNode/PersonNodeModel';
+import { RelationshipNodeModel } from '../../nodes/RelationshipNode';
+import { EventNodeModel } from '../../nodes/EventNode';
+import { AsymmetricFriendshipNodeModel } from '../../nodes/AsymmetricFriendshipNode';
+import { LoveTriangleNodeModel } from '../../nodes/LoveTriangleNode';
+import { BusinessRivalryNodeModel } from '../../nodes/BusinessRivalryNode';
+import { JealousUncleNodeModel } from '../../nodes/JealousUncleNode';
+import { LikesNodeModel } from '../../nodes/LikesNode';
+import { DislikesNodeModel } from '../../nodes/DislikesNode';
+import { VariableNodeModel } from '../../nodes/VariableNode';
+import { BoolNodeModel } from '../../nodes/BoolNode';
+import { NumberNodeModel } from '../../nodes/NumberNode';
+import { StringNodeModel } from '../../nodes/StringNode';
+import { InequalityNodeModel } from '../../nodes/InequalityNode';
+import { EditorState } from '../../redux/editors/editorReducer';
+import { BusinessNodeModel } from '../../nodes/BusinessNode';
+import { OccupationNodeModel } from '../../nodes/OccupationNode';
+import { SocialConnNodeModel } from '../../nodes/SocialConnNode';
+import { NotNodeModel } from '../../nodes/NotNode';
+import { NotJoinNodeModel } from '../../nodes/NotJoinNode';
 
 const WidgetBody = styled.div`
   position: relative;
@@ -66,7 +70,6 @@ export class EditorWidget extends React.Component<
   EditorWidgetProps,
   EditorWidgetState
 > {
-
   debounceUpdate = debounce(
     (diagram: DiagramModel<DiagramModelGenerics>) =>
       this.props.onUpdate(diagram.serialize()),
@@ -79,15 +82,18 @@ export class EditorWidget extends React.Component<
       selectedNode: null,
     };
 
-    this.props.editor.app.getActiveDiagram()
+    this.props.editor.app.getActiveDiagram();
 
-    this.props.editor.app.getActiveDiagram().getNodes().map((node) => {
-      node.registerListener({
-        eventDidFire: () => {
-          this.handleUpdate();
-        },
+    this.props.editor.app
+      .getActiveDiagram()
+      .getNodes()
+      .map((node) => {
+        node.registerListener({
+          eventDidFire: () => {
+            this.handleUpdate();
+          },
+        });
       });
-    })
 
     this.props.editor.app.getActiveDiagram().registerListener({
       eventDidFire: () => {
@@ -99,7 +105,7 @@ export class EditorWidget extends React.Component<
       linksUpdated: () => {
         this.handleUpdate();
       },
-      lockChanged:  () => {
+      lockChanged: () => {
         this.handleUpdate();
       },
     });
@@ -113,43 +119,55 @@ export class EditorWidget extends React.Component<
   }
 
   onDrop(event: React.DragEvent): void {
-    const data = JSON.parse(event.dataTransfer.getData("storm-diagram-node"));
+    const data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
 
     let node: NodeModel = null;
 
-    if (data.type === "person") {
+    if (data.type === 'person') {
       node = new PersonNodeModel();
-    } else if (data.type === "relationship") {
+    } else if (data.type === 'relationship') {
       node = new RelationshipNodeModel();
-    } else if (data.type === "event") {
+    } else if (data.type === 'event') {
       node = new EventNodeModel();
-    } else if (data.type === "asymmetric-friendship") {
+    } else if (data.type === 'asymmetric-friendship') {
       node = new AsymmetricFriendshipNodeModel();
-    } else if (data.type === "love-triangle") {
+    } else if (data.type === 'love-triangle') {
       node = new LoveTriangleNodeModel();
-    } else if (data.type === "business-rivalry") {
+    } else if (data.type === 'business-rivalry') {
       node = new BusinessRivalryNodeModel();
-    } else if (data.type === "jealous-uncle") {
+    } else if (data.type === 'jealous-uncle') {
       node = new JealousUncleNodeModel();
-    } else if (data.type === "likes") {
+    } else if (data.type === 'likes') {
       node = new LikesNodeModel();
-    } else if (data.type === "dislikes") {
+    } else if (data.type === 'dislikes') {
       node = new DislikesNodeModel();
-    } else if (data.type === "variable") {
+    } else if (data.type === 'variable') {
       node = new VariableNodeModel();
-    } else if (data.type === "string") {
+    } else if (data.type === 'string') {
       node = new StringNodeModel();
-    } else if (data.type === "number") {
+    } else if (data.type === 'number') {
       node = new NumberNodeModel();
-    } else if (data.type === "boolean") {
+    } else if (data.type === 'boolean') {
       node = new BoolNodeModel();
-    } else if (data.type === "modifier") {
-      node = new ModifierNodeModel();
+    } else if (data.type === 'inequality') {
+      node = new InequalityNodeModel();
+    } else if (data.type === 'business') {
+      node = new BusinessNodeModel();
+    } else if (data.type === 'occupation') {
+      node = new OccupationNodeModel();
+    } else if (data.type === 'socialConn') {
+      node = new SocialConnNodeModel();
+    } else if (data.type === 'not') {
+      node = new NotNodeModel();
+    } else if (data.type === 'notJoin') {
+      node = new NotJoinNodeModel();
     } else {
       return;
     }
 
-    const point = this.props.editor.app.getDiagramEngine().getRelativeMousePoint(event);
+    const point = this.props.editor.app
+      .getDiagramEngine()
+      .getRelativeMousePoint(event);
     node.setPosition(point);
 
     node.registerListener({
@@ -186,7 +204,7 @@ export class EditorWidget extends React.Component<
 
   render(): ReactNode {
     return (
-      <WidgetBody onContextMenu={() => console.log("open context menu")}>
+      <WidgetBody onContextMenu={() => console.log('open context menu')}>
         {/* <ContextMenu /> */}
         <WidgetContent>
           <WidgetLayer

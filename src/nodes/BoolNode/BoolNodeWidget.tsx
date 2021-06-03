@@ -33,7 +33,7 @@ const Select = styled.select`
 `;
 
 const PortContainer = styled.div`
-  /* color: black; */
+  color: white;
   border: solid 2px black;
   border-radius: 10px 0px 0px 10px;
   background-color: #525252;

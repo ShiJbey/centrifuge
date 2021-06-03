@@ -1,32 +1,38 @@
-// import { expose } from 'comlink';
+import { expose } from 'comlink';
+import { Simulation } from './utility/models/talktown';
 
-// const hello = (): string => {
-//   return 'Hello from worker';
-// }
+const hello = (): string => {
+  return 'Hello from worker';
+}
 
-// const worker = {
-//   hello
-// };
+const processTown = (town: Simulation) => {
+  console.log(town);
+};
 
-// export type HelloWorker = typeof worker;
+const worker = {
+  hello,
+  processTown,
+};
 
-// expose(worker);
+export type HelloWorker = typeof worker;
 
-const ctx: Worker = self as any;
+expose(worker);
 
-console.log('Hello from worker');
+// const ctx: Worker = self as any;
 
-// Post data to parent thread
-ctx.postMessage({ foo: "foo" });
+// console.log('Hello from worker');
 
-// Respond to message from parent thread
-ctx.addEventListener("message", (event) => console.log(event));
+// // Post data to parent thread
+// ctx.postMessage({ foo: "foo" });
 
-// const onmessage = function(e: any) {
-//   console.log('Message received from main script');
-//   const workerResult = 'Result: ' + (e.data[0] * e.data[1]);
-//   console.log('Posting message back to main script');
-//   postMessage(workerResult);
-// }
+// // Respond to message from parent thread
+// ctx.addEventListener("message", (event) => console.log(event));
 
-export default onmessage
+// // const onmessage = function(e: any) {
+// //   console.log('Message received from main script');
+// //   const workerResult = 'Result: ' + (e.data[0] * e.data[1]);
+// //   console.log('Posting message back to main script');
+// //   postMessage(workerResult);
+// // }
+
+// export default onmessage

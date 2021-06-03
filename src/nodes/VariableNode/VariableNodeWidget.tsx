@@ -3,20 +3,33 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { VariableNodeModel } from './VariableNodeModel';
 import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { VARIABLE_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../utility/constants';
+import {
+  VARIABLE_NODE_COLOR,
+  SELECTION_BORDER_COLOR,
+} from '../../utility/constants';
 
 const Node = styled.div<{ selected: boolean }>`
-  display: grid;
   box-sizing: content-box;
-  grid-template-columns: 1fr auto;
   background-color: ${VARIABLE_NODE_COLOR};
   border-radius: 5px;
   font-family: sans-serif;
-  width: 10rem;
+  width: 12rem;
   font-size: 1rem;
-  height: 2.25rem;
-  padding: 3px 0 3px 3px;
   ${(p) => (p.selected ? `border: solid 2px ${SELECTION_BORDER_COLOR}` : '')}
+`;
+
+const Header = styled.div`
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: hsla(0, 0%, 0%, 0.5);
+  padding: 0.1rem;
+  color: white;
+`;
+
+const Ports = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
 `;
 
 const VariableValue = styled.input`
@@ -25,17 +38,13 @@ const VariableValue = styled.input`
   font-weight: bold;
   background: #ccc;
   overflow: hidden;
-  display: flex;
-  justify-content: left;
-  align-items: center;
   height: 100%;
   width: 100%;
 `;
 
 const PortContainer = styled.div`
-  border: solid 2px black;
-  border-radius: 10px 0px 0px 10px;
-  background-color: #525252;
+  background-color: #00000039;
+  color: white;
 `;
 
 export interface VariableNodeWidgetProps {
@@ -59,9 +68,6 @@ export class VariableNodeWidget extends React.Component<
   }
 
   public render(): React.ReactNode {
-    const nodeOptions = this.props.node.getOptions();
-    const outPort = this.props.node.outPort;
-
     const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       this.setState({
         ...this.state,
@@ -71,13 +77,12 @@ export class VariableNodeWidget extends React.Component<
     };
 
     return (
-      <Node
-        data-person-node-name={nodeOptions.label}
-        selected={this.props.node.isSelected()}
-      >
-        <div style={{paddingRight: '3px', overflow: 'hidden'}}>
+      <Node selected={this.props.node.isSelected()}>
+        <Header>Variable</Header>
+        <div style={{ width: '100%', display: 'flex' }}>
+          <label style={{paddingLeft: '0.1rem', paddingRight: '0.1rem'}}>Name:</label>
           <VariableValue
-            type='text'
+            type="text"
             value={this.state.name}
             onClick={(event) => {
               event.currentTarget.contentEditable = 'true';
@@ -93,13 +98,26 @@ export class VariableNodeWidget extends React.Component<
             }}
           />
         </div>
-        <PortContainer>
-          <DefaultPortLabel
-            engine={this.props.engine}
-            port={outPort}
-            key={outPort.getID()}
-          />
-        </PortContainer>
+        <Ports>
+          <div>
+            <PortContainer>
+              <DefaultPortLabel
+                engine={this.props.engine}
+                port={this.props.node.inPort}
+                key={this.props.node.inPort.getID()}
+              />
+            </PortContainer>
+          </div>
+          <div>
+            <PortContainer>
+              <DefaultPortLabel
+                engine={this.props.engine}
+                port={this.props.node.outPort}
+                key={this.props.node.outPort.getID()}
+              />
+            </PortContainer>
+          </div>
+        </Ports>
         <div>
           Public: <input type="checkbox" />
         </div>

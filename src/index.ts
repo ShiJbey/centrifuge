@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, net } from 'electron';
+import axios from 'axios';
 import { createMenu } from './main-process/menu';
 import {
   CLOSE_DIR,
@@ -10,6 +11,7 @@ import {
   OPEN_SAVE_AS,
   OPEN_TOWN_FILE,
   SAVE_PATTERN,
+  QUERY_DATABASE
 } from './utility/electronChannels';
 import * as io from './main-process/io';
 import { OpenFileResponse, SaveFileResponse } from './utility/electronApi';
@@ -93,6 +95,11 @@ ipcMain.on(CLOSE_DIR, async (event) => {
   io.unWatchDirectory(event.sender);
 });
 
+ipcMain.on(OPEN_TOWN_FILE, async (event) => {
+  const res = io.openFile(null, [{name: 'Talktown Town', extensions: ['town.json', 'json']}]);
+  event.sender.send(OPEN_TOWN_FILE, res);
+});
+
 ipcMain.handle(
   OPEN_PATTERN_FILE,
   async (_, args: any[]): Promise<OpenFileResponse> => {
@@ -143,5 +150,19 @@ ipcMain.handle(OPEN_SAVE_AS, async () => {
 });
 
 ipcMain.handle(OPEN_TOWN_FILE, async (): Promise<OpenFileResponse> => {
-  return io.openFile(null, [{name: 'Talktown Town', extensions: ['town']}])
+  return io.openFile(null, [{name: 'Talktown Town', extensions: ['town.json', 'json']}]);
+});
+
+ipcMain.handle(QUERY_DATABASE, async(_, args: any[]): Promise<any> => {
+  const [query] = args;
+  const axiosResponse = await axios.post(
+      `http://localhost:8080/`,
+      {
+        op: 'query',
+        query
+      });
+  if (axiosResponse.status === 200) {
+    return axiosResponse.data;
+  }
+  return null;
 });

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import {
-  RelationshipNodeModel,
+  RelationshipNodeModel, RelationshipTypes,
 } from './RelationshipNodeModel';
 import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
@@ -13,6 +13,7 @@ import {
 const Node = styled.div<{ background: string; selected: boolean }>`
   background-color: ${(p) => p.background ?? RELATIONSHIP_NODE_COLOR};
   border-radius: 5px;
+  width: max-content;
   font-family: sans-serif;
   color: white;
   overflow: visible;
@@ -34,8 +35,9 @@ const TitleName = styled.div`
 `;
 
 const Ports = styled.div`
-  display: flex;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
 `;
 
 const PortsContainer = styled.div`
@@ -74,28 +76,37 @@ export class RelationshipNodeWidget extends React.Component<RelationshipNodeWidg
         <Title>
           <TitleName>{nodeOptions.label}</TitleName>
         </Title>
+        <div>
+          <label htmlFor={`occupationTypes_${this.props.node.getID()}`}></label>
+          <select
+            defaultValue={nodeOptions.relationshipType}
+            style={{ width: '100%' }}
+            name={`occupationTypes_${this.props.node.getID()}`}
+            onChange={(event) => {
+              this.props.node.getOptions().relationshipType = event.target.value;
+              this.forceUpdate();
+            }}
+          >
+            <option value="_">Select relationship type...</option>
+            {RelationshipTypes.map((typeName) => (
+              <option
+                key={`relationshipType_${this.props.node.getID()}_${typeName}`}
+                value={typeName}
+              >
+                {typeName}
+              </option>
+            ))}
+          </select>
+        </div>
         <Ports>
           <PortsContainer>
-            <DefaultPortLabel
-              engine={this.props.engine}
-              port={this.props.node.ownerPort}
-              key={this.props.node.ownerPort.getID()}
-            />
-            <DefaultPortLabel
-              engine={this.props.engine}
-              port={this.props.node.targetPort}
-              key={this.props.node.targetPort.getID()}
-            />
-            <DefaultPortLabel
-              engine={this.props.engine}
-              port={this.props.node.chargePort}
-              key={this.props.node.chargePort.getID()}
-            />
-            <DefaultPortLabel
-              engine={this.props.engine}
-              port={this.props.node.sparkPort}
-              key={this.props.node.sparkPort.getID()}
-            />
+            {this.props.node.getInPorts().map((port) => (
+              <DefaultPortLabel
+                engine={this.props.engine}
+                port={port}
+                key={port.getID()}
+              />
+            ))}
           </PortsContainer>
           <PortsContainer>
             <DefaultPortLabel

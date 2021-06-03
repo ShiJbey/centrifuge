@@ -13,7 +13,7 @@
 import { RelationshipNodeModelOptions } from './RelationshipNode';
 import { EventNodeModelOptions } from './EventNode';
 import { PersonNodeModelOptions } from './PersonNode';
-import { ModifierNodeModelOptions } from './ModifierNode';
+import { InequalityNodeModelOptions } from './InequalityNode';
 import { NumberNodeModelOptions } from './NumberNode';
 import { BoolNodeModelOptions } from './BoolNode';
 import { StringNodeModelOptions } from './StringNode';
@@ -35,7 +35,7 @@ export type CentrifugeNodeTypesModelOptions =
   RelationshipNodeModelOptions |
   EventNodeModelOptions |
   PersonNodeModelOptions |
-  ModifierNodeModelOptions |
+  InequalityNodeModelOptions |
   NumberNodeModelOptions |
   BoolNodeModelOptions |
   StringNodeModelOptions |

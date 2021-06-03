@@ -18,7 +18,7 @@ const Container = styled.div<{ color: string; background: string }>`
     width: 100%;
   }
 
-  background-image: linear-gradient(
+  /* background-image: linear-gradient(
       0deg,
       transparent 24%,
       ${(p) => p.color} 25%,
@@ -41,7 +41,7 @@ const Container = styled.div<{ color: string; background: string }>`
       ${(p) => p.color} 76%,
       transparent 77%,
       transparent
-    );
+    ); */
 `;
 
 const AppCanvasWidget: React.FC<AppCanvasWidgetProps> = (props) => {

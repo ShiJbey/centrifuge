@@ -18,7 +18,12 @@ import { VariableNodeFactory } from './nodes/VariableNode';
 import { NumberNodeFactory } from './nodes/NumberNode';
 import { StringNodeFactory } from './nodes/StringNode';
 import { BoolNodeFactory } from './nodes/BoolNode';
-import { ModifierNodeFactory } from './nodes/ModifierNode';
+import { InequalityNodeFactory } from './nodes/InequalityNode';
+import { BusinessNodeFactory } from './nodes/BusinessNode';
+import { OccupationNodeFactory } from './nodes/OccupationNode';
+import { SocialConnNodeFactory } from './nodes/SocialConnNode';
+import { NotNodeFactory } from './nodes/NotNode';
+import { NotJoinNodeFactory } from './nodes/NotJoinNode';
 
 class Application {
   protected activeModel: DiagramModel;
@@ -50,7 +55,12 @@ class Application {
     this.diagramEngine.getNodeFactories().registerFactory(new NumberNodeFactory());
     this.diagramEngine.getNodeFactories().registerFactory(new StringNodeFactory());
     this.diagramEngine.getNodeFactories().registerFactory(new BoolNodeFactory());
-    this.diagramEngine.getNodeFactories().registerFactory(new ModifierNodeFactory());
+    this.diagramEngine.getNodeFactories().registerFactory(new InequalityNodeFactory());
+    this.diagramEngine.getNodeFactories().registerFactory(new BusinessNodeFactory());
+    this.diagramEngine.getNodeFactories().registerFactory(new OccupationNodeFactory());
+    this.diagramEngine.getNodeFactories().registerFactory(new SocialConnNodeFactory());
+    this.diagramEngine.getNodeFactories().registerFactory(new NotNodeFactory());
+    this.diagramEngine.getNodeFactories().registerFactory(new NotJoinNodeFactory());
     this.diagramEngine.setModel(this.activeModel);
   }
 

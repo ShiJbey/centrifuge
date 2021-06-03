@@ -12,6 +12,7 @@ import {
   OPEN_DIR,
   OPEN_PATTERN_FILE,
   OPEN_TOWN_FILE,
+  QUERY_DATABASE,
 } from '../../utility/electronChannels';
 import ElectronAPI, {
   OpenDirectoryResponse,
@@ -27,8 +28,7 @@ import {
 } from '../../redux/fileTree/fileTreeActions';
 import { addEditor } from '../../redux/editors/editorActions';
 import { SerializedDiagram } from '../../utility/serialization';
-// import { wrap } from 'comlink';
-// import DbWorker from 'worker-loader!/../../db.worker';
+import { wrap } from 'comlink';
 
 declare const electron: ElectronAPI;
 
@@ -43,7 +43,19 @@ interface AppProps {
 export class App extends Component<AppProps> {
   componentDidMount() {
     this.registerElectronListeners();
-    this.launchWorker();
+    // this.launchWorker();
+    // electron.invoke(
+    //   QUERY_DATABASE,
+    //   `[
+    //     :find
+    //     [?eventType ...]
+    //     :in $ %
+    //     :where
+    //     [?e "event/type" ?eventType]
+    //   ]`
+    // ).then((res) => {
+    //   console.log(res);
+    // });
   }
 
   componentWillUnmount() {
@@ -52,13 +64,9 @@ export class App extends Component<AppProps> {
 
   async launchWorker() {
     const worker = new Worker('worker/index.js');
-    worker.postMessage({ a: 1 });
-    worker.onmessage = (event) => console.log("App onMsg:", event);
-
-    worker.addEventListener("message", (event) => {console.log(event)});
-    // const worker = new Worker('worker', {name: 'worker', type: 'module'});
-    // const {hello} = wrap<import('worker-loader!/../../db.worker.ts').default>(worker);
-    // console.log(hello());
+    const { hello } = wrap<import('../../db.worker').HelloWorker>(worker);
+    console.log(await hello());
+    worker.terminate();
   }
 
   registerElectronListeners() {
@@ -87,7 +95,10 @@ export class App extends Component<AppProps> {
     });
 
     electron.receive(OPEN_TOWN_FILE, (_, res: OpenFileResponse) => {
-      console.log(res);
+      const worker = new Worker('worker/index.js');
+      const { processTown } =
+        wrap<import('../../db.worker').HelloWorker>(worker);
+      processTown(res.payload.data);
     });
   }
 

@@ -53,7 +53,7 @@ export function createMenu(win: BrowserWindow): Menu {
           accelerator: 'CmdOrCtrl+Shift+O',
           click: () => {
             io.openFile(win, [
-              { name: 'Talktown Town', extensions: ['town'] },
+              { name: 'Talktown Town', extensions: ['town.json', 'json'] },
             ])
               .then((res) => {
                 if (res.status === 'ok')

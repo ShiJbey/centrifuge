@@ -1,20 +1,18 @@
 import React from 'react';
 import TrayItem from './TrayItem';
 import {
-  ASYMMETRIC_FRIENDSHIP_NODE_COLOR,
   EVENT_NODE_COLOR,
   RELATIONSHIP_NODE_COLOR,
   PERSON_NODE_COLOR,
-  LOVE_TRIANGLE_NODE_COLOR,
-  BUSINESS_RIVALRY_NODE_COLOR,
-  JEALOUS_UNCLE_NODE_COLOR,
-  LIKES_NODE_COLOR,
-  DISLIKES_NODE_COLOR,
   VARIABLE_NODE_COLOR,
   NUMBER_NODE_COLOR,
   STRING_NODE_COLOR,
   BOOL_NODE_COLOR,
   MODIFIER_NODE_COLOR,
+  BUSINESS_NODE_COLOR,
+  OCCUPATION_NODE_COLOR,
+  SOCIAL_CONN_NODE_COLOR,
+  NOT_JOIN_NODE_COLOR,
 } from '../../utility/constants';
 // import styles from './NodeTray.module.scss';
 
@@ -43,9 +41,24 @@ const NodeTray: React.FC = () => {
         color={BOOL_NODE_COLOR}
       />
       <TrayItem
-        model={{ type: 'modifier' }}
-        name="Modifier Node"
+        model={{ type: 'not' }}
+        name="Not Node"
         color={MODIFIER_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'notJoin' }}
+        name="Not Join Node"
+        color={NOT_JOIN_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'inequality' }}
+        name="Inequality"
+        color={MODIFIER_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'socialConn' }}
+        name="Social Connection"
+        color={SOCIAL_CONN_NODE_COLOR}
       />
       <hr></hr>
       <h3 className="text-center">Entities</h3>
@@ -63,6 +76,16 @@ const NodeTray: React.FC = () => {
         model={{ type: 'event' }}
         name="Event Node"
         color={EVENT_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'business' }}
+        name="Business Node"
+        color={BUSINESS_NODE_COLOR}
+      />
+      <TrayItem
+        model={{ type: 'occupation' }}
+        name="Occupation Node"
+        color={OCCUPATION_NODE_COLOR}
       />
       {/* <h3 className="text-center">Patterns</h3>
         <TrayItem

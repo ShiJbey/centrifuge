@@ -125,6 +125,11 @@ export class PatternEditor extends Component<
     this.setState({ ...this.state, showCode: true });
   }
 
+  queryDb() {
+    const [activeEditor] = this.props.editors.filter(editor => editor.id === this.props.activeEditor);
+    console.log(compilePattern(activeEditor.app.getActiveDiagram().serialize()));
+  }
+
   render() {
     return (
       <>
@@ -155,7 +160,7 @@ export class PatternEditor extends Component<
                     <FaPlus />
                   </span>
                 </Button>
-                <Button variant="light" className={classNames('mx-1')}>
+                <Button variant="light" className={classNames('mx-1')} onClick={() => this.queryDb()}>
                   Search
                 </Button>
                 <Button

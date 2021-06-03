@@ -29,66 +29,54 @@ export class PersonNodeModel extends NodeModel<
   PersonNodeModelGenerics & NodeModelGenerics
 > {
 
+  protected inputPorts: DefaultPortModel[] = [];
   public outPort: DefaultPortModel;
-  public agePort: DefaultPortModel;
-  public genderPort: DefaultPortModel;
-  public alivePort: DefaultPortModel;
-  public adultPort: DefaultPortModel;
-  public occupationPort: DefaultPortModel;
 
   constructor(options: PersonNodeModelOptions = { type: PERSON_NODE_TYPE, label: 'Person' }) {
     super({
       ...options,
     });
 
-    this.agePort = new DefaultPortModel({
-      in: true,
-      name: 'age',
-      label: 'age',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.genderPort = new DefaultPortModel({
-      in: true,
-      name: 'gender',
-      label: 'gender',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.alivePort = new DefaultPortModel({
-      in: true,
-      name: 'alive',
-      label: 'alive',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.adultPort = new DefaultPortModel({
-      in: true,
-      name: 'adult',
-      label: 'adult',
-      alignment: PortModelAlignment.LEFT,
-    });
-
-    this.occupationPort = new DefaultPortModel({
-      in: true,
-      name: 'occupation',
-      label: 'Occ.',
-      alignment: PortModelAlignment.LEFT,
-    });
-
     this.outPort = new DefaultPortModel({
       in: false,
       name: 'out',
-      label: 'person',
+      label: 'Out (P)',
       alignment: PortModelAlignment.RIGHT,
     });
-
-    this.addPort(this.agePort);
-    this.addPort(this.genderPort);
-    this.addPort(this.alivePort);
-    this.addPort(this.adultPort);
-    this.addPort(this.occupationPort);
     this.addPort(this.outPort);
+
+    this.addInputPort('birth', 'Birth (E)');
+    this.addInputPort('age', 'Age (Num)');
+    this.addInputPort('gender', 'Gender (Str+)');
+    this.addInputPort('tags', 'Tags (Str+)');
+    this.addInputPort('alive', 'Alive (Bool)');
+    this.addInputPort('death_year', 'Death Year (Num)');
+    this.addInputPort('attracted_to', 'Attracted To (P+)');
+    this.addInputPort('friends', 'Friends (P+)');
+    this.addInputPort('enemies', 'Enemies (P+)');
+    this.addInputPort('aquaintances', 'Acquiantances (P+)');
+    this.addInputPort('grieving', 'Grieving (Bool)');
+    this.addInputPort('college_graduate', 'College Graduate (Bool)');
+    this.addInputPort('retired', 'Retired (Bool)');
+    this.addInputPort('occupation', 'Occupation (Occ)');
+    this.addInputPort('pregnant', 'Pregnant (Bool)');
+    this.addInputPort('attracted_to', 'Attracted To (Str+)');
+  }
+
+  private addInputPort(name: string, label: string): DefaultPortModel {
+    const port = new DefaultPortModel({
+      in: true,
+      name,
+      label,
+      alignment: PortModelAlignment.LEFT,
+    });
+    this.addPort(port);
+    this.inputPorts.push(port);
+    return port;
+  }
+
+  public getInPorts(): DefaultPortModel[] {
+    return this.inputPorts;
   }
 
   public serialize(): any {

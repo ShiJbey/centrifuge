@@ -24,6 +24,7 @@ export class VariableNodeModel extends NodeModel<
   VariableNodeModelGenerics & NodeModelGenerics
 > {
   public outPort: DefaultPortModel;
+  public inPort: DefaultPortModel;
 
   constructor(
     options: VariableNodeModelOptions = {
@@ -40,11 +41,19 @@ export class VariableNodeModel extends NodeModel<
     this.outPort = new DefaultPortModel({
       in: false,
       name: 'out',
-      label: 'Var',
+      label: 'out',
       alignment: PortModelAlignment.RIGHT,
     });
 
+    this.inPort = new DefaultPortModel({
+      in: true,
+      name: 'in',
+      label: 'in',
+      alignment: PortModelAlignment.LEFT,
+    });
+
     this.addPort(this.outPort);
+    this.addPort(this.inPort);
   }
 
   public serialize(): SerializedNodeModel & VariableNodeModelOptions {

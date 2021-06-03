@@ -6,57 +6,50 @@ import {
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
-export interface ModifierNodeModelOptions {
+export const SOCIAL_CONN_NODE_TYPE = 'social-conn-node';
+
+export interface SocialConnNodeModelOptions {
   label: string;
-  name?: string;
+  relationshipType: string;
 }
 
-export interface ModifierNodeModelGenerics {
-  OPTIONS: ModifierNodeModelOptions;
+export interface SocialConnNodeModelGenerics {
+  OPTIONS: SocialConnNodeModelOptions;
 }
 
-export class ModifierNodeModel extends NodeModel<
-  ModifierNodeModelGenerics & NodeModelGenerics
+export class SocialConnNodeModel extends NodeModel<
+  SocialConnNodeModelGenerics & NodeModelGenerics
 > {
-  public outPort: DefaultPortModel;
   public valueAPort: DefaultPortModel;
   public valueBPort: DefaultPortModel
 
   constructor(
-    options: ModifierNodeModelOptions = {
-      label: 'Modifier',
-      name: 'X',
+    options: SocialConnNodeModelOptions = {
+      label: 'Social Connection',
+      relationshipType: 'friend',
     }
   ) {
     super({
       ...options,
-      type: 'modifier-node',
+      type: SOCIAL_CONN_NODE_TYPE,
     });
 
     this.valueAPort = new DefaultPortModel({
       in: true,
-      name: 'valueA',
-      label: 'value A',
+      name: 'subject',
+      label: 'Subject (P)',
       alignment: PortModelAlignment.LEFT,
     });
 
     this.valueBPort = new DefaultPortModel({
       in: true,
-      name: 'valueB',
-      label: 'value B',
+      name: 'other',
+      label: 'Other (P)',
       alignment: PortModelAlignment.LEFT,
-    });
-
-    this.outPort = new DefaultPortModel({
-      in: false,
-      name: 'out',
-      label: 'value A',
-      alignment: PortModelAlignment.RIGHT,
     });
 
     this.addPort(this.valueAPort);
     this.addPort(this.valueBPort);
-    this.addPort(this.outPort);
   }
 
   public serialize(): any {
