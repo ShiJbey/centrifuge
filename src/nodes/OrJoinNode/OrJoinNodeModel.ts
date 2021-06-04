@@ -8,29 +8,29 @@ import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import _ from 'lodash';
 import { SerializedNodeModel } from '../../utility/serialization';
 
-export const NOT_JOIN_NODE_TYPE = 'not-join-node';
+export const OR_JOIN_NODE_TYPE = 'or-join-node';
 
-export interface NotJoinNodeModelOptions {
-	type: typeof NOT_JOIN_NODE_TYPE;
+export interface OrJoinNodeModelOptions {
+	type: typeof OR_JOIN_NODE_TYPE;
 	label: string;
 	portsInOrder: string[];
 	portsOutOrder: string[];
 }
 
-export interface NotJoinNodeModelGenerics {
-	OPTIONS: NotJoinNodeModelOptions;
+export interface OrJoinNodeModelGenerics {
+	OPTIONS: OrJoinNodeModelOptions;
 }
 
-export class NotJoinNodeModel extends NodeModel<
-	NotJoinNodeModelGenerics & NodeModelGenerics
+export class OrJoinNodeModel extends NodeModel<
+	OrJoinNodeModelGenerics & NodeModelGenerics
 > {
 	protected inputPorts: DefaultPortModel[] = [];
 	protected outPorts: DefaultPortModel[] = [];
 
 	constructor(
-		options: NotJoinNodeModelOptions = {
-			type: NOT_JOIN_NODE_TYPE,
-			label: 'Not-Join',
+		options: OrJoinNodeModelOptions = {
+			type: OR_JOIN_NODE_TYPE,
+			label: 'Or-Join',
 			portsInOrder: [],
 			portsOutOrder: [],
 		}
@@ -105,7 +105,7 @@ export class NotJoinNodeModel extends NodeModel<
 		this.addPort(p);
 	}
 
-	serialize(): SerializedNodeModel & NotJoinNodeModelOptions {
+	serialize(): SerializedNodeModel & OrJoinNodeModelOptions {
 		return {
 			...super.serialize(),
 			...this.options,
