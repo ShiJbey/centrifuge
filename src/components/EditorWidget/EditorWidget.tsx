@@ -1,15 +1,7 @@
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
-import {
-	DiagramModel,
-	DiagramModelGenerics,
-	NodeModel,
-} from '@projectstorm/react-diagrams';
-import {
-	CanvasWidget,
-	BaseModel,
-	BaseModelGenerics,
-} from '@projectstorm/react-canvas-core';
+import { DiagramModel, DiagramModelGenerics, NodeModel } from '@projectstorm/react-diagrams';
+import { CanvasWidget, BaseModel, BaseModelGenerics } from '@projectstorm/react-canvas-core';
 import debounce from 'lodash/debounce';
 import AppCanvasWidget from '../AppCanvasWidget/AppCanvasWidget';
 import { PersonNodeModel } from '../../nodes/PersonNode/PersonNodeModel';
@@ -36,6 +28,7 @@ import { OrJoinNodeModel } from '../../nodes/OrJoinNode';
 import { OrNodeModel } from '../../nodes/OrNode';
 import { AndNodeModel } from '../../nodes/AndNode';
 import { CountNodeModel } from '../../nodes/CountNode';
+import { OutputNodeModel } from '../../nodes/OutputNode';
 
 const WidgetBody = styled.div`
 	position: relative;
@@ -70,13 +63,9 @@ export interface EditorWidgetState {
 	selectedNode: BaseModel<BaseModelGenerics>;
 }
 
-export class EditorWidget extends React.Component<
-	EditorWidgetProps,
-	EditorWidgetState
-> {
+export class EditorWidget extends React.Component<EditorWidgetProps, EditorWidgetState> {
 	debounceUpdate = debounce(
-		(diagram: DiagramModel<DiagramModelGenerics>) =>
-			this.props.onUpdate(diagram.serialize()),
+		(diagram: DiagramModel<DiagramModelGenerics>) => this.props.onUpdate(diagram.serialize()),
 		500
 	);
 
@@ -173,13 +162,13 @@ export class EditorWidget extends React.Component<
 			node = new AndNodeModel();
 		} else if (data.type === 'count') {
 			node = new CountNodeModel();
+		} else if (data.type === 'output') {
+			node = new OutputNodeModel();
 		} else {
 			return;
 		}
 
-		const point = this.props.editor.app
-			.getDiagramEngine()
-			.getRelativeMousePoint(event);
+		const point = this.props.editor.app.getDiagramEngine().getRelativeMousePoint(event);
 		node.setPosition(point);
 
 		node.registerListener({
@@ -219,10 +208,7 @@ export class EditorWidget extends React.Component<
 			<WidgetBody onContextMenu={() => console.log('open context menu')}>
 				{/* <ContextMenu /> */}
 				<WidgetContent>
-					<WidgetLayer
-						onDrop={this.onDrop.bind(this)}
-						onDragOver={this.onDragOver}
-					>
+					<WidgetLayer onDrop={this.onDrop.bind(this)} onDragOver={this.onDragOver}>
 						<AppCanvasWidget>
 							<CanvasWidget engine={this.props.editor.app.getDiagramEngine()} />
 						</AppCanvasWidget>

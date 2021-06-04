@@ -20,6 +20,7 @@ export const ONLY_CHILD_NODE_COLOR = 'rgb(23, 123, 210)';
 export const RELATIONSHIP_NODE_COLOR = 'rgb(23, 123, 210)';
 export const RIVALRY_NODE_COLOR = 'rgb(23, 123, 210)';
 export const SIBLINGS_NODE_COLOR = 'rgb(23, 123, 210)';
+export const OUTPUT_NODE_COLOR = '#ccc';
 export const VARIABLE_NODE_COLOR = '#ccc';
 export const NUMBER_NODE_COLOR = '#ccc';
 export const STRING_NODE_COLOR = '#ccc';
