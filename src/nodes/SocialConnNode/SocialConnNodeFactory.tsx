@@ -4,17 +4,19 @@ import { SocialConnNodeWidget } from './SocialConnNodeWidget';
 import { AbstractReactFactory, GenerateWidgetEvent } from '@projectstorm/react-canvas-core';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 
-export class SocialConnNodeFactory extends AbstractReactFactory<SocialConnNodeModel, DiagramEngine> {
+export class SocialConnNodeFactory extends AbstractReactFactory<
+	SocialConnNodeModel,
+	DiagramEngine
+> {
+	constructor() {
+		super(SOCIAL_CONN_NODE_TYPE);
+	}
 
-  constructor() {
-    super(SOCIAL_CONN_NODE_TYPE);
-  }
+	public generateModel(): SocialConnNodeModel {
+		return new SocialConnNodeModel();
+	}
 
-  public generateModel(): SocialConnNodeModel {
-    return new SocialConnNodeModel();
-  }
-
-  public generateReactWidget(event: GenerateWidgetEvent<SocialConnNodeModel>): JSX.Element {
-    return <SocialConnNodeWidget engine={this.engine} node={event.model} />
-  }
+	public generateReactWidget(event: GenerateWidgetEvent<SocialConnNodeModel>): JSX.Element {
+		return <SocialConnNodeWidget engine={this.engine} node={event.model} />;
+	}
 }

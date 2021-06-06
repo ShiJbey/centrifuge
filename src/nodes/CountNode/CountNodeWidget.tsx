@@ -1,41 +1,8 @@
 import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { CountNodeModel } from './CountNodeModel';
-import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import {
-	SELECTION_BORDER_COLOR,
-	MODIFIER_NODE_COLOR,
-} from '../../utility/constants';
-
-const Node = styled.div<{ selected: boolean }>`
-	box-sizing: content-box;
-	background-color: ${MODIFIER_NODE_COLOR};
-	border-radius: 5px;
-	font-family: sans-serif;
-	width: 12rem;
-	font-size: 1rem;
-	${(p) => (p.selected ? `border: solid 2px ${SELECTION_BORDER_COLOR}` : '')}
-`;
-
-const Header = styled.div`
-	font-size: 1.1rem;
-	font-weight: bold;
-	background: hsla(0, 0%, 0%, 0.5);
-	padding: 0.1rem;
-	color: white;
-`;
-
-const Ports = styled.div`
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: auto;
-`;
-
-const PortContainer = styled.div`
-	background-color: #00000039;
-	color: white;
-`;
+import { Node, Header, Ports, PortContainer, MODIFIER_NODE_COLOR } from '../nodeStyles';
 
 export interface CountNodeWidgetProps {
 	node: CountNodeModel;
@@ -49,7 +16,7 @@ export class CountNodeWidget extends React.Component<CountNodeWidgetProps> {
 
 	public render(): React.ReactNode {
 		return (
-			<Node selected={this.props.node.isSelected()}>
+			<Node background={MODIFIER_NODE_COLOR} selected={this.props.node.isSelected()}>
 				<Header>COUNT</Header>
 				<Ports>
 					<div>

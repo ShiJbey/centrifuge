@@ -1,20 +1,20 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { ChartDataset } from 'chart.js';
+// import { ChartDataset } from 'chart.js';
 import _ from 'lodash';
 import metrics from './eventMetrics.json';
 
 const colors = [
-  '#4bc0c0',
-  '#c06c4b',
-  '#8f90c5',
-  '#d63939',
-  '#66ff00',
-  '#fffb00',
-  '#ff9100',
-  '#2600ff',
-  '#ff00ea',
-  '#00f7ff',
+	'#4bc0c0',
+	'#c06c4b',
+	'#8f90c5',
+	'#d63939',
+	'#66ff00',
+	'#fffb00',
+	'#ff9100',
+	'#2600ff',
+	'#ff00ea',
+	'#00f7ff',
 ];
 
 const startYear = metrics.range.min;
@@ -24,15 +24,15 @@ const numBins = Math.ceil(yearRange / binSize);
 const labels = _.range(numBins).map((x) => x * binSize + startYear);
 
 const state = {
-  labels,
-  datasets: metrics.dataset.map((data, index) => {
-    return {
-      ...data,
-      borderWidth: 3,
-      backgroundColor: colors[index % colors.length],
-      borderColor: colors[index % colors.length],
-    };
-  }),
+	labels,
+	datasets: metrics.dataset.map((data, index) => {
+		return {
+			...data,
+			borderWidth: 3,
+			backgroundColor: colors[index % colors.length],
+			borderColor: colors[index % colors.length],
+		};
+	}),
 };
 // const state = {
 //   labels,
@@ -69,29 +69,29 @@ const state = {
 // };
 
 export class MetricsDashboard extends React.Component {
-  render() {
-    return (
-      <div>
-        <div className="container">
-          <Line
-            type="Line"
-            data={state}
-            options={{
-              title: {
-                display: true,
-                text: 'Average Rainfall per month',
-                fontSize: 20,
-              },
-              legend: {
-                display: true,
-                position: 'right',
-              },
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
+	render() {
+		return (
+			<div>
+				<div className="container">
+					<Line
+						type="Line"
+						data={state}
+						options={{
+							title: {
+								display: true,
+								text: 'Average Rainfall per month',
+								fontSize: 20,
+							},
+							legend: {
+								display: true,
+								position: 'right',
+							},
+						}}
+					/>
+				</div>
+			</div>
+		);
+	}
 }
 
 export default MetricsDashboard;

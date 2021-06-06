@@ -1,13 +1,9 @@
-import {
-	NodeModel,
-	DefaultPortModel,
-	PortModelAlignment,
-} from '@projectstorm/react-diagrams';
+import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { SerializedNodeModel } from '../../utility/serialization';
 
-export const AND_NODE_TYPE = 'and-node';
+export const AND_NODE_TYPE = 'AND-node';
 
 export interface AndNodeModelOptions {
 	type: typeof AND_NODE_TYPE;
@@ -18,16 +14,14 @@ export interface AndNodeModelGenerics {
 	OPTIONS: AndNodeModelOptions;
 }
 
-export class AndNodeModel extends NodeModel<
-	AndNodeModelGenerics & NodeModelGenerics
-> {
+export class AndNodeModel extends NodeModel<AndNodeModelGenerics & NodeModelGenerics> {
 	public outPort: DefaultPortModel;
 	public inPort: DefaultPortModel;
 
 	constructor(
 		options: AndNodeModelOptions = {
 			type: AND_NODE_TYPE,
-			label: 'And',
+			label: 'AND',
 		}
 	) {
 		super({
@@ -37,15 +31,16 @@ export class AndNodeModel extends NodeModel<
 		this.outPort = new DefaultPortModel({
 			in: false,
 			name: 'out',
-			label: 'out (Any)',
+			label: '',
 			alignment: PortModelAlignment.RIGHT,
 		});
 
 		this.inPort = new DefaultPortModel({
 			in: true,
 			name: 'in',
-			label: 'In (Any+)',
+			label: '',
 			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
 		});
 
 		this.addPort(this.outPort);

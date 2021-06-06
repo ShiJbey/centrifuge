@@ -1,8 +1,4 @@
-import {
-	NodeModel,
-	DefaultPortModel,
-	PortModelAlignment,
-} from '@projectstorm/react-diagrams';
+import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { SerializedNodeModel } from '../../utility/serialization';
@@ -18,16 +14,14 @@ export interface OrNodeModelGenerics {
 	OPTIONS: OrNodeModelOptions;
 }
 
-export class OrNodeModel extends NodeModel<
-	OrNodeModelGenerics & NodeModelGenerics
-> {
+export class OrNodeModel extends NodeModel<OrNodeModelGenerics & NodeModelGenerics> {
 	public outPort: DefaultPortModel;
 	public inPort: DefaultPortModel;
 
 	constructor(
 		options: OrNodeModelOptions = {
 			type: OR_NODE_TYPE,
-			label: 'Or',
+			label: 'OR',
 		}
 	) {
 		super({
@@ -37,15 +31,16 @@ export class OrNodeModel extends NodeModel<
 		this.outPort = new DefaultPortModel({
 			in: false,
 			name: 'out',
-			label: 'out (Any)',
+			label: '',
 			alignment: PortModelAlignment.RIGHT,
 		});
 
 		this.inPort = new DefaultPortModel({
 			in: true,
 			name: 'in',
-			label: 'In (Any+)',
+			label: '',
 			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
 		});
 
 		this.addPort(this.outPort);

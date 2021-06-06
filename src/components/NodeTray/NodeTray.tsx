@@ -4,26 +4,23 @@ import {
 	EVENT_NODE_COLOR,
 	RELATIONSHIP_NODE_COLOR,
 	PERSON_NODE_COLOR,
-	VARIABLE_NODE_COLOR,
-	NUMBER_NODE_COLOR,
-	STRING_NODE_COLOR,
-	BOOL_NODE_COLOR,
 	MODIFIER_NODE_COLOR,
 	BUSINESS_NODE_COLOR,
 	OCCUPATION_NODE_COLOR,
 	SOCIAL_CONN_NODE_COLOR,
 	OUTPUT_NODE_COLOR,
-} from '../../utility/constants';
+	PRIMITIVE_NODE_COLOR,
+} from '../../nodes/nodeStyles';
 // import styles from './NodeTray.module.scss';
 
 const NodeTray: React.FC = () => {
 	return (
 		<div>
 			<h3 className="text-center">Primitives</h3>
-			<TrayItem model={{ type: 'variable' }} name="Variable Node" color={VARIABLE_NODE_COLOR} />
-			<TrayItem model={{ type: 'number' }} name="Number Node" color={NUMBER_NODE_COLOR} />
-			<TrayItem model={{ type: 'string' }} name="String Node" color={STRING_NODE_COLOR} />
-			<TrayItem model={{ type: 'boolean' }} name="Boolean Node" color={BOOL_NODE_COLOR} />
+			<TrayItem model={{ type: 'variable' }} name="Variable Node" color={PRIMITIVE_NODE_COLOR} />
+			<TrayItem model={{ type: 'number' }} name="Number Node" color={PRIMITIVE_NODE_COLOR} />
+			<TrayItem model={{ type: 'string' }} name="String Node" color={PRIMITIVE_NODE_COLOR} />
+			<TrayItem model={{ type: 'boolean' }} name="Boolean Node" color={PRIMITIVE_NODE_COLOR} />
 			<TrayItem model={{ type: 'output' }} name="Output Node" color={OUTPUT_NODE_COLOR} />
 			<hr></hr>
 			<h3 className="text-center">Entities</h3>

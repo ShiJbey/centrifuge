@@ -7,12 +7,6 @@ import AppCanvasWidget from '../AppCanvasWidget/AppCanvasWidget';
 import { PersonNodeModel } from '../../nodes/PersonNode/PersonNodeModel';
 import { RelationshipNodeModel } from '../../nodes/RelationshipNode';
 import { EventNodeModel } from '../../nodes/EventNode';
-import { AsymmetricFriendshipNodeModel } from '../../nodes/AsymmetricFriendshipNode';
-import { LoveTriangleNodeModel } from '../../nodes/LoveTriangleNode';
-import { BusinessRivalryNodeModel } from '../../nodes/BusinessRivalryNode';
-import { JealousUncleNodeModel } from '../../nodes/JealousUncleNode';
-import { LikesNodeModel } from '../../nodes/LikesNode';
-import { DislikesNodeModel } from '../../nodes/DislikesNode';
 import { VariableNodeModel } from '../../nodes/VariableNode';
 import { BoolNodeModel } from '../../nodes/BoolNode';
 import { NumberNodeModel } from '../../nodes/NumberNode';
@@ -122,18 +116,6 @@ export class EditorWidget extends React.Component<EditorWidgetProps, EditorWidge
 			node = new RelationshipNodeModel();
 		} else if (data.type === 'event') {
 			node = new EventNodeModel();
-		} else if (data.type === 'asymmetric-friendship') {
-			node = new AsymmetricFriendshipNodeModel();
-		} else if (data.type === 'love-triangle') {
-			node = new LoveTriangleNodeModel();
-		} else if (data.type === 'business-rivalry') {
-			node = new BusinessRivalryNodeModel();
-		} else if (data.type === 'jealous-uncle') {
-			node = new JealousUncleNodeModel();
-		} else if (data.type === 'likes') {
-			node = new LikesNodeModel();
-		} else if (data.type === 'dislikes') {
-			node = new DislikesNodeModel();
 		} else if (data.type === 'variable') {
 			node = new VariableNodeModel();
 		} else if (data.type === 'string') {

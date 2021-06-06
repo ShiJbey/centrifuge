@@ -1,8 +1,4 @@
-import {
-	NodeModel,
-	DefaultPortModel,
-	PortModelAlignment,
-} from '@projectstorm/react-diagrams';
+import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { SerializedNodeModel } from '../../utility/serialization';
@@ -21,9 +17,7 @@ export interface OutputNodeModelGenerics {
 	OPTIONS: OutputNodeModelOptions;
 }
 
-export class OutputNodeModel extends NodeModel<
-	OutputNodeModelGenerics & NodeModelGenerics
-> {
+export class OutputNodeModel extends NodeModel<OutputNodeModelGenerics & NodeModelGenerics> {
 	public inPort: DefaultPortModel;
 
 	constructor(
@@ -42,7 +36,7 @@ export class OutputNodeModel extends NodeModel<
 		this.inPort = new DefaultPortModel({
 			in: true,
 			name: 'in',
-			label: 'In (Any)',
+			label: 'In (Entity)',
 			alignment: PortModelAlignment.LEFT,
 		});
 		this.addPort(this.inPort);

@@ -1,57 +1,8 @@
 import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
-import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
 import { OrJoinNodeModel } from './OrJoinNodeModel';
-import {
-	MODIFIER_NODE_COLOR,
-	SELECTION_BORDER_COLOR,
-} from '../../utility/constants';
-
-const Node = styled.div<{ selected: boolean }>`
-	background-color: ${MODIFIER_NODE_COLOR};
-	border-radius: 5px;
-	width: max-content;
-	font-family: sans-serif;
-	color: white;
-	overflow: visible;
-	font-size: 11px;
-	padding-bottom: 4px;
-	${(p) => (p.selected ? `border: solid 2px ${SELECTION_BORDER_COLOR}` : '')}
-`;
-
-const Title = styled.div`
-	background: rgba(0, 0, 0, 0.3);
-	display: flex;
-	white-space: nowrap;
-	justify-items: center;
-`;
-
-const TitleName = styled.div`
-	flex-grow: 1;
-	padding: 5px 5px;
-`;
-
-const Ports = styled.div`
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: auto;
-`;
-
-const PortsContainer = styled.div`
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	background-color: rgba(1, 1, 1, 0.6);
-
-	&:first-of-type {
-		margin-right: 10px;
-	}
-
-	&:only-child {
-		margin-right: 0px;
-	}
-`;
+import { Node, Header, Ports, PortContainer, MODIFIER_NODE_COLOR } from '../nodeStyles';
 
 export interface OrJoinNodeWidgetProps {
 	node: OrJoinNodeModel;
@@ -67,10 +18,8 @@ export class OrJoinNodeWidget extends React.Component<OrJoinNodeWidgetProps> {
 		const nodeOptions = this.props.node.getOptions();
 
 		return (
-			<Node selected={this.props.node.isSelected()}>
-				<Title>
-					<TitleName>{nodeOptions.label}</TitleName>
-				</Title>
+			<Node background={MODIFIER_NODE_COLOR} selected={this.props.node.isSelected()}>
+				<Header>{nodeOptions.label}</Header>
 				<div>
 					<button
 						onClick={() => {
@@ -90,24 +39,16 @@ export class OrJoinNodeWidget extends React.Component<OrJoinNodeWidgetProps> {
 					</button>
 				</div>
 				<Ports>
-					<PortsContainer>
+					<PortContainer>
 						{this.props.node.getInPorts().map((port) => (
-							<DefaultPortLabel
-								engine={this.props.engine}
-								port={port}
-								key={port.getID()}
-							/>
+							<DefaultPortLabel engine={this.props.engine} port={port} key={port.getID()} />
 						))}
-					</PortsContainer>
-					<PortsContainer>
+					</PortContainer>
+					<PortContainer>
 						{this.props.node.getOutPorts().map((port) => (
-							<DefaultPortLabel
-								engine={this.props.engine}
-								port={port}
-								key={port.getID()}
-							/>
+							<DefaultPortLabel engine={this.props.engine} port={port} key={port.getID()} />
 						))}
-					</PortsContainer>
+					</PortContainer>
 				</Ports>
 			</Node>
 		);

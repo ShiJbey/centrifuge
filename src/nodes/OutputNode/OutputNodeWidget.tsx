@@ -1,48 +1,15 @@
 import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { OutputNodeModel } from './OutputNodeModel';
-import styled from 'styled-components';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { OUTPUT_NODE_COLOR, SELECTION_BORDER_COLOR } from '../../utility/constants';
-
-const Node = styled.div<{ selected: boolean }>`
-	box-sizing: content-box;
-	background-color: ${OUTPUT_NODE_COLOR};
-	border-radius: 5px;
-	font-family: sans-serif;
-	width: 12rem;
-	font-size: 1rem;
-	${(p) => (p.selected ? `border: solid 2px ${SELECTION_BORDER_COLOR}` : '')}
-`;
-
-const Header = styled.div`
-	font-size: 1.1rem;
-	font-weight: bold;
-	background: hsla(0, 0%, 0%, 0.5);
-	padding: 0.1rem;
-	color: white;
-`;
-
-const Ports = styled.div`
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: auto;
-`;
-
-const OutputValue = styled.input`
-	color: black;
-	border-radius: 5px;
-	font-weight: bold;
-	background: #ccc;
-	overflow: hidden;
-	height: 100%;
-	width: 100%;
-`;
-
-const PortContainer = styled.div`
-	background-color: #00000039;
-	color: white;
-`;
+import {
+	Node,
+	Header,
+	Ports,
+	PortContainer,
+	OUTPUT_NODE_COLOR,
+	NodeValueInput,
+} from '../nodeStyles';
 
 export interface OutputNodeWidgetProps {
 	node: OutputNodeModel;
@@ -74,11 +41,11 @@ export class OutputNodeWidget extends React.Component<
 		};
 
 		return (
-			<Node selected={this.props.node.isSelected()}>
+			<Node background={OUTPUT_NODE_COLOR} selected={this.props.node.isSelected()}>
 				<Header>Output</Header>
 				<div style={{ width: '100%', display: 'flex' }}>
 					<label style={{ paddingLeft: '0.1rem', paddingRight: '0.1rem' }}>Name:</label>
-					<OutputValue
+					<NodeValueInput
 						type="text"
 						value={this.state.name}
 						onClick={(event) => {

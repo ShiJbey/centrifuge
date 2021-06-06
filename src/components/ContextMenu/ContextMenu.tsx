@@ -1,32 +1,32 @@
 import React from 'react';
-import { FaCopy, FaCut, FaPaste, FaTimes, FaTrash } from 'react-icons/fa';
+// import { FaCopy, FaCut, FaPaste, FaTimes, FaTrash } from 'react-icons/fa';
 import styled from 'styled-components';
 
 const ContextMenuContainer = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  z-index: 100;
-  width: 300px;
-  background-color: var(--bg);
-  border: var(--border);
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  overflow: hidden;
-  transition: height var(--speed) ease;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 100;
+	width: 300px;
+	background-color: var(--bg);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	padding: 1rem;
+	overflow: hidden;
+	transition: height var(--speed) ease;
 `;
 
 const Menu = styled.div`
-  width: 100%;
+	width: 100%;
 `;
 
 const MenuItem = styled.div`
-  height: 50px;
-  display: flex;
-  align-items: center;
-  border-radius: var(--border-radius);
-  transition: background var(--speed);
-  padding: 0.5rem;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	border-radius: var(--border-radius);
+	transition: background var(--speed);
+	padding: 0.5rem;
 `;
 
 // .menu-item .icon-button {
@@ -78,15 +78,13 @@ const MenuItem = styled.div`
 // }
 
 const ContextMenu = () => {
-  return (
-    <ContextMenuContainer>
-      <Menu>
-        <MenuItem>
-          <FaCut /> Cut
-        </MenuItem>
-      </Menu>
-    </ContextMenuContainer>
-  );
+	return (
+		<ContextMenuContainer>
+			<Menu>
+				<MenuItem>{/* <FaCut /> Cut */}</MenuItem>
+			</Menu>
+		</ContextMenuContainer>
+	);
 };
 
 export default ContextMenu;
