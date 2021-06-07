@@ -6,7 +6,6 @@ export const NOT_NODE_TYPE = 'not-node';
 
 export interface NotNodeModelOptions {
 	label: string;
-	sign: string;
 }
 
 export interface NotNodeModelGenerics {
@@ -20,7 +19,6 @@ export class NotNodeModel extends NodeModel<NotNodeModelGenerics & NodeModelGene
 	constructor(
 		options: NotNodeModelOptions = {
 			label: 'Not',
-			sign: '>',
 		}
 	) {
 		super({

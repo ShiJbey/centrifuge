@@ -53,7 +53,7 @@ export class OutputNodeModel extends NodeModel<OutputNodeModelGenerics & NodeMod
 		super.deserialize(event);
 		this.options.label = event.data.label;
 		this.options.name = event.data.name;
-		this.options.required = event.data.hidden;
+		this.options.required = event.data.required;
 		this.options.hidden = event.data.hidden;
 	}
 }

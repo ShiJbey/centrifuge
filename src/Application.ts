@@ -2,7 +2,7 @@ import createEngine, { DiagramEngine, DiagramModel } from '@projectstorm/react-d
 import { PersonNodeFactory } from './nodes/PersonNode/';
 import { EventNodeFactory } from './nodes/EventNode';
 import { RelationshipNodeFactory } from './nodes/RelationshipNode';
-import { VariableNodeFactory } from './nodes/VariableNode';
+// import { VariableNodeFactory } from './nodes/VariableNode';
 import { NumberNodeFactory } from './nodes/NumberNode';
 import { StringNodeFactory } from './nodes/StringNode';
 import { BoolNodeFactory } from './nodes/BoolNode';
@@ -32,7 +32,7 @@ class Application {
 		this.diagramEngine.getNodeFactories().registerFactory(new EventNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new PersonNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new RelationshipNodeFactory());
-		this.diagramEngine.getNodeFactories().registerFactory(new VariableNodeFactory());
+		// this.diagramEngine.getNodeFactories().registerFactory(new VariableNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new NumberNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new StringNodeFactory());
 		this.diagramEngine.getNodeFactories().registerFactory(new BoolNodeFactory());

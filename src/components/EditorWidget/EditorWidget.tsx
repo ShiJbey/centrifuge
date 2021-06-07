@@ -7,7 +7,7 @@ import AppCanvasWidget from '../AppCanvasWidget/AppCanvasWidget';
 import { PersonNodeModel } from '../../nodes/PersonNode/PersonNodeModel';
 import { RelationshipNodeModel } from '../../nodes/RelationshipNode';
 import { EventNodeModel } from '../../nodes/EventNode';
-import { VariableNodeModel } from '../../nodes/VariableNode';
+// import { VariableNodeModel } from '../../nodes/VariableNode';
 import { BoolNodeModel } from '../../nodes/BoolNode';
 import { NumberNodeModel } from '../../nodes/NumberNode';
 import { StringNodeModel } from '../../nodes/StringNode';
@@ -117,7 +117,7 @@ export class EditorWidget extends React.Component<EditorWidgetProps, EditorWidge
 		} else if (data.type === 'event') {
 			node = new EventNodeModel();
 		} else if (data.type === 'variable') {
-			node = new VariableNodeModel();
+			// node = new VariableNodeModel();
 		} else if (data.type === 'string') {
 			node = new StringNodeModel();
 		} else if (data.type === 'number') {

@@ -1,6 +1,7 @@
 import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
+import { SerializedNodeModel } from '../../utility/serialization';
 
 export const SOCIAL_CONN_NODE_TYPE = 'social-conn-node';
 
@@ -50,7 +51,7 @@ export class SocialConnNodeModel extends NodeModel<
 		this.addPort(this.valueBPort);
 	}
 
-	public serialize(): any {
+	public serialize(): SerializedNodeModel & SocialConnNodeModelOptions {
 		return {
 			...super.serialize(),
 			...this.options,
@@ -59,5 +60,6 @@ export class SocialConnNodeModel extends NodeModel<
 
 	public deserialize(event: DeserializeEvent<this>): void {
 		super.deserialize(event);
+		this.options.relationshipType = event.data.relationshipType;
 	}
 }

@@ -42,8 +42,8 @@ const NodeTray: React.FC = () => {
 			<TrayItem model={{ type: 'not' }} name="NOT Node" color={MODIFIER_NODE_COLOR} />
 			<TrayItem model={{ type: 'and' }} name="AND Node" color={MODIFIER_NODE_COLOR} />
 			<TrayItem model={{ type: 'or' }} name="OR Node" color={MODIFIER_NODE_COLOR} />
-			<TrayItem model={{ type: 'orJoin' }} name="OR-JOIN Node" color={MODIFIER_NODE_COLOR} />
-			<TrayItem model={{ type: 'notJoin' }} name="NOT-JOIN Node" color={MODIFIER_NODE_COLOR} />
+			{/* <TrayItem model={{ type: 'orJoin' }} name="OR-JOIN Node" color={MODIFIER_NODE_COLOR} />
+			<TrayItem model={{ type: 'notJoin' }} name="NOT-JOIN Node" color={MODIFIER_NODE_COLOR} /> */}
 			<TrayItem model={{ type: 'inequality' }} name="Inequality" color={MODIFIER_NODE_COLOR} />
 			<TrayItem model={{ type: 'count' }} name="Count Node" color={MODIFIER_NODE_COLOR} />
 			<TrayItem

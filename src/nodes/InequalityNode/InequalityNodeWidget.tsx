@@ -27,40 +27,46 @@ export class InequalityNodeWidget extends React.Component<
 				...this.state,
 				name: event.target.value,
 			});
-			this.props.node.getOptions().sign = event.target.value;
+			this.props.node.getOptions().symbol = event.target.value;
 		};
 
 		return (
 			<Node background={MODIFIER_NODE_COLOR} selected={this.props.node.isSelected()}>
-				<Header>{this.props.node.getOptions().label}</Header>
-				<Ports>
+				<Header>
 					<PortContainer>
 						<DefaultPortLabel
 							engine={this.props.engine}
-							port={this.props.node.valueAPort}
-							key={this.props.node.valueAPort.getID()}
-						/>
-						<div>
-							<select
-								onChange={onSignChange}
-								style={{ width: '100%', fontWeight: 'bold', fontSize: '1.1rem' }}
-								defaultValue={this.props.node.getOptions().sign}
-							>
-								<option value="!=">=</option>
-								<option value="!=">!=</option>
-								<option value=">">&#62;</option>
-								<option value="<">&#60;</option>
-								<option value=">=">&ge;</option>
-								<option value="<=">&le;</option>
-							</select>
-						</div>
-						<DefaultPortLabel
-							engine={this.props.engine}
-							port={this.props.node.valueBPort}
-							key={this.props.node.valueBPort.getID()}
+							port={this.props.node.outPort}
+							key={this.props.node.outPort.getID()}
 						/>
 					</PortContainer>
-				</Ports>
+				</Header>
+				<PortContainer>
+					<DefaultPortLabel
+						engine={this.props.engine}
+						port={this.props.node.valueAPort}
+						key={this.props.node.valueAPort.getID()}
+					/>
+					<div>
+						<select
+							onChange={onSignChange}
+							style={{ width: '100%', fontWeight: 'bold', fontSize: '1.1rem' }}
+							defaultValue={this.props.node.getOptions().symbol}
+						>
+							<option value="=">=</option>
+							<option value="!=">!=</option>
+							<option value=">">&#62;</option>
+							<option value="<">&#60;</option>
+							<option value=">=">&ge;</option>
+							<option value="<=">&le;</option>
+						</select>
+					</div>
+					<DefaultPortLabel
+						engine={this.props.engine}
+						port={this.props.node.valueBPort}
+						key={this.props.node.valueBPort.getID()}
+					/>
+				</PortContainer>
 			</Node>
 		);
 	}

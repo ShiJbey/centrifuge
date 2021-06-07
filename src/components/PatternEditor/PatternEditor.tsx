@@ -20,7 +20,7 @@ import EditorWidget from '../EditorWidget/EditorWidget';
 import styles from './PatternEditor.module.scss';
 import { SerializedDiagram } from '../../utility/serialization';
 import classNames from 'classnames';
-import { compilePattern } from '../../utility/patternCompiler/patternCompiler';
+import { compilePattern, toQueryString } from '../../utility/patternCompiler/patternCompiler';
 import NodeTray from '../NodeTray';
 import EditorPanel from '../EditorPanel/EditorPanel';
 
@@ -123,7 +123,8 @@ export class PatternEditor extends Component<PatternEditorProps, PatternEditorSt
 		const [activeEditor] = this.props.editors.filter(
 			(editor) => editor.id === this.props.activeEditor
 		);
-		console.log(compilePattern(activeEditor.app.getActiveDiagram().serialize()));
+		const pattern = compilePattern(activeEditor.app.getActiveDiagram().serialize());
+		console.log(toQueryString(pattern));
 	}
 
 	render() {
