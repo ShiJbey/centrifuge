@@ -20,6 +20,7 @@ export class SocialConnNodeModel extends NodeModel<
 > {
 	public valueAPort: DefaultPortModel;
 	public valueBPort: DefaultPortModel;
+	public outPort: DefaultPortModel;
 
 	constructor(
 		options: SocialConnNodeModelOptions = {
@@ -38,6 +39,7 @@ export class SocialConnNodeModel extends NodeModel<
 			name: 'subject',
 			label: 'Subject (P)',
 			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
 		});
 
 		this.valueBPort = new DefaultPortModel({
@@ -45,10 +47,20 @@ export class SocialConnNodeModel extends NodeModel<
 			name: 'other',
 			label: 'Other (P)',
 			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
+		});
+
+		this.outPort = new DefaultPortModel({
+			in: false,
+			name: 'out',
+			label: options.label,
+			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
 		});
 
 		this.addPort(this.valueAPort);
 		this.addPort(this.valueBPort);
+		this.addPort(this.outPort);
 	}
 
 	public serialize(): SerializedNodeModel & SocialConnNodeModelOptions {

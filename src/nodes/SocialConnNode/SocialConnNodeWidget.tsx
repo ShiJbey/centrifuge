@@ -94,41 +94,47 @@ export class SocialConnNodeWidget extends React.Component<
 
 		return (
 			<Node background={SOCIAL_CONN_NODE_COLOR} selected={this.props.node.isSelected()}>
-				<Header>{this.props.node.getOptions().label}</Header>
-				<Ports>
+				<Header>
 					<PortContainer>
 						<DefaultPortLabel
 							engine={this.props.engine}
-							port={this.props.node.valueAPort}
-							key={this.props.node.valueAPort.getID()}
-						/>
-						<div>
-							<select
-								onChange={onTypeChange}
-								style={{
-									width: '100%',
-									fontWeight: 'bold',
-									fontSize: '1.1rem',
-								}}
-								defaultValue={this.props.node.getOptions().relationshipType}
-							>
-								{ConnectionTypes.map((connType) => (
-									<option
-										key={`connType_${this.props.node.getID()}_${connType.name}`}
-										value={connType.name}
-									>
-										{connType.label}
-									</option>
-								))}
-							</select>
-						</div>
-						<DefaultPortLabel
-							engine={this.props.engine}
-							port={this.props.node.valueBPort}
-							key={this.props.node.valueBPort.getID()}
+							port={this.props.node.outPort}
+							key={this.props.node.outPort.getID()}
 						/>
 					</PortContainer>
-				</Ports>
+				</Header>
+				<PortContainer>
+					<DefaultPortLabel
+						engine={this.props.engine}
+						port={this.props.node.valueAPort}
+						key={this.props.node.valueAPort.getID()}
+					/>
+					<div>
+						<select
+							onChange={onTypeChange}
+							style={{
+								width: '100%',
+								fontWeight: 'bold',
+								fontSize: '1.1rem',
+							}}
+							defaultValue={this.props.node.getOptions().relationshipType}
+						>
+							{ConnectionTypes.map((connType) => (
+								<option
+									key={`connType_${this.props.node.getID()}_${connType.name}`}
+									value={connType.name}
+								>
+									{connType.label}
+								</option>
+							))}
+						</select>
+					</div>
+					<DefaultPortLabel
+						engine={this.props.engine}
+						port={this.props.node.valueBPort}
+						key={this.props.node.valueBPort.getID()}
+					/>
+				</PortContainer>
 			</Node>
 		);
 	}

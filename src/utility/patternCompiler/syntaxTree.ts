@@ -2,20 +2,25 @@ import { VariableNodeModelOptions } from '../../nodes/VariableNode';
 import { SerializedLinkModel, SerializedNodeModel } from '../serialization';
 import { isValidVariableName } from '../utils';
 
-export interface Param<T = any> {
+export interface Param {
 	/** Port Name */
 	portName: string;
 	/** Literal value */
-	value?: T;
+	value?: number | string | boolean;
 	/** Link ID */
 	dependency?: string;
 }
 
 export abstract class SyntaxTreeNode {
 	protected params: Map<string, Param>;
+	protected children: SyntaxTreeNode[] = [];
 
 	constructor() {
 		this.params = new Map();
+	}
+
+	addChild(node: SyntaxTreeNode): void {
+		this.children.push(node);
 	}
 
 	getParams(): Param[] {
@@ -26,21 +31,25 @@ export abstract class SyntaxTreeNode {
 		this.params.set(portID, { portName, dependency });
 	}
 
-	get(key: string): Param {
-		return this.params.get(key);
+	get(portID: string): Param {
+		return this.params.get(portID);
 	}
 }
 
 export type EntityType = 'person' | 'relationship' | 'event' | 'business' | 'occupation';
 
 export class EntitySyntaxNode extends SyntaxTreeNode {
-	protected entityType: string;
+	protected entityType: EntityType;
 	protected entityName: string;
 
 	constructor(entityType: EntityType, name: string) {
 		super();
 		this.entityType = entityType;
 		this.entityName = name;
+	}
+
+	getType(): EntityType {
+		return this.entityType;
 	}
 
 	getName(): string {
@@ -61,27 +70,40 @@ export class EntitySyntaxNode extends SyntaxTreeNode {
 }
 
 export class PrimitiveSyntaxNode extends SyntaxTreeNode {
+	protected value: number | string | boolean;
+
 	constructor(portID: string, value: number | string | boolean) {
 		super();
-		this.params.set(portID, { portName: 'out', value });
+		this.value = value;
+		this.params.set(portID, { portName: 'value', value });
+	}
+
+	getValue(): number | string | boolean {
+		return this.value;
 	}
 
 	toString(): string {
-		for (const [, value] of this.params) {
-			return String(value.value);
-		}
-		return '';
+		return String(this.value);
 	}
 }
 
 export class OutputSyntaxNode extends SyntaxTreeNode {
 	protected required: boolean;
 	protected hidden: boolean;
+	protected entities: EntitySyntaxNode[] = [];
 
 	constructor(required: boolean, hidden: boolean) {
 		super();
 		this.required = required;
 		this.hidden = hidden;
+	}
+
+	addEntitiy(entity: EntitySyntaxNode): void {
+		this.entities.push(entity);
+	}
+
+	getEntities(): EntitySyntaxNode[] {
+		return this.entities;
 	}
 
 	addNameDependency(param: Param): void {
@@ -98,49 +120,48 @@ export class OutputSyntaxNode extends SyntaxTreeNode {
 }
 
 export class CountSyntaxNode extends SyntaxTreeNode {
-	protected in: Param;
-	protected out: Param;
+	protected inputVarName: string;
+	protected outputVarName: string;
 
-	setInput(portID: string, dependency: Param): void {
-		this.in = dependency;
-		this.params.set(portID, dependency);
+	constructor(inputVarName: string) {
+		super();
+		this.inputVarName = inputVarName;
+		this.outputVarName = `${inputVarName}_count`;
 	}
 
-	setOutputName(portID: string, name: string): void {
-		this.out = { portName: 'out', value: name };
-		this.params.set(portID, this.out);
+	getInputVarName(): string {
+		return this.inputVarName;
+	}
+
+	getOutputVarName(): string {
+		return this.outputVarName;
 	}
 
 	toString(): string {
-		return `[(count ${this.in.value}) ${this.out.value}]`;
+		return `[(count ${this.inputVarName}) ${this.outputVarName}]`;
 	}
 }
 
 export class SocialConnSyntaxNode extends SyntaxTreeNode {
-	protected subjectName: string;
+	protected subject: string;
+	protected other: string;
 	protected relationshipType: string;
-	protected other: Param;
 
 	constructor(relationshipType: string) {
 		super();
 		this.relationshipType = relationshipType;
 	}
 
-	setSubject(subject: Param): void {
-		this.params.set('subject', subject);
+	setSubject(subject: string): void {
+		this.subject = subject;
 	}
 
-	setOther(portID: string, other: Param): void {
+	setOther(other: string): void {
 		this.other = other;
-		this.params.set(portID, other);
-	}
-
-	setSubjectName(subject: string): void {
-		this.subjectName = subject;
 	}
 
 	toString(): string {
-		return `[${this.subjectName} "person/${this.relationshipType}" ${this.other?.value})]\n`;
+		return `[${this.subject} "person/${this.relationshipType}" ${this.other})]\n`;
 	}
 }
 
@@ -148,6 +169,8 @@ export class InequalitySyntaxNode extends SyntaxTreeNode {
 	protected symbol: string;
 	protected first: Param;
 	protected second: Param;
+	protected valA: number | string | boolean;
+	protected valB: number | string | boolean;
 
 	constructor(symbol: string, first: Param, second: Param) {
 		super();
@@ -158,12 +181,31 @@ export class InequalitySyntaxNode extends SyntaxTreeNode {
 		this.params.set('second', second);
 	}
 
+	setValueA(value: number | string | boolean): void {
+		this.valA = value;
+	}
+
+	setValueB(value: number | string | boolean): void {
+		this.valB = value;
+	}
+
 	toString(): string {
-		return `[(${this.symbol} ${this.first?.value} ${this.second?.value})]\n`;
+		return `[(${this.symbol} ${this.valA} ${this.valB})]\n`;
 	}
 }
 
-export type SyntaxTreeNodeTypes = PrimitiveSyntaxNode | EntitySyntaxNode | InequalitySyntaxNode;
+export class LogicalOpSyntaxNode extends SyntaxTreeNode {
+	protected op: 'and' | 'or' | 'not';
+
+	constructor(op: 'and' | 'or' | 'not') {
+		super();
+		this.op = op;
+	}
+
+	toString(): string {
+		return `(${this.op} ${this.children.map((child) => child.toString()).join('')})\n`;
+	}
+}
 
 export interface PatternParam {
 	/** Name of the variable */
@@ -187,7 +229,8 @@ export interface CompiledPattern {
 export class PatternSyntaxTree {
 	private usedNames: Set<string> = new Set();
 	private dependencies: Map<string, SerializedLinkModel> = new Map();
-	private nodes: Map<string, SyntaxTreeNodeTypes> = new Map();
+	private nodes: Map<string, SyntaxTreeNode> = new Map();
+	private leafNodes: Map<string, SyntaxTreeNode> = new Map();
 
 	/** Insert dependency link between ports */
 	addDependencyLink(link: SerializedLinkModel): void {
@@ -206,7 +249,17 @@ export class PatternSyntaxTree {
 	}
 
 	insertPrimitiveNode(value: any, node: SerializedNodeModel) {
-		const syntaxNode = new PrimitiveSyntaxNode(node.ports[0].id, value);
+		const [outPort] = node.ports.filter((port) => port.name === 'out');
+
+		if (!outPort) {
+			throw new Error('Cannot find output port for primitive node');
+		}
+
+		if (!outPort.links.length) {
+			console.warn('Primitive node lacks any children');
+		}
+
+		const syntaxNode = new PrimitiveSyntaxNode(outPort.id, value);
 		this.nodes.set(node.id, syntaxNode);
 	}
 
@@ -222,152 +275,288 @@ export class PatternSyntaxTree {
 	}
 
 	insertOutputNode(required: boolean, hidden: boolean, node: SerializedNodeModel): void {
-		// if (this.isVariableNameTaken(name)) {
-		// 	throw new Error(`Duplicate output variable name '${name}'`);
-		// } else {
-		// 	this.usedNames.add(name);
-		// }
+		const [inputPort] = node.ports.filter((port) => port.name === 'in');
 
-		// if (!isValidVariableName(name)) {
-		// 	throw new Error(`Invalid variable name '${name}' contains special characters`);
-		// }
+		if (!inputPort) {
+			throw new Error('Could not find input port on Output Node');
+		}
 
-		if (node.ports[0].links.length) {
+		if (!inputPort.links.length) {
+			throw new Error('No incoming links on output node');
+		}
+
+		if (inputPort.links.length) {
 			const syntaxNode = new OutputSyntaxNode(required, hidden);
-			syntaxNode.addNameDependency({
-				portName: 'in',
-				dependency: node.ports[0].links[0],
-			});
+
+			for (const linkID of inputPort.links) {
+				const depLink = this.dependencies.get(linkID);
+
+				if (depLink.source === node.id) {
+					throw new Error('Backwards connection between Ouput Node and source');
+				}
+
+				const depNode = this.nodes.get(depLink.source);
+
+				if (!depNode) {
+					throw new Error('Could not find dependecy for output');
+				} else if (depNode instanceof EntitySyntaxNode) {
+					syntaxNode.addEntitiy(depNode);
+				} else {
+					throw new Error('Output node needs to be attached to an Entity Node');
+				}
+			}
+
 			this.nodes.set(node.id, syntaxNode);
+			this.leafNodes.set(node.id, syntaxNode);
 		}
 	}
 
 	insertInequalityNode(symbol: string, node: SerializedNodeModel): void {
-		if (node.ports[0].links.length < 1) {
-			throw new Error('Inequality node missing first input');
+		const [valueAPort] = node.ports.filter((port) => port.name === 'valueA');
+		const [valueBPort] = node.ports.filter((port) => port.name === 'valueB');
+		const [outputPort] = node.ports.filter((port) => port.name === 'out');
+
+		if (!valueAPort) {
+			throw new Error("Could not find port with name'valueA' on Inequality node.");
+		} else if (valueAPort.links.length !== 1) {
+			throw new Error('Incorrect number of inputs to first port of Inequality node');
 		}
-		if (node.ports[1].links.length < 1) {
-			throw new Error('Inequality node missing second input');
+
+		if (!valueBPort) {
+			throw new Error("Could not find port with name'valueB' on Inequality node.");
+		} else if (valueBPort.links.length !== 1) {
+			throw new Error('Incorrect number of inputs to second port of Inequality node');
 		}
+
+		if (!outputPort) {
+			throw new Error('Could not find output port with name: out');
+		}
+
 		const syntaxNode = new InequalitySyntaxNode(
 			symbol,
 			{
-				portName: node.ports[0].name,
-				dependency: node.ports[0].links[0],
+				portName: valueAPort.name,
+				dependency: valueAPort.links[0],
 			},
 			{
-				portName: node.ports[1].name,
-				dependency: node.ports[1].links[0],
+				portName: valueBPort.name,
+				dependency: valueBPort.links[0],
 			}
 		);
+
+		// Get the values for this node
+		const [inputALinkID] = valueAPort.links;
+		let depLink = this.dependencies.get(inputALinkID);
+		if (depLink.source === node.id) {
+			throw new Error('Backwards connection between first port on Inquality');
+		}
+
+		let depNode = this.nodes.get(depLink.source);
+		if (!depNode) {
+			throw new Error('Could not find dependency for inequality');
+		} else if (depNode instanceof EntitySyntaxNode) {
+			syntaxNode.setValueA(depNode.get(depLink.sourcePort).value);
+		} else if (depNode instanceof PrimitiveSyntaxNode) {
+			syntaxNode.setValueA(depNode.getValue());
+		} else if (depNode instanceof CountSyntaxNode) {
+			syntaxNode.setValueA(depNode.getOutputVarName());
+		} else {
+			throw new Error(
+				`Inequality node cannot accept connection from node of type ${typeof depNode}`
+			);
+		}
+
+		const [inputBLinkID] = valueBPort.links;
+		depLink = this.dependencies.get(inputBLinkID);
+		if (depLink.source === node.id) {
+			throw new Error('Backwards connection between second port on Inquality');
+		}
+
+		depNode = this.nodes.get(depLink.source);
+		if (!depNode) {
+			throw new Error('Could not find dependency for inequality');
+		} else if (depNode instanceof EntitySyntaxNode) {
+			syntaxNode.setValueB(depNode.get(depLink.sourcePort).value);
+		} else if (depNode instanceof PrimitiveSyntaxNode) {
+			syntaxNode.setValueB(depNode.getValue());
+		} else if (depNode instanceof CountSyntaxNode) {
+			syntaxNode.setValueB(depNode.getOutputVarName());
+		} else {
+			throw new Error(
+				`Inequality node cannot accept connection from node of type ${typeof depNode}`
+			);
+		}
+
 		this.nodes.set(node.id, syntaxNode);
+
+		if (!outputPort.links.length) {
+			this.leafNodes.set(node.id, syntaxNode);
+		}
 	}
 
 	insertCountNode(name: string, node: SerializedNodeModel): void {
 		const [input] = node.ports.filter((p) => p.name === 'in');
 		const [output] = node.ports.filter((p) => p.name === 'out');
-		if (!input.links.length) {
-			throw new Error('Count node missing input');
+
+		if (!input) {
+			throw new Error('Could not find input port with name: in');
+		} else if (!input.links.length) {
+			throw new Error('Count node missing input link');
 		}
-		if (!output.links.length) {
+
+		if (!output) {
+			throw new Error('Could not find output port with name: out');
+		} else if (!output.links.length) {
 			throw new Error('Count node missing output');
 		}
-		const syntaxNode = new CountSyntaxNode();
-		syntaxNode.setInput(input.id, { portName: input.name, dependency: input.links[0] });
-		syntaxNode.setOutputName(output.id, name);
-		this.nodes.set(node.id, syntaxNode);
+
+		// Get the input variable name
+		const depLink = this.dependencies.get(input.links[0]);
+
+		if (depLink.source === node.id) {
+			throw new Error('Backwards connection between Count Node and source');
+		}
+
+		const depNode = this.nodes.get(depLink.source);
+
+		if (!depNode) {
+			throw new Error('Could not find dependecy for COUNT node');
+		} else if (depNode instanceof EntitySyntaxNode) {
+			const syntaxNode = new CountSyntaxNode(String(depNode.get(depLink.sourcePort).value));
+			this.nodes.set(node.id, syntaxNode);
+			if (!output.links.length) {
+				this.leafNodes.set(node.id, syntaxNode);
+			}
+		} else {
+			throw new Error('Output node needs to be attached to an Entity Node');
+		}
 	}
 
 	insertSocialConnNode(relationshipType: string, node: SerializedNodeModel): void {
-		if (node.ports[0].links.length < 1) {
+		const [subjectPort] = node.ports.filter((port) => port.name === 'subject');
+		const [otherPort] = node.ports.filter((port) => port.name === 'other');
+		const [outputPort] = node.ports.filter((port) => port.name === 'out');
+
+		if (!subjectPort) {
+			throw new Error('Could not find port with name: subject');
+		} else if (subjectPort.links.length !== 1) {
 			throw new Error('Social Connection node missing first input');
 		}
-		if (node.ports[1].links.length < 1) {
+
+		if (!otherPort) {
+			throw new Error('Could not find port with name: other');
+		} else if (otherPort.links.length < 1) {
 			throw new Error('Social Connection node missing second input');
 		}
+
+		if (!outputPort) {
+			throw new Error('Could not find port with name: out');
+		}
+
 		const syntaxNode = new SocialConnSyntaxNode(relationshipType);
-		syntaxNode.setSubject({
-			portName: node.ports[0].name,
-			dependency: node.ports[0].links[0],
-		});
-		syntaxNode.setOther(node.ports[1].id, {
-			portName: node.ports[1].name,
-			dependency: node.ports[1].links[0],
-		});
+
+		// Get the information from the entities
+		const [subjectLinkID] = subjectPort.links;
+		let depLink = this.dependencies.get(subjectLinkID);
+		if (depLink.source === node.id) {
+			throw new Error('Backwards connection on social connection subject port');
+		}
+		let depNode = this.nodes.get(depLink.source);
+		if (!depNode) {
+			throw new Error('Could not find dependency for subject');
+		} else if (depNode instanceof EntitySyntaxNode && depNode.getType() === 'person') {
+			syntaxNode.setSubject(depNode.getName());
+		} else {
+			throw new Error('Social connection only accepts Person nodes');
+		}
+
+		const [otherLinkID] = otherPort.links;
+		depLink = this.dependencies.get(otherLinkID);
+		if (depLink.source === node.id) {
+			throw new Error('Backwards connection between first port on Inquality');
+		}
+		depNode = this.nodes.get(depLink.source);
+		if (!depNode) {
+			throw new Error('Could not find dependency for inequality');
+		} else if (depNode instanceof EntitySyntaxNode && depNode.getType() === 'person') {
+			syntaxNode.setOther(String(depNode.get(depLink.sourcePort).value));
+		} else {
+			throw new Error('Social connection only accepts Person nodes');
+		}
+
 		this.nodes.set(node.id, syntaxNode);
+		if (!outputPort.links.length) {
+			this.leafNodes.set(node.id, syntaxNode);
+		}
+	}
+
+	insertLogicalOpNode(op: 'and' | 'or' | 'not', node: SerializedNodeModel): void {
+		const [input] = node.ports.filter((p) => p.name === 'in');
+		const [output] = node.ports.filter((p) => p.name === 'out');
+
+		if (!input) {
+			throw new Error('Could not find input port with name: in');
+		} else if (!input.links.length) {
+			throw new Error(`Logical '${op}' node missing input link`);
+		}
+
+		if (!output) {
+			throw new Error('Could not find output port with name: out');
+		}
+
+		const syntaxNode = new LogicalOpSyntaxNode(op);
+
+		for (const linkID of input.links) {
+			const depLink = this.dependencies.get(linkID);
+			if (depLink.source === node.id) {
+				throw new Error('Backwards connection on social connection subject port');
+			}
+			const depNode = this.nodes.get(depLink.source);
+			if (!depNode) {
+				throw new Error('Could not find dependency for subject');
+			} else if (
+				depNode instanceof InequalitySyntaxNode ||
+				depNode instanceof LogicalOpSyntaxNode ||
+				depNode instanceof SocialConnSyntaxNode
+			) {
+				syntaxNode.addChild(depNode);
+			} else {
+				throw new Error(
+					'Social connection only accepts Inequality, Logical, and Social Connection nodes'
+				);
+			}
+		}
+
+		this.nodes.set(node.id, syntaxNode);
+		if (!output.links.length) {
+			this.leafNodes.set(node.id, syntaxNode);
+		}
 	}
 
 	parseTree(patternName: string): CompiledPattern {
 		let whereClauses = '';
 		const parameters: PatternParam[] = [];
 
-		for (const [, node] of this.nodes) {
-			this.propagateDependencies(node);
-			if (node instanceof EntitySyntaxNode) {
-				whereClauses += node.toString();
-			} else if (node instanceof OutputSyntaxNode) {
-				const depLink = this.dependencies.get(node.get('name').dependency);
-				const depNode = this.nodes.get(depLink.source);
-				if (depNode instanceof EntitySyntaxNode) {
+		for (const [, node] of this.leafNodes) {
+			if (node instanceof OutputSyntaxNode) {
+				for (const entity of node.getEntities()) {
 					parameters.push({
-						name: depNode.getName(),
+						name: entity.getName(),
 						hidden: node.isHidden(),
 						required: node.isRequired(),
 					});
-				} else {
-					throw new Error('Output node needs to be attached to an Entity Node');
+					whereClauses += entity.toString();
 				}
-			} else if (node instanceof InequalitySyntaxNode) {
+			} else {
 				whereClauses += node.toString();
-			} else if (node instanceof CountSyntaxNode) {
-				//
-			} else if (node instanceof SocialConnSyntaxNode) {
-				const depLink = this.dependencies.get(node.get('subject').dependency);
-				const depNode = this.nodes.get(depLink.source);
-				if (depNode instanceof EntitySyntaxNode) {
-					node.setSubjectName(depNode.getName());
-					whereClauses += node.toString();
-				} else {
-					throw new Error('Social Conncection node needs to be attached to an Person Node');
-				}
 			}
 		}
+
 		return {
 			name: patternName,
 			parameters,
 			whereClauses,
 		};
-	}
-
-	private propagateDependencies(node: SyntaxTreeNode): void {
-		const params: Param[] = node.getParams();
-		for (const param of params) {
-			this.findDependency(param);
-		}
-	}
-
-	/** Traces the dependency tree to find the value of a variable */
-	private findDependency(param: Param): void {
-		let value: any;
-		let focus = param;
-		const dependencyStack = [];
-
-		while (focus) {
-			if (focus.value) {
-				value = focus.value;
-				break;
-			} else if (focus.dependency) {
-				dependencyStack.push(focus);
-				// Track down the param this has a dependency on
-				const depLink = this.dependencies.get(focus.dependency);
-				const sourceNodeID = depLink.source;
-				focus = this.nodes.get(sourceNodeID).get(depLink.sourcePort);
-			}
-		}
-
-		for (const param of dependencyStack) {
-			param.value = value;
-		}
 	}
 
 	/** Check if a variable name has already been used */

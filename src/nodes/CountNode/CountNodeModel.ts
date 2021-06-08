@@ -1,8 +1,4 @@
-import {
-	NodeModel,
-	DefaultPortModel,
-	PortModelAlignment,
-} from '@projectstorm/react-diagrams';
+import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { SerializedNodeModel } from '../../utility/serialization';
@@ -18,9 +14,7 @@ export interface CountNodeModelGenerics {
 	OPTIONS: CountNodeModelOptions;
 }
 
-export class CountNodeModel extends NodeModel<
-	CountNodeModelGenerics & NodeModelGenerics
-> {
+export class CountNodeModel extends NodeModel<CountNodeModelGenerics & NodeModelGenerics> {
 	public outPort: DefaultPortModel;
 	public inPort: DefaultPortModel;
 
@@ -34,22 +28,21 @@ export class CountNodeModel extends NodeModel<
 			...options,
 		});
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'out',
-			label: 'out (Num)',
-			alignment: PortModelAlignment.RIGHT,
-		});
-
 		this.inPort = new DefaultPortModel({
 			in: true,
 			name: 'in',
 			label: 'In (Any)',
 			alignment: PortModelAlignment.LEFT,
 		});
-
-		this.addPort(this.outPort);
 		this.addPort(this.inPort);
+
+		this.outPort = new DefaultPortModel({
+			in: false,
+			name: 'out',
+			label: 'out (Num)',
+			alignment: PortModelAlignment.RIGHT,
+		});
+		this.addPort(this.outPort);
 	}
 
 	public serialize(): SerializedNodeModel & CountNodeModelOptions {

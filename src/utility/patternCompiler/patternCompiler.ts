@@ -44,11 +44,26 @@ function getNodes(model: SerializedDiagram): {
 	return {};
 }
 
-function getChildren(node: SerializedNodeModel): string[] {
+function getParents(
+	node: SerializedNodeModel,
+	links: { [id: string]: SerializedLinkModel }
+): string[] {
+	return node.ports
+		.filter((p) => p.alignment === 'left')
+		.map((p) => p.links)
+		.reduce((acc, curr) => acc.concat(curr), [])
+		.map((linkID) => links[linkID].source);
+}
+
+function getChildren(
+	node: SerializedNodeModel,
+	links: { [id: string]: SerializedLinkModel }
+): string[] {
 	return node.ports
 		.filter((p) => p.alignment === 'right')
 		.map((p) => p.links)
-		.reduce((acc, curr) => acc.concat(curr), []);
+		.reduce((acc, curr) => acc.concat(curr), [])
+		.map((linkID) => links[linkID].target);
 }
 
 export function toRuleString(pattern: CompiledPattern): string {
@@ -94,50 +109,101 @@ export function compilePattern(diagram: SerializedDiagram, name = 'pattern'): Co
 	}
 
 	const nodes = getNodes(diagram);
+
+	const rootNodes = Object.values(nodes).filter(
+		(node) => node && getParents(node, links).length === 0
+	);
+
+	// Prevent adding duplicates
+	const touchedNodes: Set<string> = new Set<string>();
+	// Know when to process a child node
+	const processedNodes: Set<string> = new Set<string>();
+	// Nodes to be processed
+	const nodeQueue: { node: SerializedNodeModel; parents: string[] }[] = rootNodes.map((node) => {
+		return { node, parents: [] };
+	});
+
 	let numPersonNodes = 0;
 	let numEventNodes = 0;
 	let numRelationshipNodes = 0;
 	let numBusinessNodes = 0;
 	let numOccupationNodes = 0;
-	// let numCountNodes = 0;
+	let numCountNodes = 0;
 
-	for (const node of Object.values(nodes)) {
+	while (nodeQueue.length) {
+		const { node, parents } = nodeQueue.shift();
+
+		// make sure all the parents have been processed
+		for (const parentID of parents) {
+			if (!processedNodes.has(parentID)) {
+				nodeQueue.push({ node, parents });
+				continue;
+			}
+		}
+
+		processedNodes.add(node.id);
+
+		const children = getChildren(node, links).map((id) => nodes[id]);
+		for (const child of children) {
+			if (!touchedNodes.has(child.id)) {
+				nodeQueue.push({
+					node: child,
+					parents: getParents(child, links),
+				});
+				touchedNodes.add(child.id);
+			}
+		}
+
 		switch (node.type) {
 			// Entities
 			case PERSON_NODE_TYPE: {
+				if (children.length === 0) {
+					console.warn('Person Node is missing children or export');
+				}
 				syntaxTree.insertEntityNode('person', `?person_${numPersonNodes}`, node);
 				numPersonNodes += 1;
 				break;
 			}
 			case RELATIONSHIP_NODE_TYPE: {
+				if (children.length === 0) {
+					console.warn('Relationship Node is missing children or export');
+				}
 				syntaxTree.insertEntityNode('relationship', `?relationship_${numRelationshipNodes}`, node);
 				numRelationshipNodes += 1;
 				break;
 			}
 			case EVENT_NODE_TYPE: {
+				if (children.length === 0) {
+					console.warn('Event Node is missing children or export');
+				}
 				syntaxTree.insertEntityNode('event', `?event_${numEventNodes}`, node);
 				numEventNodes += 1;
 				break;
 			}
 			case BUSINESS_NODE_TYPE: {
+				if (children.length === 0) {
+					console.warn('Business Node is missing children or export');
+				}
 				syntaxTree.insertEntityNode('business', `?business_${numBusinessNodes}`, node);
 				numBusinessNodes += 1;
 				break;
 			}
 			case OCCUPATION_NODE_TYPE: {
+				if (children.length === 0) {
+					console.warn('Occupation Node is missing children or export');
+				}
 				syntaxTree.insertEntityNode('occupation', `?occupation_${numOccupationNodes}`, node);
 				numOccupationNodes += 1;
 				break;
 			}
 			// Modifiers
 			case AND_NODE_TYPE: {
-				console.warn('Compiler skipping AND Node');
+				syntaxTree.insertLogicalOpNode('and', node);
 				break;
 			}
 			case COUNT_NODE_TYPE: {
-				console.warn('Compiler skipping COUNT Node');
-				// syntaxTree.insertCountNode(`?count_${numCountNodes}`, node);
-				// numCountNodes++;
+				syntaxTree.insertCountNode(`?count_${numCountNodes}`, node);
+				numCountNodes++;
 				break;
 			}
 			case INEQUALITY_NODE_TYPE: {
@@ -150,7 +216,7 @@ export function compilePattern(diagram: SerializedDiagram, name = 'pattern'): Co
 				break;
 			}
 			case NOT_NODE_TYPE: {
-				console.warn('Compiler skipping NOT Node');
+				syntaxTree.insertLogicalOpNode('not', node);
 				break;
 			}
 			case OR_JOIN_NODE_TYPE: {
@@ -158,7 +224,7 @@ export function compilePattern(diagram: SerializedDiagram, name = 'pattern'): Co
 				break;
 			}
 			case OR_NODE_TYPE: {
-				console.warn('Compiler skipping OR Node');
+				syntaxTree.insertLogicalOpNode('or', node);
 				break;
 			}
 			case SOCIAL_CONN_NODE_TYPE: {

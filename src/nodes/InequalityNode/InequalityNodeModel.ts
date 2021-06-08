@@ -37,6 +37,7 @@ export class InequalityNodeModel extends NodeModel<
 			name: 'valueA',
 			label: 'value A',
 			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
 		});
 
 		this.valueBPort = new DefaultPortModel({
@@ -44,6 +45,7 @@ export class InequalityNodeModel extends NodeModel<
 			name: 'valueB',
 			label: 'value B',
 			alignment: PortModelAlignment.LEFT,
+			maximumLinks: 1,
 		});
 
 		this.outPort = new DefaultPortModel({
@@ -51,6 +53,7 @@ export class InequalityNodeModel extends NodeModel<
 			name: 'out',
 			label: options.label,
 			alignment: PortModelAlignment.RIGHT,
+			maximumLinks: 1,
 		});
 
 		this.addPort(this.valueAPort);
