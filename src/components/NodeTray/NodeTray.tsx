@@ -17,7 +17,7 @@ const NodeTray: React.FC = () => {
 	return (
 		<div>
 			<h3 className="text-center">Primitives</h3>
-			<TrayItem model={{ type: 'variable' }} name="Variable Node" color={PRIMITIVE_NODE_COLOR} />
+			{/* <TrayItem model={{ type: 'variable' }} name="Variable Node" color={PRIMITIVE_NODE_COLOR} /> */}
 			<TrayItem model={{ type: 'number' }} name="Number Node" color={PRIMITIVE_NODE_COLOR} />
 			<TrayItem model={{ type: 'string' }} name="String Node" color={PRIMITIVE_NODE_COLOR} />
 			<TrayItem model={{ type: 'boolean' }} name="Boolean Node" color={PRIMITIVE_NODE_COLOR} />

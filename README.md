@@ -37,13 +37,13 @@ npm i -g yarn
 
 ## Project Status
 
-The editor create valid [Datascript](https://github.com/tonsky/datascript) queries for its JavaScript API.
+The editor creates valid [Datascript](https://github.com/tonsky/datascript) queries for its JavaScript API.
 
-### Unsupported Syntax based on [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
+### Unsupported Query Syntax based on [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
 
-- [pull expressions](https://docs.datomic.com/cloud/query/query-data-reference.html#pull-expressions)
+- [pull expressions\*](https://docs.datomic.com/cloud/query/query-data-reference.html#pull-expressions)
 - [return maps](https://docs.datomic.com/cloud/query/query-data-reference.html#return-maps)
-- [Some Built-In Aggregates (e.g. avg, distict, variance...)](https://docs.datomic.com/cloud/query/query-data-reference.html#built-in-aggregates)
+- [Aggregates (except for count)](https://docs.datomic.com/cloud/query/query-data-reference.html#built-in-aggregates)
 - [functions](https://docs.datomic.com/cloud/query/query-data-reference.html#functions)
 - [get-else](https://docs.datomic.com/cloud/query/query-data-reference.html#get-else)
 - [get-some](https://docs.datomic.com/cloud/query/query-data-reference.html#get-some)
@@ -51,9 +51,8 @@ The editor create valid [Datascript](https://github.com/tonsky/datascript) queri
 - [missing?](https://docs.datomic.com/cloud/query/query-data-reference.html#missing)
 - [tuple](https://docs.datomic.com/cloud/query/query-data-reference.html#tuple)
 - [untuple](https://docs.datomic.com/cloud/query/query-data-reference.html#untuple)
-- [or](https://docs.datomic.com/cloud/query/query-data-reference.html#or-clauses)
-- [and](https://docs.datomic.com/cloud/query/query-data-reference.html#and-clause)
 - [not-join](https://docs.datomic.com/cloud/query/query-data-reference.html#not-join)
 - [or-join](https://docs.datomic.com/cloud/query/query-data-reference.html#or-join)
-- [required bundings for rules](https://docs.datomic.com/cloud/query/query-data-reference.html#rule-required-bindings)
 - [database scoping](https://docs.datomic.com/cloud/query/query-data-reference.html#rule-database-scoping)
+
+\*Datascript JS API doesnt support in-query pull expressions

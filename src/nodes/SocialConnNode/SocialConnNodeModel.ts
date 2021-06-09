@@ -18,8 +18,8 @@ export interface SocialConnNodeModelGenerics {
 export class SocialConnNodeModel extends NodeModel<
 	SocialConnNodeModelGenerics & NodeModelGenerics
 > {
-	public valueAPort: DefaultPortModel;
-	public valueBPort: DefaultPortModel;
+	public subjectPort: DefaultPortModel;
+	public otherPort: DefaultPortModel;
 	public outPort: DefaultPortModel;
 
 	constructor(
@@ -34,7 +34,7 @@ export class SocialConnNodeModel extends NodeModel<
 			type: SOCIAL_CONN_NODE_TYPE,
 		});
 
-		this.valueAPort = new DefaultPortModel({
+		this.subjectPort = new DefaultPortModel({
 			in: true,
 			name: 'subject',
 			label: 'Subject (P)',
@@ -42,7 +42,7 @@ export class SocialConnNodeModel extends NodeModel<
 			maximumLinks: 1,
 		});
 
-		this.valueBPort = new DefaultPortModel({
+		this.otherPort = new DefaultPortModel({
 			in: true,
 			name: 'other',
 			label: 'Other (P)',
@@ -54,12 +54,12 @@ export class SocialConnNodeModel extends NodeModel<
 			in: false,
 			name: 'out',
 			label: options.label,
-			alignment: PortModelAlignment.LEFT,
+			alignment: PortModelAlignment.RIGHT,
 			maximumLinks: 1,
 		});
 
-		this.addPort(this.valueAPort);
-		this.addPort(this.valueBPort);
+		this.addPort(this.subjectPort);
+		this.addPort(this.otherPort);
 		this.addPort(this.outPort);
 	}
 

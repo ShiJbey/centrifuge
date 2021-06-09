@@ -238,13 +238,15 @@ export class PatternEditor extends Component<PatternEditorProps, PatternEditorSt
 						</div>
 
 						<EditorPanel>
-							<div className={styles.PanelTitle}>
-								Results
-								<hr></hr>
+							<div style={{ padding: '0.5rem' }}>
+								<div className={styles.PanelTitle}>
+									Results
+									<hr></hr>
+								</div>
+								{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((x) => (
+									<div key={x}>Result #{x}</div>
+								))}
 							</div>
-							{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((x) => (
-								<div key={x}>Result #{x}</div>
-							))}
 						</EditorPanel>
 					</div>
 				</div>

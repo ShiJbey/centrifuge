@@ -56,7 +56,7 @@ export class BoolNodeWidget extends React.Component<BoolNodeWidgetProps, BoolNod
 			<Node
 				background={PRIMITIVE_NODE_COLOR}
 				selected={this.props.node.isSelected()}
-				style={{ padding: '3px 0 3px 3px', width: '11rem' }}
+				style={{ padding: '3px 0 3px 3px', width: '8rem' }}
 			>
 				<Ports>
 					<div style={{ paddingRight: '3px', overflow: 'hidden' }}>

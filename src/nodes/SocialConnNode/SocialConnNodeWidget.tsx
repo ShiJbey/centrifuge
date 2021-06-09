@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { SocialConnNodeModel } from './SocialConnNodeModel';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { Node, Header, Ports, PortContainer, SOCIAL_CONN_NODE_COLOR } from '../nodeStyles';
+import { Node, Header, PortContainer, SOCIAL_CONN_NODE_COLOR } from '../nodeStyles';
 
 const ConnectionTypes: { name: string; label: string }[] = [
 	{ name: 'spouse', label: 'Spouse of...' },
@@ -106,8 +106,8 @@ export class SocialConnNodeWidget extends React.Component<
 				<PortContainer>
 					<DefaultPortLabel
 						engine={this.props.engine}
-						port={this.props.node.valueAPort}
-						key={this.props.node.valueAPort.getID()}
+						port={this.props.node.otherPort}
+						key={this.props.node.otherPort.getID()}
 					/>
 					<div>
 						<select
@@ -115,7 +115,6 @@ export class SocialConnNodeWidget extends React.Component<
 							style={{
 								width: '100%',
 								fontWeight: 'bold',
-								fontSize: '1.1rem',
 							}}
 							defaultValue={this.props.node.getOptions().relationshipType}
 						>
@@ -131,8 +130,8 @@ export class SocialConnNodeWidget extends React.Component<
 					</div>
 					<DefaultPortLabel
 						engine={this.props.engine}
-						port={this.props.node.valueBPort}
-						key={this.props.node.valueBPort.getID()}
+						port={this.props.node.subjectPort}
+						key={this.props.node.subjectPort.getID()}
 					/>
 				</PortContainer>
 			</Node>

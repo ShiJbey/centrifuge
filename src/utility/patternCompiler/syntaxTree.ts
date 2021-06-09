@@ -19,8 +19,12 @@ export abstract class SyntaxTreeNode {
 		this.params = new Map();
 	}
 
-	addChild(node: SyntaxTreeNode): void {
-		this.children.push(node);
+	addChild(...node: SyntaxTreeNode[]): void {
+		this.children.push(...node);
+	}
+
+	getChildren(): SyntaxTreeNode[] {
+		return this.children;
 	}
 
 	getParams(): Param[] {
@@ -138,7 +142,7 @@ export class CountSyntaxNode extends SyntaxTreeNode {
 	}
 
 	toString(): string {
-		return `[(count ${this.inputVarName}) ${this.outputVarName}]`;
+		return `[(count ${this.inputVarName}) ${this.outputVarName}]\n`;
 	}
 }
 
@@ -190,7 +194,8 @@ export class InequalitySyntaxNode extends SyntaxTreeNode {
 	}
 
 	toString(): string {
-		return `[(${this.symbol} ${this.valA} ${this.valB})]\n`;
+		const childrenStr = this.children.map((child) => child.toString()).join('');
+		return `${childrenStr}[(${this.symbol} ${this.valA} ${this.valB})]\n`;
 	}
 }
 
@@ -231,6 +236,7 @@ export class PatternSyntaxTree {
 	private dependencies: Map<string, SerializedLinkModel> = new Map();
 	private nodes: Map<string, SyntaxTreeNode> = new Map();
 	private leafNodes: Map<string, SyntaxTreeNode> = new Map();
+	private entityNodes: EntitySyntaxNode[] = [];
 
 	/** Insert dependency link between ports */
 	addDependencyLink(link: SerializedLinkModel): void {
@@ -272,6 +278,7 @@ export class PatternSyntaxTree {
 			}
 		}
 		this.nodes.set(node.id, syntaxNode);
+		this.entityNodes.push(syntaxNode);
 	}
 
 	insertOutputNode(required: boolean, hidden: boolean, node: SerializedNodeModel): void {
@@ -360,6 +367,7 @@ export class PatternSyntaxTree {
 			syntaxNode.setValueA(depNode.getValue());
 		} else if (depNode instanceof CountSyntaxNode) {
 			syntaxNode.setValueA(depNode.getOutputVarName());
+			syntaxNode.addChild(depNode);
 		} else {
 			throw new Error(
 				`Inequality node cannot accept connection from node of type ${typeof depNode}`
@@ -537,6 +545,10 @@ export class PatternSyntaxTree {
 		let whereClauses = '';
 		const parameters: PatternParam[] = [];
 
+		for (const entity of this.entityNodes) {
+			whereClauses += entity.toString();
+		}
+
 		for (const [, node] of this.leafNodes) {
 			if (node instanceof OutputSyntaxNode) {
 				for (const entity of node.getEntities()) {
@@ -545,7 +557,6 @@ export class PatternSyntaxTree {
 						hidden: node.isHidden(),
 						required: node.isRequired(),
 					});
-					whereClauses += entity.toString();
 				}
 			} else {
 				whereClauses += node.toString();
