@@ -237,7 +237,7 @@ export class PatternEditor extends Component<PatternEditorProps, PatternEditorSt
 							</EditorPanel>
 						</div>
 
-						<EditorPanel>
+						{/* <EditorPanel>
 							<div style={{ padding: '0.5rem' }}>
 								<div className={styles.PanelTitle}>
 									Results
@@ -247,7 +247,7 @@ export class PatternEditor extends Component<PatternEditorProps, PatternEditorSt
 									<div key={x}>Result #{x}</div>
 								))}
 							</div>
-						</EditorPanel>
+						</EditorPanel> */}
 					</div>
 				</div>
 			</>

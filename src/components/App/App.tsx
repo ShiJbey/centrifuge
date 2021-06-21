@@ -109,9 +109,9 @@ export class App extends Component<AppProps> {
 				<div className={styles.App}>
 					<AppNavbar />
 					<div className={styles.Main}>
-						<div>
+						{/* <div>
 							<TownToolbar />
-						</div>
+						</div> */}
 						<Switch>
 							<Route exact path="/editor" component={PatternEditor} />
 							<Route exact path="/metrics" component={MetricsDashboard} />
