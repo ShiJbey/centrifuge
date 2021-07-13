@@ -22,22 +22,26 @@ Normally in Bad News, one player acts as the _Wizard_ and must live-code inside 
 
 ### Setup
 
-This project uses yarn for package management. If your don't have it, feel free to install it with:
-
-```
-npm i -g yarn
-```
+This project uses yarn for package management. If you don't have it, we recommend you install it with, `npm i -g yarn`. Without it, dependencies can still be installed using `npm`.
 
 ### Cloning and Building
 
 1. `git clone https://github.com/ShiJbey/centrifuge.git`
 2. `cd centrifuge`
-3. `yarn`
-4. `yarn start`
+3. `yarn` or `npm install`
+4. `yarn start` or `npm start`
 
 ## Project Status
 
-The editor creates valid [Datascript](https://github.com/tonsky/datascript) queries for its JavaScript API.
+The editor creates valid queries for [Datascript's](https://github.com/tonsky/datascript) JavaScript API.
+
+## Supported Query Syntax from [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
+- [:with clause](https://docs.datomic.com/cloud/query/query-data-reference.html#with)
+- [rule expressions](https://docs.datomic.com/cloud/query/query-data-reference.html#using-rule)
+- [not-clause](https://docs.datomic.com/cloud/query/query-data-reference.html#not-clauses)
+- [or-clause](https://docs.datomic.com/cloud/query/query-data-reference.html#or-clauses)
+- [range predicates](https://docs.datomic.com/cloud/query/query-data-reference.html#range-predicates)
+- [count aggregate](https://docs.datomic.com/cloud/query/query-data-reference.html#built-in-aggregates)
 
 ### Unsupported Query Syntax based on [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
 
@@ -55,4 +59,4 @@ The editor creates valid [Datascript](https://github.com/tonsky/datascript) quer
 - [or-join](https://docs.datomic.com/cloud/query/query-data-reference.html#or-join)
 - [database scoping](https://docs.datomic.com/cloud/query/query-data-reference.html#rule-database-scoping)
 
-\*Datascript JS API doesnt support in-query pull expressions
+\*While you can do pull operations in Datascript, the JavaScript API does not support **in-query** pull expressions.
