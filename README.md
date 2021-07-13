@@ -18,6 +18,16 @@ Normally in Bad News, one player acts as the _Wizard_ and must live-code inside 
    - **Delete link:** Hold _shift_, click the link, press _delete_ or _backspace_
 5. Click _Compile_, to compile the diagrams into code.
 
+## Data Modeling
+
+The nodes used in this editor are configured specifically for Talk of the Town's data. However, the general design approach coudl be modified to fit any social simulation. 
+
+The core entities/objects modeled in the python code become entities within the DataScript database. The include:
+- People
+- Businesses (Locations)
+- Relationships
+- Events
+
 ## Building Development Version
 
 ### Setup
@@ -33,10 +43,10 @@ This project uses yarn for package management. If you don't have it, we recommen
 
 ## Project Status
 
-The editor creates valid queries for [Datascript's](https://github.com/tonsky/datascript) JavaScript API.
+The editor creates valid queries to be passed to [DataScript's](https://github.com/tonsky/datascript) JavaScript API.
 
-## Supported Query Syntax from [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
-- [:with clause](https://docs.datomic.com/cloud/query/query-data-reference.html#with)
+### Supported Query Syntax from [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
+- [:with-clauses](https://docs.datomic.com/cloud/query/query-data-reference.html#with)
 - [rule expressions](https://docs.datomic.com/cloud/query/query-data-reference.html#using-rule)
 - [not-clause](https://docs.datomic.com/cloud/query/query-data-reference.html#not-clauses)
 - [or-clause](https://docs.datomic.com/cloud/query/query-data-reference.html#or-clauses)
@@ -59,4 +69,4 @@ The editor creates valid queries for [Datascript's](https://github.com/tonsky/da
 - [or-join](https://docs.datomic.com/cloud/query/query-data-reference.html#or-join)
 - [database scoping](https://docs.datomic.com/cloud/query/query-data-reference.html#rule-database-scoping)
 
-\*While you can do pull operations in Datascript, the JavaScript API does not support **in-query** pull expressions.
+\*While you can do pull operations in DataScript, the JavaScript API does not support **in-query** pull expressions.
