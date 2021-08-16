@@ -1,10 +1,10 @@
 # Centrifuge: Narrative Pattern Editor and Profiler Tool
 
-This is a cross-platform desktop tool for edditing narrative patterns and obtaining pattern metrics from a playtrace of Talk of the Town.
+Cetrifuge is a cross-platform desktop tool for authoring narrative sifting patterns used to query a playtrace of [_Talk of the Town_](https://github.com/ShiJbey/talktown). _Talk of the Town_ is a simulationist story generator, and was used by the acclaimed augmented reality live-acting game, [_Bad News_](https://users.soe.ucsc.edu/~jor/publications/samuelBadNews.pdf). Here is an example [video](https://www.youtube.com/watch?v=NUnp44OkaQo) of _Bad New's_ gameplay.
 
-This version was built specifically for use with the [Talk of the Town](https://github.com/ShiJbey/talktown) simulationist story generator, made popular by the augmented reality live-acting game, [Bad News](https://users.soe.ucsc.edu/~jor/publications/samuelBadNews.pdf). Here is an example [video](https://www.youtube.com/watch?v=NUnp44OkaQo) of gameplay.
+Normally in _Bad News_, one player operates as the _Wizard_. Their job is to live-code inside a Python interpreter and find interesting dramatic content to communicate to the live-acting player. This process is tedious and requires knowledge of python programming and the internal simulation API. This application alleviates the live coding requirement by allowing players to define reusable narrative patterns using a visual drag-and-drop node-based interface.
 
-Normally in Bad News, one player acts as the _Wizard_ and must live-code inside a Python interpreter to find interestin dramatic content and surface it to the live-acting player. This process is tedious and requires knowledge of python programming and the internal simulation API. This application alleviates the live coding requirement by allowing players to define reusable narrative patterns using a visual node-based interface. Patterns can be used during or outside of gameplay to inspect simulation states. As an additional bonus, Centrifuge also allows users to visualize pattern metrics so that they may better characterize the simulation and its configuration.
+The editor creates valid [Datascript](https://github.com/tonsky/datascript) queries for its JavaScript API.
 
 ![Centrifuge editor screenshot](./docs/resources/editor_screenshot.png 'Centrifuge Editor Screenshot')
 
@@ -18,11 +18,9 @@ Normally in Bad News, one player acts as the _Wizard_ and must live-code inside 
    - **Delete link:** Hold _shift_, click the link, press _delete_ or _backspace_
 5. Click _Compile_, to compile the diagrams into code.
 
-## Building Development Version
+### Install Yarn (Optional)
 
-### Setup
-
-This project uses yarn for package management. If your don't have it, feel free to install it with:
+This project uses yarn for package management. If you don't have it, feel free to install it with the command below. If you plan on contributing to this project, Yarn is a requirement:
 
 ```
 npm i -g yarn
@@ -32,12 +30,10 @@ npm i -g yarn
 
 1. `git clone https://github.com/ShiJbey/centrifuge.git`
 2. `cd centrifuge`
-3. `yarn`
-4. `yarn start`
+3. `yarn` or `npm install`
+4. `yarn start` or `npm start`
 
 ## Project Status
-
-The editor creates valid [Datascript](https://github.com/tonsky/datascript) queries for its JavaScript API.
 
 ### Unsupported Query Syntax based on [Datomic Query Reference](https://docs.datomic.com/cloud/query/query-data-reference.html)
 
