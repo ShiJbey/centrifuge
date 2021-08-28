@@ -31,14 +31,14 @@ export class AndNodeModel extends NodeModel<AndNodeModelGenerics & NodeModelGene
 		this.outPort = new DefaultPortModel({
 			in: false,
 			name: 'out',
-			label: '',
+			label: 'out',
 			alignment: PortModelAlignment.RIGHT,
 		});
 
 		this.inPort = new DefaultPortModel({
 			in: true,
 			name: 'in',
-			label: '',
+			label: 'in',
 			alignment: PortModelAlignment.LEFT,
 			maximumLinks: 1,
 		});

@@ -5,6 +5,7 @@ import {
 	NodeModelGenerics,
 } from '@projectstorm/react-diagrams';
 import { BaseModelOptions, DeserializeEvent } from '@projectstorm/react-canvas-core';
+import { SerializedNodeModel } from '../../utility/serialization';
 
 export const PERSON_NODE_TYPE = 'person-node';
 
@@ -28,12 +29,13 @@ export class PersonNodeModel extends NodeModel<PersonNodeModelGenerics & NodeMod
 
 		this.outPort = new DefaultPortModel({
 			in: false,
-			name: 'id',
+			name: 'entity_id',
 			label: options.label,
 			alignment: PortModelAlignment.RIGHT,
 		});
 		this.addPort(this.outPort);
 
+		this.addAttributePort('id', 'ID (str)');
 		this.addAttributePort('age', 'Age (Num)');
 		this.addAttributePort('gender', 'Gender (Str+)');
 		this.addAttributePort('tags', 'Tags (Str+)');
@@ -63,7 +65,7 @@ export class PersonNodeModel extends NodeModel<PersonNodeModelGenerics & NodeMod
 		return this.attributePorts;
 	}
 
-	public serialize(): any {
+	public serialize(): SerializedNodeModel & PersonNodeModelOptions {
 		return {
 			...super.serialize(),
 			...this.options,

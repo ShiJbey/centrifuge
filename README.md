@@ -43,7 +43,7 @@ The editor creates valid [Datascript](https://github.com/tonsky/datascript) quer
 
 - [pull expressions\*](https://docs.datomic.com/cloud/query/query-data-reference.html#pull-expressions)
 - [return maps](https://docs.datomic.com/cloud/query/query-data-reference.html#return-maps)
-- [Aggregates (except for count)](https://docs.datomic.com/cloud/query/query-data-reference.html#built-in-aggregates)
+- [Aggregates](https://docs.datomic.com/cloud/query/query-data-reference.html#built-in-aggregates)
 - [functions](https://docs.datomic.com/cloud/query/query-data-reference.html#functions)
 - [get-else](https://docs.datomic.com/cloud/query/query-data-reference.html#get-else)
 - [get-some](https://docs.datomic.com/cloud/query/query-data-reference.html#get-some)
@@ -51,8 +51,6 @@ The editor creates valid [Datascript](https://github.com/tonsky/datascript) quer
 - [missing?](https://docs.datomic.com/cloud/query/query-data-reference.html#missing)
 - [tuple](https://docs.datomic.com/cloud/query/query-data-reference.html#tuple)
 - [untuple](https://docs.datomic.com/cloud/query/query-data-reference.html#untuple)
-- [not-join](https://docs.datomic.com/cloud/query/query-data-reference.html#not-join)
-- [or-join](https://docs.datomic.com/cloud/query/query-data-reference.html#or-join)
 - [database scoping](https://docs.datomic.com/cloud/query/query-data-reference.html#rule-database-scoping)
 
-\*Datascript JS API doesnt support in-query pull expressions
+\*Datascript JS API doesn't support in-query pull expressions

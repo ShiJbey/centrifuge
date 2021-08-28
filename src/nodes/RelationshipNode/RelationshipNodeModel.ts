@@ -2,6 +2,7 @@ import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/r
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 
+
 export const RelationshipTypes = ['Acquaintance', 'Enmity', 'Friendship'];
 
 export const RELATIONSHIP_NODE_TYPE = 'relationship-node';
@@ -34,14 +35,14 @@ export class RelationshipNodeModel extends NodeModel<
 
 		this.outPort = new DefaultPortModel({
 			in: false,
-			name: 'id',
+			name: 'entity_id',
 			label: options.label,
 			alignment: PortModelAlignment.LEFT,
 		});
 		this.addPort(this.outPort);
 
-		this.addAttributePort('owner', 'Owner (P)');
-		this.addAttributePort('subject', 'Subject (P)');
+		this.addAttributePort('owner', 'Owner ID (str)');
+		this.addAttributePort('subject', 'Subject ID (str)');
 		this.addAttributePort('preceeded_by', 'Preceeded By (R)');
 		this.addAttributePort('suceeded_by', 'Succeeded By (R)');
 		this.addAttributePort('where_they_met', 'Where They Met (Pl)');

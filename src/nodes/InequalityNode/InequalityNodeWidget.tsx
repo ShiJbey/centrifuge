@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { InequalityNodeModel } from './InequalityNodeModel';
 import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
-import { Node, Header, Ports, PortContainer, MODIFIER_NODE_COLOR } from '../nodeStyles';
+import { Node, Header, PortContainer, MODIFIER_NODE_COLOR } from '../nodeStyles';
 
 export interface InequalityNodeWidgetProps {
 	node: InequalityNodeModel;

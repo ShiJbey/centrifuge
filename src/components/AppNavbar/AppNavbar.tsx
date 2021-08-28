@@ -1,50 +1,62 @@
-import React from 'react';
-import { FaChartLine, FaProjectDiagram, FaQuestion } from 'react-icons/fa';
-import { IconContext } from 'react-icons';
-import { Link, useLocation } from 'react-router-dom';
-import styles from './AppNavbar.module.scss';
-import classNames from 'classnames';
+import React from "react";
+import {
+  FaProjectDiagram,
+  FaQuestion,
+} from "react-icons/fa";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { IconContext } from "react-icons";
+import { Link, useLocation } from "react-router-dom";
+import styles from "./AppNavbar.module.scss";
+import classNames from "classnames";
+
+interface NavLinkInfo {
+  icon: JSX.Element;
+  router_link: string;
+  tooltip: string;
+}
+
+const NAV_LINKS: NavLinkInfo[] = [
+  {
+    icon: <FaProjectDiagram />,
+    router_link: "/editor",
+    tooltip: "Editor",
+  },
+  {
+    icon: <FaQuestion />,
+    router_link: "/help",
+    tooltip: "Help",
+  },
+];
 
 const AppNavbar: React.FC = () => {
   const location = useLocation();
+
   return (
     <nav className={styles.AppNavbar}>
       <ul className={styles.AppNavbarNav}>
-        {/* <li className={styles.Logo}>
-          <div className={styles.NavLink}>
-          <span className={classNames(styles.LinkText, styles.LogoText)}>Centrifuge</span>
-            <IconContext.Provider value={{ className: styles.NavIcon }}>
-              <FaVial />
-            </IconContext.Provider>
-          </div>
-        </li> */}
-        <li className={styles.NavItem}>
-          <Link to="/editor" className={classNames(styles.NavLink, { [styles.active]: location.pathname === '/editor'})}>
-            {location.pathname === '/editor' && <div className={styles.ActiveIndicator}></div>}
-            <IconContext.Provider value={{ className: styles.NavIcon }}>
-              <FaProjectDiagram />
-            </IconContext.Provider>
-            <span className={styles.LinkText}>Editor</span>
-          </Link>
-        </li>
-        <li className={styles.NavItem}>
-          <Link to="/metrics" className={classNames(styles.NavLink, { [styles.active]: location.pathname === '/metrics'})}>
-          {location.pathname === '/metrics' && <div className={styles.ActiveIndicator}></div>}
-            <IconContext.Provider value={{ className: styles.NavIcon }}>
-              <FaChartLine />
-            </IconContext.Provider>
-            <span className={styles.LinkText}>Metrics</span>
-          </Link>
-        </li>
-        <li className={styles.NavItem}>
-          <Link to="/help" className={classNames(styles.NavLink, { [styles.active]: location.pathname === '/help'})}>
-            {location.pathname === '/help' && <div className={styles.ActiveIndicator}></div>}
-            <IconContext.Provider value={{ className: styles.NavIcon }}>
-              <FaQuestion />
-            </IconContext.Provider>
-            <span className={styles.LinkText}>Help</span>
-          </Link>
-        </li>
+        {NAV_LINKS.map((linkInfo, index) => (
+          <li key={`${index}_${linkInfo.router_link}`} className={styles.NavItem}>
+            <OverlayTrigger
+              placement="right"
+              delay={{ show: 600, hide: 250 }}
+              overlay={(props: any) => <Tooltip {...props}>{linkInfo.tooltip}</Tooltip>}
+            >
+              <Link
+                to={linkInfo.router_link}
+                className={classNames(styles.NavLink, {
+                  [styles.active]: location.pathname === linkInfo.router_link,
+                })}
+              >
+                {location.pathname === linkInfo.router_link && (
+                  <div className={styles.ActiveIndicator}></div>
+                )}
+                <IconContext.Provider value={{ className: styles.NavIcon }}>
+                  {linkInfo.icon}
+                </IconContext.Provider>
+              </Link>
+            </OverlayTrigger>
+          </li>
+        ))}
       </ul>
     </nav>
   );

@@ -6,6 +6,7 @@ import { SerializedNodeModel } from '../../utility/serialization';
 export const INEQUALITY_NODE_TYPE = 'inequality-node';
 
 export interface InequalityNodeModelOptions {
+	type: typeof INEQUALITY_NODE_TYPE;
 	label: string;
 	symbol: string;
 }
@@ -23,13 +24,13 @@ export class InequalityNodeModel extends NodeModel<
 
 	constructor(
 		options: InequalityNodeModelOptions = {
+			type: INEQUALITY_NODE_TYPE,
 			label: 'Inequality',
 			symbol: '>',
 		}
 	) {
 		super({
 			...options,
-			type: INEQUALITY_NODE_TYPE,
 		});
 
 		this.valueAPort = new DefaultPortModel({

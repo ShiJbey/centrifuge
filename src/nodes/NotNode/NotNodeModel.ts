@@ -18,7 +18,7 @@ export class NotNodeModel extends NodeModel<NotNodeModelGenerics & NodeModelGene
 
 	constructor(
 		options: NotNodeModelOptions = {
-			label: 'Not',
+			label: 'NOT',
 		}
 	) {
 		super({

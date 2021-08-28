@@ -210,12 +210,13 @@ export class OccupationNodeModel extends NodeModel<
 
 		this.outPort = new DefaultPortModel({
 			in: false,
-			name: 'out',
+			name: 'entity_id',
 			label: options.label,
 			alignment: PortModelAlignment.RIGHT,
 		});
 		this.addPort(this.outPort);
 
+		this.addAttributePort('id', 'ID (str)');
 		this.addAttributePort('person', 'Person (P)');
 		this.addAttributePort('company', 'Company (C)');
 		this.addAttributePort('shift', 'Shift (Str)');

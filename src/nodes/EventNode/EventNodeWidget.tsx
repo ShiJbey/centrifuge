@@ -61,6 +61,11 @@ export class EventNodeWidget extends React.Component<EventNodeWidgetProps> {
 					</select>
 				</div>
 				<PortContainer>
+				<DefaultPortLabel
+						engine={this.props.engine}
+						port={this.props.node.eventIdPort}
+						key={this.props.node.eventIdPort.getID()}
+					/>
 					<DefaultPortLabel
 						engine={this.props.engine}
 						port={this.props.node.timestampPort}

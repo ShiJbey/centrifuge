@@ -12,12 +12,14 @@ const Container = styled.div<{ color: string }>`
   color: black;
   font-family: Helvetica, Arial;
   padding: 5px;
-  margin: 0px 10px;
+  margin: 10px 15px;
   border: solid 1px ${(p) => p.color};
   background: ${(p) => p.color};
   border-radius: 5px;
   margin-bottom: 2px;
   cursor: pointer;
+  text-align: center;
+  box-shadow: 0 8px 8px -4px grey;
 `;
 
 const TrayItem: React.FC<TrayWidgetItemProps> = (props) => {

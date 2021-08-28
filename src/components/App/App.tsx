@@ -17,7 +17,6 @@ import {
 import ElectronAPI, { OpenDirectoryResponse, OpenFileResponse } from '../../utility/electronApi';
 import { Dispatch } from 'redux';
 import { loadData, clearData } from '../../redux/database/databaseActions';
-import TownToolbar from '../TownToolbar';
 import { DirectoryTree } from 'directory-tree';
 import { updateDirectoryTree, clearDirectoryTree } from '../../redux/fileTree/fileTreeActions';
 import { addEditor } from '../../redux/editors/editorActions';

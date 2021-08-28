@@ -5,7 +5,6 @@ import { InequalityNodeModelOptions } from './InequalityNode';
 import { NumberNodeModelOptions } from './NumberNode';
 import { BoolNodeModelOptions } from './BoolNode';
 import { StringNodeModelOptions } from './StringNode';
-import { VariableNodeModelOptions } from './VariableNode';
 import { AndNodeModelOptions } from './AndNode';
 import { BusinessNodeModelOptions } from './BusinessNode';
 import { OccupationNodeModelOptions } from './OccupationNode';
@@ -37,5 +36,4 @@ export type CentrifugeNodeTypesModelOptions =
 	| StringNodeModelOptions
 	| BoolNodeModelOptions
 	| NumberNodeModelOptions
-	| VariableNodeModelOptions
 	| OutputNodeModelOptions;

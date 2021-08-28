@@ -37,7 +37,7 @@ export class SocialConnNodeModel extends NodeModel<
 		this.subjectPort = new DefaultPortModel({
 			in: true,
 			name: 'subject',
-			label: 'Subject (P)',
+			label: 'Subject ID (str)',
 			alignment: PortModelAlignment.LEFT,
 			maximumLinks: 1,
 		});
@@ -45,7 +45,7 @@ export class SocialConnNodeModel extends NodeModel<
 		this.otherPort = new DefaultPortModel({
 			in: true,
 			name: 'other',
-			label: 'Other (P)',
+			label: 'Other Person ID (str)',
 			alignment: PortModelAlignment.LEFT,
 			maximumLinks: 1,
 		});

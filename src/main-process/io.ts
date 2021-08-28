@@ -20,13 +20,13 @@ export async function openDirectory(
 ): Promise<OpenDirectoryResponse> {
   try {
     const ret = await dialog.showOpenDialog(win, {
-      properties: ['openDirectory'],
+      properties: ['openDirectory', 'createDirectory'],
     });
 
     if (!ret.canceled) {
       const [path] = ret.filePaths;
 
-      const payload = dirTree(path);
+      const payload = dirTree(path, { extensions: /\.ctr/ });
 
       const response: OpenDirectoryResponse = {
         payload,
@@ -117,7 +117,7 @@ export async function savePatternAs(
 
 export function watchDirectory(path: string, renderer: WebContents): void {
   const watcher = chokidar.watch(path).on('all', () => {
-    renderer.send(DIR_CHANGE, dirTree(path));
+    renderer.send(DIR_CHANGE, dirTree(path, { extensions: /\.ctr/ }));
   });
 
   watchers[renderer.getProcessId()] = { watcher, path };

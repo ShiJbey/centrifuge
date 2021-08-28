@@ -23,7 +23,7 @@ export class OutputNodeModel extends NodeModel<OutputNodeModelGenerics & NodeMod
 	constructor(
 		options: OutputNodeModelOptions = {
 			type: OUTPUT_NODE_TYPE,
-			label: 'Output',
+			label: 'Variable',
 			name: 'var',
 			required: false,
 			hidden: false,
@@ -36,7 +36,7 @@ export class OutputNodeModel extends NodeModel<OutputNodeModelGenerics & NodeMod
 		this.inPort = new DefaultPortModel({
 			in: true,
 			name: 'in',
-			label: 'In (Entity)',
+			label: '(Entity)',
 			alignment: PortModelAlignment.LEFT,
 		});
 		this.addPort(this.inPort);

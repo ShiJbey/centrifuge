@@ -408,7 +408,7 @@ const createNameChangePorts = () => [
 	new DefaultPortModel({
 		in: false,
 		name: 'subject',
-		label: 'Subject (P)',
+		label: 'Subject ID (str)',
 		alignment: PortModelAlignment.RIGHT,
 	}),
 	new DefaultPortModel({
@@ -492,6 +492,7 @@ export class EventNodeModel extends NodeModel<EventNodeModelGenerics & NodeModel
 	protected attributePorts: DefaultPortModel[] = [];
 
 	public timestampPort: DefaultPortModel;
+	public eventIdPort: DefaultPortModel;
 	public outPort: DefaultPortModel;
 
 	constructor(
@@ -511,14 +512,22 @@ export class EventNodeModel extends NodeModel<EventNodeModelGenerics & NodeModel
 			alignment: PortModelAlignment.RIGHT,
 		});
 
+		this.eventIdPort = new DefaultPortModel({
+			in: false,
+			name: 'id',
+			label: 'ID (str)',
+			alignment: PortModelAlignment.RIGHT,
+		});
+
 		this.outPort = new DefaultPortModel({
 			in: false,
-			name: 'out',
+			name: 'entity_id',
 			label: options.label,
 			alignment: PortModelAlignment.RIGHT,
 		});
 
 		this.addPort(this.timestampPort);
+		this.addPort(this.eventIdPort);
 		this.addPort(this.outPort);
 
 		if (options.eventType) {

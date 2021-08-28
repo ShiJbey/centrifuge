@@ -31,7 +31,7 @@ export class BusinessNodeModel extends NodeModel<BusinessNodeModelGenerics & Nod
 
 		this.outPort = new DefaultPortModel({
 			in: false,
-			name: 'out',
+			name: 'entity_id',
 			label: options.label,
 			alignment: PortModelAlignment.RIGHT,
 		});

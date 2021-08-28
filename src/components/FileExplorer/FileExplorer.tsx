@@ -100,13 +100,13 @@ export class FileExplorer extends Component<FileExplorerProps> {
   render() {
     return (
       <div className={styles.FileExplorer}>
+        <div style={{fontSize: 'small', background: '#0000001f', textAlign: 'center'}}>WORKSPACE FOLDER</div>
         {this.props.directoryTree ? (
           <ul className={classNames(styles.DTreeContainer)}>
             <TreeNode node={this.props.directoryTree} depth={0} />
           </ul>
         ) : (
-          <div style={{ padding: "16px" }}>
-            <p>No Open Folder</p>
+          <div style={{ padding: '10px' }}>
             <Button variant="primary" onClick={this.openDirectory}>
               Open Folder
             </Button>

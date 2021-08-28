@@ -5,8 +5,8 @@ $font-family: "Open Sans";
 $textPrimary: #b6b6b6;
 $textSecondary: #ececec;
 $bgPrimary: hsl(207, 44%, 15%); //hsl(0, 0%, 20%);
-$bgSecondary: #141418;
-$transitionSpeed: 600ms;
+$bgSecondary: hsl(240, 9%, 9%);
+$transitionSpeed: 300ms;
 
 .AppNavbar {
   font-size: 16px;
@@ -58,32 +58,31 @@ $transitionSpeed: 600ms;
   text-decoration: none;
 }
 
-.AppNavbar:hover {
-  width: $sidebarWidthFull;
+// .AppNavbar:hover {
+//   width: $sidebarWidthFull;
 
-  .LinkText {
-    display: inline;
-  }
+//   .LinkText {
+//     display: inline;
+//   }
 
-  .LogoText {
-    left: 0px;
-  }
+//   .LogoText {
+//     left: 0px;
+//   }
 
-  .Logo .NavIcon {
-    margin-left: 11.75rem;
-    transform: rotate(720deg);
-    transition: 0.9s;
-  }
-}
+//   .Logo .NavIcon {
+//     margin-left: 11.75rem;
+//     transform: rotate(720deg);
+//     transition: 0.9s;
+//   }
+// }
 
 .ActiveIndicator {
   position: absolute;
   top: 0;
   left: 0;
-  width: 8px;
+  width: 4px;
   height: 100%;
-  border-radius: 0 50% 50% 0;
-  background: lightgreen;
+  background: rgb(233, 233, 233);
 }
 
 .Logo {
