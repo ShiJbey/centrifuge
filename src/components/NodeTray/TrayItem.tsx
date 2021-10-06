@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 interface TrayWidgetItemProps {
   model: { [key: string]: string };
-  color?: string;
+  color: string;
   name: string;
   enabled?: boolean;
 }

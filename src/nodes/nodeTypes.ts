@@ -1,7 +1,7 @@
 import { RelationshipNodeModelOptions } from './RelationshipNode';
 import { EventNodeModelOptions } from './EventNode';
 import { PersonNodeModelOptions } from './PersonNode';
-import { InequalityNodeModelOptions } from './InequalityNode';
+import { RangePredicateNodeModelOptions } from './RangePredicateNode';
 import { NumberNodeModelOptions } from './NumberNode';
 import { BoolNodeModelOptions } from './BoolNode';
 import { StringNodeModelOptions } from './StringNode';
@@ -13,27 +13,34 @@ import { NotNodeModelOptions } from './NotNode';
 import { OrJoinNodeModelOptions } from './OrJoinNode';
 import { NotJoinNodeModelOptions } from './NotJoinNode';
 import { SocialConnNodeModelOptions } from './SocialConnNode';
-import { OutputNodeModelOptions } from './OutputNode';
+import { VariableNodeModelOptions } from './VariableNode';
 import { CountNodeModelOptions } from './CountNode';
 
+export type CentrifugeEntityNodeTypeOptions =
+    | RelationshipNodeModelOptions
+    | EventNodeModelOptions
+    | PersonNodeModelOptions
+    | BusinessNodeModelOptions
+    | OccupationNodeModelOptions;
+
 export type CentrifugeNodeTypesModelOptions =
-	// Entities
-	| RelationshipNodeModelOptions
-	| EventNodeModelOptions
-	| PersonNodeModelOptions
-	| BusinessNodeModelOptions
-	| OccupationNodeModelOptions
-	// Modifiers
-	| InequalityNodeModelOptions
-	| AndNodeModelOptions
-	| OrNodeModelOptions
-	| NotNodeModelOptions
-	| OrJoinNodeModelOptions
-	| NotJoinNodeModelOptions
-	| SocialConnNodeModelOptions
-	| CountNodeModelOptions
-	// Primitives
-	| StringNodeModelOptions
-	| BoolNodeModelOptions
-	| NumberNodeModelOptions
-	| OutputNodeModelOptions;
+    // Entities
+    | RelationshipNodeModelOptions
+    | EventNodeModelOptions
+    | PersonNodeModelOptions
+    | BusinessNodeModelOptions
+    | OccupationNodeModelOptions
+    // Modifiers
+    | RangePredicateNodeModelOptions
+    | AndNodeModelOptions
+    | OrNodeModelOptions
+    | NotNodeModelOptions
+    | OrJoinNodeModelOptions
+    | NotJoinNodeModelOptions
+    | SocialConnNodeModelOptions
+    | CountNodeModelOptions
+    // Primitives
+    | StringNodeModelOptions
+    | BoolNodeModelOptions
+    | NumberNodeModelOptions
+    | VariableNodeModelOptions;

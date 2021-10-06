@@ -1,76 +1,74 @@
-import {
-	NodeModel,
-	DefaultPortModel,
-	PortModelAlignment,
-} from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { SerializedNodeModel } from '../../utility/serialization';
+import { TypedPortModel } from 'src/ports/TypedPort';
 
 export const NOT_JOIN_NODE_TYPE = 'not-join-node';
 
 export interface NotJoinNodeModelOptions {
-	type: typeof NOT_JOIN_NODE_TYPE;
-	label: string;
+    type: typeof NOT_JOIN_NODE_TYPE;
 }
 
 export interface NotJoinNodeModelGenerics {
-	OPTIONS: NotJoinNodeModelOptions;
+    OPTIONS: NotJoinNodeModelOptions;
 }
 
 export class NotJoinNodeModel extends NodeModel<
-	NotJoinNodeModelGenerics & NodeModelGenerics
+    NotJoinNodeModelGenerics & NodeModelGenerics
 > {
-	public outPort: DefaultPortModel;
-	public variablesPort: DefaultPortModel;
-	public clausesPort: DefaultPortModel;
+    public outPort: TypedPortModel;
+    public externalVariablesPort: TypedPortModel;
+    public internalVariablesPort: TypedPortModel;
+    public clausesPort: TypedPortModel;
 
-	constructor(
-		options: NotJoinNodeModelOptions = {
-			type: NOT_JOIN_NODE_TYPE,
-			label: 'Not-Join',
-		}
-	) {
-		super({
-			...options,
-		});
+    constructor() {
+        super({
+            type: NOT_JOIN_NODE_TYPE,
+        });
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'out',
-			label: options.label,
-			alignment: PortModelAlignment.RIGHT,
-			maximumLinks: 1,
-		});
+        this.outPort = new TypedPortModel({
+            in: false,
+            name: 'out',
+            maxLinks: 1,
+            dataType: 'clause',
+        });
 
-		this.variablesPort = new DefaultPortModel({
-			in: true,
-			name: 'variables',
-			label: 'Variables (Entity)',
-			alignment: PortModelAlignment.LEFT,
-		});
+        this.externalVariablesPort = new TypedPortModel({
+            name: 'external_variables',
+            label: 'External Variables',
+            in: true,
+            dataType: 'ref',
+        });
 
-		this.clausesPort = new DefaultPortModel({
-			in: true,
-			name: 'clauses',
-			label: 'clauses (Clause+)',
-			alignment: PortModelAlignment.LEFT,
-		});
+        this.internalVariablesPort = new TypedPortModel({
+            name: 'internal_variables',
+            label: 'Internal Variables',
+            in: true,
+            dataType: 'ref',
+        });
 
-		this.addPort(this.outPort);
-		this.addPort(this.variablesPort);
-		this.addPort(this.clausesPort);
-	}
+        this.clausesPort = new TypedPortModel({
+            in: true,
+            name: 'clauses',
+            label: 'clauses',
+            dataType: 'clause',
+        });
 
+        this.addPort(this.outPort);
+        this.addPort(this.internalVariablesPort);
+        this.addPort(this.externalVariablesPort);
+        this.addPort(this.clausesPort);
+    }
 
-	serialize(): SerializedNodeModel & NotJoinNodeModelOptions {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
+    serialize(): SerializedNodeModel & NotJoinNodeModelOptions {
+        return {
+            ...super.serialize(),
+            ...this.options,
+        };
+    }
 
-	deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-	}
+    deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+    }
 }

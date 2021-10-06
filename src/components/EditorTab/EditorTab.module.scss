@@ -1,22 +1,22 @@
 .EditorTab {
-  width: 10rem;
-  display: flex;
-  justify-content: space-between;
-  color: black;
+    width: 10rem;
+    display: flex;
+    justify-content: space-between;
+    color: white;
 
-  .Title {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 8rem;
-    text-decoration: none;
+    .Title {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 8rem;
+        text-decoration: none;
 
-    &:hover {
-      text-decoration: none;
+        &:hover {
+            text-decoration: none;
+        }
     }
-  }
 
-  .CloseBtn {
-    color: black;
-  }
+    .CloseBtn {
+        color: black;
+    }
 }

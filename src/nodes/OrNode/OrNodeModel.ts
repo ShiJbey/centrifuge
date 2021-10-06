@@ -1,61 +1,65 @@
-import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { SerializedNodeModel } from '../../utility/serialization';
+import { LogicalNodeModelOptions } from '../SyntaxNode';
+import { TypedPortModel } from 'src/ports/TypedPort';
 
 export const OR_NODE_TYPE = 'or-node';
 
-export interface OrNodeModelOptions {
-	type: typeof OR_NODE_TYPE;
-	label: string;
+export interface OrNodeModelOptions extends LogicalNodeModelOptions {
+    type: typeof OR_NODE_TYPE;
 }
 
 export interface OrNodeModelGenerics {
-	OPTIONS: OrNodeModelOptions;
+    OPTIONS: OrNodeModelOptions;
 }
 
-export class OrNodeModel extends NodeModel<OrNodeModelGenerics & NodeModelGenerics> {
-	public outPort: DefaultPortModel;
-	public inPort: DefaultPortModel;
+export class OrNodeModel extends NodeModel<
+    OrNodeModelGenerics & NodeModelGenerics
+> {
+    public outPort: TypedPortModel;
+    public inPort: TypedPortModel;
 
-	constructor(
-		options: OrNodeModelOptions = {
-			type: OR_NODE_TYPE,
-			label: 'OR',
-		}
-	) {
-		super({
-			...options,
-		});
+    constructor() {
+        super({
+            type: OR_NODE_TYPE,
+            op: 'or',
+        });
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'out',
-			label: '',
-			alignment: PortModelAlignment.RIGHT,
-		});
+        this.outPort = new TypedPortModel({
+            in: false,
+            name: 'out',
+            maxLinks: 1,
+            dataType: 'clause',
+        });
 
-		this.inPort = new DefaultPortModel({
-			in: true,
-			name: 'in',
-			label: '',
-			alignment: PortModelAlignment.LEFT,
-			maximumLinks: 1,
-		});
+        this.inPort = new TypedPortModel({
+            in: true,
+            name: 'in',
+            dataType: 'clause',
+        });
 
-		this.addPort(this.outPort);
-		this.addPort(this.inPort);
-	}
+        this.addPort(this.outPort);
+        this.addPort(this.inPort);
+    }
 
-	public serialize(): SerializedNodeModel & OrNodeModelOptions {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
+    getInputNodes(): NodeModel[] {
+        return Object.values(this.inPort.getLinks())
+            .filter((link) => !!link.getSourcePort())
+            .map(
+                (link) => link.getSourcePort().getNode() as unknown as NodeModel
+            );
+    }
 
-	public deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-		this.options.label = event.data.label;
-	}
+    public serialize(): SerializedNodeModel & OrNodeModelOptions {
+        return {
+            ...super.serialize(),
+            ...this.options,
+        };
+    }
+
+    public deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+    }
 }

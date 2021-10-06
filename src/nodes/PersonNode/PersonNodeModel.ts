@@ -1,78 +1,94 @@
+import { NodeModel, NodeModelGenerics } from '@projectstorm/react-diagrams';
 import {
-	NodeModel,
-	DefaultPortModel,
-	PortModelAlignment,
-	NodeModelGenerics,
-} from '@projectstorm/react-diagrams';
-import { BaseModelOptions, DeserializeEvent } from '@projectstorm/react-canvas-core';
-import { SerializedNodeModel } from '../../utility/serialization';
+    BaseModelOptions,
+    DeserializeEvent,
+} from '@projectstorm/react-canvas-core';
+import { EntityNodeModelOptions } from '../SyntaxNode';
+import { PortDataType, TypedPortModel } from 'src/ports/TypedPort';
 
 export const PERSON_NODE_TYPE = 'person-node';
 
-export interface PersonNodeModelOptions extends BaseModelOptions {
-	type: typeof PERSON_NODE_TYPE;
-	label: string;
+export interface PersonNodeModelOptions
+    extends BaseModelOptions,
+        EntityNodeModelOptions {
+    type: typeof PERSON_NODE_TYPE;
 }
 
 export interface PersonNodeModelGenerics {
-	OPTIONS: PersonNodeModelOptions;
+    OPTIONS: PersonNodeModelOptions;
 }
 
-export class PersonNodeModel extends NodeModel<PersonNodeModelGenerics & NodeModelGenerics> {
-	protected attributePorts: DefaultPortModel[] = [];
-	public outPort: DefaultPortModel;
+export class PersonNodeModel extends NodeModel<
+    PersonNodeModelGenerics & NodeModelGenerics
+> {
+    private static instanceCount = 0;
+    protected attributePorts: TypedPortModel[] = [];
+    public outPort: TypedPortModel;
 
-	constructor(options: PersonNodeModelOptions = { type: PERSON_NODE_TYPE, label: 'Person (P)' }) {
-		super({
-			...options,
-		});
+    constructor(options?: { entityName: '' }) {
+        super({
+            type: PERSON_NODE_TYPE,
+            entityType: 'person',
+            entityName:
+                options?.entityName ??
+                `person_${PersonNodeModel.instanceCount}`,
+        });
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'entity_id',
-			label: options.label,
-			alignment: PortModelAlignment.RIGHT,
-		});
-		this.addPort(this.outPort);
+        PersonNodeModel.instanceCount++;
 
-		this.addAttributePort('id', 'ID (str)');
-		this.addAttributePort('age', 'Age (Num)');
-		this.addAttributePort('gender', 'Gender (Str+)');
-		this.addAttributePort('tags', 'Tags (Str+)');
-		this.addAttributePort('alive', 'Alive (Bool)');
-		this.addAttributePort('death_year', 'Death Year (Num)');
-		this.addAttributePort('attracted_to', 'Attracted To (Str+)');
-		this.addAttributePort('grieving', 'Grieving (Bool)');
-		this.addAttributePort('college_graduate', 'College Graduate (Bool)');
-		this.addAttributePort('retired', 'Retired (Bool)');
-		this.addAttributePort('occupation', 'Occupation (Occ)');
-		this.addAttributePort('pregnant', 'Pregnant (Bool)');
-	}
+        this.outPort = new TypedPortModel({
+            name: 'ref',
+            in: false,
+            dataType: 'ref',
+        });
 
-	private addAttributePort(name: string, label: string): DefaultPortModel {
-		const port = new DefaultPortModel({
-			in: false,
-			name,
-			label,
-			alignment: PortModelAlignment.RIGHT,
-		});
-		this.addPort(port);
-		this.attributePorts.push(port);
-		return port;
-	}
+        this.addPort(this.outPort);
+        this.addAttributePort('id', 'Person ID', 'string');
+        this.addAttributePort('age', 'Age', 'number');
+        this.addAttributePort('gender', 'Gender', 'string', 'many');
+        this.addAttributePort('tags', 'Tags', 'string', 'many');
+        this.addAttributePort('alive', 'Alive', 'boolean');
+        this.addAttributePort('death_year', 'Death Year', 'number');
+        this.addAttributePort('attracted_to', 'Attracted To', 'string', 'many');
+        this.addAttributePort('grieving', 'Grieving', 'boolean');
+        this.addAttributePort(
+            'college_graduate',
+            'College Graduate',
+            'boolean'
+        );
+        this.addAttributePort('retired', 'Retired', 'boolean');
+        this.addAttributePort('occupation', 'Occupation ID', 'string');
+        this.addAttributePort('pregnant', 'Pregnant', 'boolean');
+    }
 
-	public getAttributePorts(): DefaultPortModel[] {
-		return this.attributePorts;
-	}
+    private addAttributePort(
+        name: string,
+        label: string,
+        dataType: PortDataType,
+        cardinality: 'one' | 'many' = 'one'
+    ): void {
+        const port = new TypedPortModel({
+            name,
+            label,
+            dataType: dataType,
+            maxLinks: cardinality === 'one' ? 1 : undefined,
+        });
+        this.addPort(port);
+        this.attributePorts.push(port);
+    }
 
-	public serialize(): SerializedNodeModel & PersonNodeModelOptions {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
+    public getAttributePorts(): TypedPortModel[] {
+        return this.attributePorts;
+    }
 
-	public deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-	}
+    public serialize() {
+        return {
+            ...super.serialize(),
+            ...this.options,
+        };
+    }
+
+    public deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+    }
 }

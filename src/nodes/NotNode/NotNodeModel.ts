@@ -1,58 +1,63 @@
-import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
+import { LogicalNodeModelOptions } from '../SyntaxNode';
+import { TypedPortModel } from 'src/ports/TypedPort';
 
 export const NOT_NODE_TYPE = 'not-node';
 
-export interface NotNodeModelOptions {
-	label: string;
+export interface NotNodeModelOptions extends LogicalNodeModelOptions {
+    type: typeof NOT_NODE_TYPE;
 }
 
 export interface NotNodeModelGenerics {
-	OPTIONS: NotNodeModelOptions;
+    OPTIONS: NotNodeModelOptions;
 }
 
-export class NotNodeModel extends NodeModel<NotNodeModelGenerics & NodeModelGenerics> {
-	public outPort: DefaultPortModel;
-	public valuePort: DefaultPortModel;
+export class NotNodeModel extends NodeModel<
+    NotNodeModelGenerics & NodeModelGenerics
+> {
+    public outPort: TypedPortModel;
+    public inPort: TypedPortModel;
 
-	constructor(
-		options: NotNodeModelOptions = {
-			label: 'NOT',
-		}
-	) {
-		super({
-			...options,
-			type: NOT_NODE_TYPE,
-		});
+    constructor() {
+        super({
+            type: NOT_NODE_TYPE,
+            op: 'not',
+        });
 
-		this.valuePort = new DefaultPortModel({
-			in: true,
-			name: 'in',
-			label: '',
-			alignment: PortModelAlignment.LEFT,
-			maximumLinks: 1,
-		});
+        this.inPort = new TypedPortModel({
+            in: true,
+            name: 'in',
+            dataType: 'clause',
+        });
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'out',
-			label: '',
-			alignment: PortModelAlignment.RIGHT,
-		});
+        this.outPort = new TypedPortModel({
+            in: false,
+            name: 'out',
+            dataType: 'clause',
+            maxLinks: 1,
+        });
 
-		this.addPort(this.valuePort);
-		this.addPort(this.outPort);
-	}
+        this.addPort(this.inPort);
+        this.addPort(this.outPort);
+    }
 
-	public serialize(): any {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
+    getInputNode(): NodeModel | undefined {
+        const [node] = Object.values(this.inPort.getLinks())
+            .filter((link) => !!link.getSourcePort())
+            .map((link) => link.getSourcePort().getNode());
+        return node;
+    }
 
-	public deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-	}
+    public serialize(): any {
+        return {
+            ...super.serialize(),
+            ...this.options,
+        };
+    }
+
+    public deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+    }
 }

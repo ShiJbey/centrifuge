@@ -28,6 +28,18 @@ This project uses yarn for package management. If your don't have it, feel free 
 npm i -g yarn
 ```
 
+### To-Do
+
+- **Custom Port Models/Factories**
+  - Clause Port
+  - Constant Value Port
+  - Entity Output Port
+    - Add entity type as an additional type string
+  - Entity Attribute Port
+    - Get use this to get the attribute name from the parent node
+    -
+
+
 ### Cloning and Building
 
 1. `git clone https://github.com/ShiJbey/centrifuge.git`

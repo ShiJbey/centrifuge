@@ -1,61 +1,77 @@
-import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
-import { SerializedNodeModel } from '../../utility/serialization';
+import { LogicalNodeModelOptions } from '../SyntaxNode';
+import { TypedPortModel } from 'src/ports/TypedPort';
 
 export const AND_NODE_TYPE = 'AND-node';
 
-export interface AndNodeModelOptions {
-	type: typeof AND_NODE_TYPE;
-	label: string;
+export interface AndNodeModelOptions extends LogicalNodeModelOptions {
+    type: typeof AND_NODE_TYPE;
 }
 
 export interface AndNodeModelGenerics {
-	OPTIONS: AndNodeModelOptions;
+    OPTIONS: AndNodeModelOptions;
 }
 
-export class AndNodeModel extends NodeModel<AndNodeModelGenerics & NodeModelGenerics> {
-	public outPort: DefaultPortModel;
-	public inPort: DefaultPortModel;
+export class AndNodeModel extends NodeModel<
+    AndNodeModelGenerics & NodeModelGenerics
+> {
+    public outPort: TypedPortModel;
+    public inPort: TypedPortModel;
 
-	constructor(
-		options: AndNodeModelOptions = {
-			type: AND_NODE_TYPE,
-			label: 'AND',
-		}
-	) {
-		super({
-			...options,
-		});
+    constructor(
+        options: AndNodeModelOptions = {
+            type: AND_NODE_TYPE,
+            op: 'and',
+        }
+    ) {
+        super({
+            ...options,
+        });
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'out',
-			label: 'out',
-			alignment: PortModelAlignment.RIGHT,
-		});
+        this.outPort = new TypedPortModel({
+            in: false,
+            name: 'out',
+            maxLinks: 1,
+            dataType: 'clause',
+        });
 
-		this.inPort = new DefaultPortModel({
-			in: true,
-			name: 'in',
-			label: 'in',
-			alignment: PortModelAlignment.LEFT,
-			maximumLinks: 1,
-		});
+        this.inPort = new TypedPortModel({
+            in: true,
+            name: 'in',
+            dataType: 'clause',
+        });
 
-		this.addPort(this.outPort);
-		this.addPort(this.inPort);
-	}
+        this.addPort(this.outPort);
+        this.addPort(this.inPort);
+    }
 
-	public serialize(): SerializedNodeModel & AndNodeModelOptions {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
+    getInputNodes(): NodeModel[] {
+        return Object.values(this.inPort.getLinks())
+            .filter((link) => !!link.getSourcePort())
+            .map((link) => link.getSourcePort().getNode());
+    }
 
-	public deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-		this.options.label = event.data.label;
-	}
+    missingInput(): boolean {
+        return this.getInputNodes().length > 0;
+    }
+
+    hasOutput(): boolean {
+        const [outputNode] = Object.values(this.outPort.getLinks())
+            .filter((link) => !!link.getTargetPort())
+            .map((link) => link.getTargetPort().getNode());
+
+        return !!outputNode;
+    }
+
+    public serialize() {
+        return {
+            ...super.serialize(),
+        };
+    }
+
+    public deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+    }
 }

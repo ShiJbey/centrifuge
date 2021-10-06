@@ -1,0 +1,16 @@
+.PatternNameContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 16px;
+    color: white;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin: 8px;
+}
+
+.PatternNameText {
+    font-size: x-large;
+    font-weight: 900;
+}

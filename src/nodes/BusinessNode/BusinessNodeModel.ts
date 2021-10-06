@@ -1,82 +1,105 @@
-import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
+import { EntityNodeModelOptions } from '../SyntaxNode';
+import { PortDataType, TypedPortModel } from 'src/ports/TypedPort';
 
 export const BUSINESS_NODE_TYPE = 'business-node';
 
-export interface BusinessNodeModelOptions {
-	type: typeof BUSINESS_NODE_TYPE;
-	label: string;
-	businessType?: string;
+export interface BusinessNodeModelOptions extends EntityNodeModelOptions {
+    type: typeof BUSINESS_NODE_TYPE;
+    businessType?: string;
 }
 
 export interface BusinessNodeModelGenerics {
-	OPTIONS: BusinessNodeModelOptions;
+    OPTIONS: BusinessNodeModelOptions;
 }
 
-export class BusinessNodeModel extends NodeModel<BusinessNodeModelGenerics & NodeModelGenerics> {
-	protected attributePorts: DefaultPortModel[] = [];
-	protected specializedPorts: DefaultPortModel[] = [];
-	public outPort: DefaultPortModel;
+export class BusinessNodeModel extends NodeModel<
+    BusinessNodeModelGenerics & NodeModelGenerics
+> {
+    private static instanceCount = 0;
+    protected attributePorts: TypedPortModel[] = [];
+    protected specializedPorts: TypedPortModel[] = [];
+    public outPort: TypedPortModel;
 
-	constructor(
-		options: BusinessNodeModelOptions = {
-			type: BUSINESS_NODE_TYPE,
-			label: 'Business (B)',
-		}
-	) {
-		super({
-			...options,
-		});
+    constructor(options?: { entityName: string }) {
+        super({
+            ...options,
+            type: BUSINESS_NODE_TYPE,
+            entityType: 'business',
+            entityName:
+                options?.entityName ??
+                `person_${BusinessNodeModel.instanceCount}`,
+        });
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'entity_id',
-			label: options.label,
-			alignment: PortModelAlignment.RIGHT,
-		});
-		this.addPort(this.outPort);
+        BusinessNodeModel.instanceCount++;
 
-		this.addAttributePort('services', 'Services (Str+)');
-		this.addAttributePort('town', 'Town (Str)');
-		this.addAttributePort('founded', 'founded (Num)');
-		this.addAttributePort('owner', 'Owner (P)');
-		this.addAttributePort('town', 'Town (Str)');
-		this.addAttributePort('employees', 'Employees (P+)');
-		this.addAttributePort('former_employees', 'Former Employees (P+)');
-		this.addAttributePort('former_owners', 'Former Owners (P+)');
-		this.addAttributePort('construction', 'Construction (E)');
-		this.addAttributePort('people_here_now', 'People Here Now (P+)');
-		this.addAttributePort('demolition', 'Demolition (E)');
-		this.addAttributePort('out_of_business', 'Out of Business (Bool)');
-		this.addAttributePort('closure', 'Closure (E)');
-		this.addAttributePort('closed', 'Closing Year (Num)');
-	}
+        this.outPort = new TypedPortModel({
+            in: false,
+            name: 'ref',
+            dataType: 'ref',
+        });
+        this.addPort(this.outPort);
 
-	private addAttributePort(name: string, label: string): DefaultPortModel {
-		const port = new DefaultPortModel({
-			in: false,
-			name,
-			label,
-			alignment: PortModelAlignment.RIGHT,
-		});
-		this.addPort(port);
-		this.attributePorts.push(port);
-		return port;
-	}
+        this.addAttributePort('services', 'Services', 'string');
+        this.addAttributePort('founded', 'founded', 'number');
+        this.addAttributePort('owner', 'Owner', 'ref');
+        this.addAttributePort('employees', 'Employees', 'ref');
+        this.addAttributePort(
+            'former_employees',
+            'Former Employees',
+            'ref',
+            'many'
+        );
+        this.addAttributePort('former_owners', 'Former Owners', 'ref');
+        this.addAttributePort('construction', 'Construction', 'ref', 'one');
+        this.addAttributePort(
+            'people_here_now',
+            'People Here Now',
+            'ref',
+            'one'
+        );
+        this.addAttributePort('demolition', 'Demolition', 'ref', 'one');
+        this.addAttributePort(
+            'out_of_business',
+            'Out of Business',
+            'boolean',
+            'one'
+        );
+        this.addAttributePort('closure', 'Closure', 'ref', 'one');
+        this.addAttributePort('closed', 'Closing Year', 'number', 'one');
+    }
 
-	public getAttributePorts(): DefaultPortModel[] {
-		return this.attributePorts;
-	}
+    private addAttributePort(
+        name: string,
+        label: string,
+        dataType: PortDataType,
+        cardinality: 'one' | 'many' = 'one'
+    ): void {
+        const port = new TypedPortModel({
+            name,
+            label,
+            dataType: dataType,
+            maxLinks: cardinality === 'one' ? 1 : undefined,
+        });
+        this.addPort(port);
+        this.attributePorts.push(port);
+    }
 
-	public serialize(): any {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
+    public getAttributePorts(): TypedPortModel[] {
+        return this.attributePorts;
+    }
 
-	public deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-	}
+    public serialize(): any {
+        return {
+            ...super.serialize(),
+            ...this.options,
+        };
+    }
+
+    public deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+        this.options.businessType = event.data.businessType;
+    }
 }
