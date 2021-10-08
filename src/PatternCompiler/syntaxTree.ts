@@ -354,7 +354,7 @@ export class PatternSyntaxTree {
     }
 
     compile(): CompiledPattern {
-        let whereClauses = '';
+        const whereClauses: string[] = [];
         const parameters: PatternParam[] = [];
 
         for (const node of this.variableNodes) {
@@ -364,13 +364,13 @@ export class PatternSyntaxTree {
         }
 
         for (const node of this.leafNodes) {
-            whereClauses += node.evaluate();
+            whereClauses.push(node.evaluate());
         }
 
         return {
             name: this.name,
             parameters,
-            whereClauses,
+            whereClauses: whereClauses.join('\n'),
         };
     }
 }

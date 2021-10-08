@@ -26,6 +26,9 @@ export class NotJoinNodeWidget extends React.Component<NotJoinNodeWidgetProps> {
                 selected={this.props.node.isSelected()}
             >
                 <Header>
+                    <div style={{ marginLeft: '6px', marginRight: '6px' }}>
+                        NOT-join
+                    </div>
                     <PortContainer>
                         <TypedPortLabel
                             engine={this.props.engine}

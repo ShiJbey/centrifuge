@@ -141,7 +141,7 @@ const NodeTray: React.FC = () => {
 
             <TrayItem
                 model={{ type: RANGE_PREDICATE_NODE_TYPE }}
-                name="Inequality"
+                name="Range"
                 color={MODIFIER_NODE_COLOR}
             />
 

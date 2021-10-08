@@ -39,15 +39,20 @@ export class BoolNodeModel extends NodeModel<
         this.addPort(this.outPort);
     }
 
+    setValue(value: boolean): void {
+        this.options.value = value;
+        this.fireEvent({}, 'changed');
+    }
+
     getChild(): NodeModel | undefined {
-        const [outLink] = Object.values(this.outPort.getLinks());
+        const [outLink] = Object.values(this.ports['out'].getLinks());
         if (outLink && outLink.getTargetPort())
             return outLink.getTargetPort().getNode();
         return undefined;
     }
 
     missingChild(): boolean {
-        return !this.getChild();
+        return this.getChild() === undefined;
     }
 
     public serialize(): SerializedNodeModel & BoolNodeModelOptions {

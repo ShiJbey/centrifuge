@@ -30,31 +30,13 @@ export interface BoolNodeWidgetProps {
     engine: DiagramEngine;
 }
 
-export interface BoolNodeWidgetState {
-    value: boolean;
-}
+export class BoolNodeWidget extends React.Component<BoolNodeWidgetProps> {
+    onValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const val = event.target.value === 'true' ? true : false;
+        this.props.node.setValue(val);
+    };
 
-export class BoolNodeWidget extends React.Component<
-    BoolNodeWidgetProps,
-    BoolNodeWidgetState
-> {
-    constructor(props: BoolNodeWidgetProps) {
-        super(props);
-        this.state = {
-            value: this.props.node.getOptions().value as boolean,
-        };
-    }
-
-    public render(): React.ReactNode {
-        const onValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            const val = event.target.value === 'true' ? true : false;
-            this.setState({
-                ...this.state,
-                value: val,
-            });
-            this.props.node.getOptions().value = val;
-        };
-
+    render(): React.ReactNode {
         return (
             <Node
                 background={PRIMITIVE_NODE_COLOR}
@@ -66,7 +48,7 @@ export class BoolNodeWidget extends React.Component<
                     <div style={{ paddingRight: '3px', overflow: 'hidden' }}>
                         <Select
                             name={`bool_select_${this.props.node.getID()}`}
-                            onChange={onValueChange}
+                            onChange={(event) => this.onValueChange(event)}
                             defaultValue={String(
                                 this.props.node.getOptions().value
                             )}

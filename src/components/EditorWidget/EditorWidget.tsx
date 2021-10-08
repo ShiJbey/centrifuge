@@ -84,6 +84,13 @@ export class EditorWidget extends React.Component<
                                 .serialize()
                         );
                     },
+                    changed: () => {
+                        this.handleUpdate(
+                            this.state.diagramManager
+                                .getActiveDiagram()
+                                .serialize()
+                        );
+                    },
                 });
             });
 

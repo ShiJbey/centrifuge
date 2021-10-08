@@ -50,7 +50,8 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
         super({
             label: `${options.label ?? ''}${getTypeLabel(
                 options.dataType,
-                options.maxLinks
+                options.maxLinks,
+                options.in
             )}`,
             in: options.in,
             alignment: options.in
@@ -95,7 +96,7 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
                 (port.getDataType() === 'primitive' &&
                     ['bool', 'string', 'number'].includes(this.getDataType()));
             console.log(
-                `${this.getType()} -> ${port.getType()} [${
+                `${this.getDataType()} -> ${port.getDataType()} [${
                     typeMatch && areOppositeAlignment ? 'accepted' : 'rejected'
                 }]`
             );
@@ -106,10 +107,6 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
     }
 
     createLinkModel(): DefaultLinkModel | null {
-        if (this.options.in) {
-            return null;
-        }
-
         if (this.options.maximumLinks) {
             const numberOfLinks: number = Object.keys(this.links).length;
             if (numberOfLinks < this.options.maximumLinks) {
@@ -124,6 +121,7 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
                 return null;
             }
         }
+
         return new DefaultLinkModel();
     }
 }
@@ -190,9 +188,13 @@ export class TypedPortFactory extends AbstractModelFactory<
 
 export function getTypeLabel(
     portType: PortDataType,
-    maxLinks?: number
+    maxLinks?: number,
+    isInput?: boolean
 ): string {
-    const cardinalitySuffix = maxLinks && maxLinks === 1 ? '' : '+';
+    let cardinalitySuffix = '';
+
+    if (isInput) cardinalitySuffix = maxLinks && maxLinks === 1 ? '' : '+';
+
     switch (portType) {
         case 'boolean':
             return ` (bool${cardinalitySuffix})`;
@@ -209,6 +211,6 @@ export function getTypeLabel(
         case 'any':
             return ` (any${cardinalitySuffix})`;
         default:
-            throw new Error(`Received invalid constant type: ${portType}`);
+            return '';
     }
 }

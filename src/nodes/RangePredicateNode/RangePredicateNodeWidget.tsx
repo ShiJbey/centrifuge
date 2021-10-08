@@ -15,28 +15,12 @@ export interface InequalityNodeWidgetProps {
     engine: DiagramEngine;
 }
 
-export interface InequalityNodeWidgetState {
-    name: string;
-}
-
-export class InequalityNodeWidget extends React.Component<
-    InequalityNodeWidgetProps,
-    InequalityNodeWidgetState
-> {
+export class InequalityNodeWidget extends React.Component<InequalityNodeWidgetProps> {
     constructor(props: InequalityNodeWidgetProps) {
         super(props);
     }
 
     public render(): React.ReactNode {
-        const onSignChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            this.setState({
-                ...this.state,
-                name: event.target.value,
-            });
-            this.props.node.getOptions().op = event.target
-                .value as InequalityOp;
-        };
-
         return (
             <Node
                 background={MODIFIER_NODE_COLOR}
@@ -44,6 +28,9 @@ export class InequalityNodeWidget extends React.Component<
                 hasError={this.props.node.missingChild()}
             >
                 <Header>
+                    <div style={{ marginLeft: '6px', marginRight: '6px' }}>
+                        Range Pred.
+                    </div>
                     <PortContainer>
                         <TypedPortLabel
                             engine={this.props.engine}
@@ -60,7 +47,11 @@ export class InequalityNodeWidget extends React.Component<
                     />
                     <div>
                         <select
-                            onChange={onSignChange}
+                            onChange={(event) =>
+                                this.props.node.setOp(
+                                    event.target.value as InequalityOp
+                                )
+                            }
                             style={{
                                 width: '100%',
                                 fontWeight: 'bold',

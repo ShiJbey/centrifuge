@@ -59,14 +59,19 @@ export class RangePredicateNodeModel extends NodeModel<
         this.addPort(this.outPort);
     }
 
+    setOp(op: InequalityOp): void {
+        this.options.op = op;
+        this.fireEvent({}, 'changed');
+    }
+
     getPortANode(): NodeModel | undefined {
-        const [portALink] = Object.values(this.valueAPort.getLinks());
+        const [portALink] = Object.values(this.ports['value_b'].getLinks());
         if (!portALink) return undefined;
         return portALink.getSourcePort().getNode();
     }
 
     getPortBNode(): NodeModel | undefined {
-        const [portBLink] = Object.values(this.valueBPort.getLinks());
+        const [portBLink] = Object.values(this.ports['value_a'].getLinks());
         if (!portBLink) return undefined;
         return portBLink.getSourcePort().getNode();
     }

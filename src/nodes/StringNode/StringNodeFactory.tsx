@@ -16,7 +16,7 @@ export class StringNodeFactory extends AbstractReactFactory<
     }
 
     public generateModel(): StringNodeModel {
-        return new StringNodeModel();
+        return new StringNodeModel({});
     }
 
     public generateReactWidget(

@@ -48,6 +48,8 @@ export const Header = styled.div`
     padding: 0.1rem;
     color: white;
     text-align: center;
+    display: flex;
+    justify-content: space-between;
 `;
 
 export const Ports = styled.div`

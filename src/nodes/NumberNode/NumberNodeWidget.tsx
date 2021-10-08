@@ -16,7 +16,6 @@ export interface NumberNodeWidgetProps {
 }
 
 export interface NumberNodeWidgetState {
-    value: string;
     hasError: boolean;
 }
 
@@ -27,40 +26,40 @@ export class NumberNodeWidget extends React.Component<
     constructor(props: NumberNodeWidgetProps) {
         super(props);
         this.state = {
-            value: this.props.node.getOptions().value.toString(),
             hasError: false,
         };
     }
 
+    onValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseFloat(event.target.value);
+        const hasError = isNaN(val);
+        this.setState({
+            ...this.state,
+            hasError: hasError,
+        });
+        this.props.node.getOptions().value = val;
+    };
+
     public render(): React.ReactNode {
-        const onValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            const val = parseFloat(event.target.value);
-            const hasError = isNaN(val);
-            this.setState({
-                ...this.state,
-                value: event.target.value,
-                hasError: hasError,
-            });
-            this.props.node.getOptions().value = val;
-        };
+        const missingOutput = this.props.node.missingChild();
 
         return (
             <Node
                 background={PRIMITIVE_NODE_COLOR}
                 selected={this.props.node.isSelected()}
                 hasError={this.state.hasError}
-                hasWarning={this.props.node.missingChild()}
+                hasWarning={missingOutput}
                 style={{ padding: '3px 0 3px 3px', width: '8rem' }}
             >
                 <Ports>
                     <div style={{ paddingRight: '3px', overflow: 'hidden' }}>
                         <NodeValueInput
                             type="text"
-                            value={this.state.value}
+                            value={`${this.props.node.getOptions().value}`}
                             onClick={(event) => {
                                 event.currentTarget.contentEditable = 'true';
                             }}
-                            onChange={onValueChange}
+                            onChange={(event) => this.onValueChange(event)}
                             onDrag={(e) => e.preventDefault()}
                             onFocus={() => {
                                 this.props.node.setLocked(true);

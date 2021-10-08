@@ -8,6 +8,12 @@ import { PortDataType, TypedPortModel } from 'src/ports/TypedPort';
 
 export const PERSON_NODE_TYPE = 'person-node';
 
+export type DoubleSidedPort = {
+    inputPort: TypedPortModel;
+    label: string;
+    outputPort: TypedPortModel;
+};
+
 export interface PersonNodeModelOptions
     extends BaseModelOptions,
         EntityNodeModelOptions {
@@ -22,7 +28,7 @@ export class PersonNodeModel extends NodeModel<
     PersonNodeModelGenerics & NodeModelGenerics
 > {
     private static instanceCount = 0;
-    protected attributePorts: TypedPortModel[] = [];
+    protected attributePorts: DoubleSidedPort[] = [];
     public outPort: TypedPortModel;
 
     constructor(options?: { entityName: '' }) {
@@ -67,17 +73,34 @@ export class PersonNodeModel extends NodeModel<
         dataType: PortDataType,
         cardinality: 'one' | 'many' = 'one'
     ): void {
-        const port = new TypedPortModel({
-            name,
-            label,
+        const inputPort = new TypedPortModel({
+            in: true,
+            name: `${name}_0`,
             dataType: dataType,
             maxLinks: cardinality === 'one' ? 1 : undefined,
         });
-        this.addPort(port);
-        this.attributePorts.push(port);
+        this.addPort(inputPort);
+
+        const outputPort = new TypedPortModel({
+            in: false,
+            name: `${name}_1`,
+            dataType: dataType,
+            maxLinks: cardinality === 'one' ? 1 : undefined,
+        });
+        this.addPort(outputPort);
+
+        this.attributePorts.push({
+            inputPort,
+            label,
+            outputPort,
+        });
     }
 
-    public getAttributePorts(): TypedPortModel[] {
+    public setEntityName(name: string): void {
+        this.options.entityName = name;
+    }
+
+    public getAttributePorts(): DoubleSidedPort[] {
         return this.attributePorts;
     }
 
@@ -85,10 +108,25 @@ export class PersonNodeModel extends NodeModel<
         return {
             ...super.serialize(),
             ...this.options,
+            // attributePorts: this.attributePorts.map((row) => {
+            //     return {
+            //         inputPortID: row.inputPort.getID(),
+            //         label: row.label,
+            //         outputPortID: row.outputPort.getID(),
+            //     };
+            // }),
         };
     }
 
     public deserialize(event: DeserializeEvent<this>): void {
         super.deserialize(event);
+        this.options.entityName = event.data.entityName;
+        // this.attributePorts = event.data.attributePorts.map((row) => {
+        //     return {
+        //         inputPort: this.getPort(row.inputPortID) as TypedPortModel,
+        //         label: row.label,
+        //         outputPort: this.getPort(row.outputPortID) as TypedPortModel,
+        //     };
+        // });
     }
 }

@@ -10,6 +10,7 @@ const Container = styled.div`
 interface Props {
     value: string;
     className?: string;
+    onActive?: () => void;
     onChange?: (text: string) => void;
 }
 
@@ -36,6 +37,7 @@ const ContentEditableDiv: React.FC<Props> = (props) => {
                     ...state,
                     isEditable: true,
                 });
+                if (props.onActive) props.onActive();
             }}
         >
             {props.value}

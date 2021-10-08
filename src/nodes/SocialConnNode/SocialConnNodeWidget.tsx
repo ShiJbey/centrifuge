@@ -82,33 +82,17 @@ export interface SocialConnNodeWidgetProps {
     engine: DiagramEngine;
 }
 
-export interface SocialConnNodeWidgetState {
-    name: string;
-}
-
-export class SocialConnNodeWidget extends React.Component<
-    SocialConnNodeWidgetProps,
-    SocialConnNodeWidgetState
-> {
-    constructor(props: SocialConnNodeWidgetProps) {
-        super(props);
-    }
-
-    public render(): React.ReactNode {
-        const onTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-            this.setState({
-                ...this.state,
-                name: event.target.value,
-            });
-            this.props.node.getOptions().relationshipType = event.target.value;
-        };
-
+export class SocialConnNodeWidget extends React.Component<SocialConnNodeWidgetProps> {
+    render(): React.ReactNode {
         return (
             <Node
                 background={SOCIAL_CONN_NODE_COLOR}
                 selected={this.props.node.isSelected()}
             >
                 <Header>
+                    <div style={{ marginLeft: '6px', marginRight: '6px' }}>
+                        Social Connection
+                    </div>
                     <PortContainer>
                         <TypedPortLabel
                             engine={this.props.engine}
@@ -125,7 +109,11 @@ export class SocialConnNodeWidget extends React.Component<
                     />
                     <div>
                         <select
-                            onChange={onTypeChange}
+                            onChange={(event) =>
+                                this.props.node.setRelationshipType(
+                                    event.target.value
+                                )
+                            }
                             style={{
                                 width: '100%',
                                 fontWeight: 'bold',

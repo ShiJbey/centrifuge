@@ -57,6 +57,11 @@ export class SocialConnNodeModel extends NodeModel<
         this.addPort(this.outPort);
     }
 
+    setRelationshipType(relationshipType: string): void {
+        this.options.relationshipType = relationshipType;
+        this.fireEvent({}, 'changed');
+    }
+
     public serialize(): SerializedNodeModel & SocialConnNodeModelOptions {
         return {
             ...super.serialize(),

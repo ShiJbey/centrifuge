@@ -10,6 +10,7 @@ import {
     PortGroupLabel,
 } from '../nodeStyles';
 import { TypedPortLabel } from 'src/ports/TypedPort';
+import ContentEditableDiv from 'src/components/ContentEditableDiv';
 
 export interface PersonNodeWidgetProps {
     node: PersonNodeModel;
@@ -27,26 +28,42 @@ export class PersonNodeWidget extends React.Component<PersonNodeWidgetProps> {
                 background={PERSON_NODE_COLOR}
                 selected={this.props.node.isSelected()}
             >
-                <Header>Person</Header>
-                <PortGroupLabel>Reference</PortGroupLabel>
-                <Ports>
-                    <PortContainer>
-                        <TypedPortLabel
-                            engine={this.props.engine}
-                            port={this.props.node.outPort}
-                        />
-                    </PortContainer>
-                </Ports>
+                <Header>
+                    <ContentEditableDiv
+                        value={this.props.node.getOptions().entityName}
+                        onActive={() => this.props.node.setSelected(false)}
+                        onChange={(text) => this.props.node.setEntityName(text)}
+                    />
+                    <TypedPortLabel
+                        engine={this.props.engine}
+                        port={this.props.node.outPort}
+                    />
+                </Header>
                 <PortGroupLabel>Attributes</PortGroupLabel>
                 <Ports>
                     <PortContainer>
-                        {this.props.node.getAttributePorts().map((port) => (
-                            <TypedPortLabel
-                                engine={this.props.engine}
-                                port={port}
-                                key={port.getID()}
-                            />
-                        ))}
+                        {this.props.node
+                            .getAttributePorts()
+                            .map((doublePort, index) => (
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                    }}
+                                    key={`attr_ports_${this.props.node.getID}_${index}`}
+                                >
+                                    <TypedPortLabel
+                                        engine={this.props.engine}
+                                        port={doublePort.inputPort}
+                                    />
+                                    {doublePort.label}
+                                    <TypedPortLabel
+                                        engine={this.props.engine}
+                                        port={doublePort.outputPort}
+                                    />
+                                </div>
+                            ))}
                     </PortContainer>
                 </Ports>
             </Node>

@@ -20,18 +20,15 @@ export class StringNodeModel extends NodeModel<
 > {
     public outPort: TypedPortModel;
 
-    constructor(
-        options: StringNodeModelOptions = {
+    constructor(options: { value?: string }) {
+        super({
             type: STRING_NODE_TYPE,
             value: 'new string',
-        }
-    ) {
-        super({
             ...options,
         });
 
         this.outPort = new TypedPortModel({
-            dataType: 'primitive',
+            dataType: 'string',
             name: 'out',
             in: false,
         });
@@ -39,10 +36,15 @@ export class StringNodeModel extends NodeModel<
         this.addPort(this.outPort);
     }
 
+    setValue(value: string): void {
+        this.options.value = value;
+        this.fireEvent({}, 'changed');
+    }
+
     getChild(): NodeModel | undefined {
-        const [outLink] = Object.values(this.outPort.getLinks());
+        const [outLink] = Object.values(this.ports['out'].getLinks());
         if (outLink && outLink.getTargetPort())
-            return outLink.getTargetPort().getNode() as unknown as NodeModel;
+            return outLink.getTargetPort().getNode();
         return undefined;
     }
 

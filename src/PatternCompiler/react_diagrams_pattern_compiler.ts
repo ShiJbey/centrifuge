@@ -17,12 +17,14 @@ import {
     SyntaxNode,
     PrimitiveValueNode,
     VariableSyntaxNode,
+    RangePredicateSyntaxNode,
 } from './syntaxTree';
 import { BUSINESS_NODE_TYPE } from 'src/nodes/BusinessNode';
 import { CentrifugeNodeTypesModelOptions } from 'src/nodes/nodeTypes';
 import { EVENT_NODE_TYPE } from 'src/nodes/EventNode';
 import { RELATIONSHIP_NODE_TYPE } from 'src/nodes/RelationshipNode';
 import { OCCUPATION_NODE_TYPE } from 'src/nodes/OccupationNode';
+import { RANGE_PREDICATE_NODE_TYPE } from 'src/nodes/RangePredicateNode';
 
 type LinkMap = {
     [id: string]: SerializedLinkModel;
@@ -132,7 +134,20 @@ function dfs(
     for (const id of outputlinkIDs) {
         const nextNodeID = links[id].target;
         if (!visitedNodes.has(nextNodeID)) {
-            i = dfs(i, nodes[nextNodeID], visitedNodes, ordering, patternGraph);
+            const nextNode = nodes[nextNodeID];
+            if (nextNode) {
+                i = dfs(
+                    i,
+                    nodes[nextNodeID],
+                    visitedNodes,
+                    ordering,
+                    patternGraph
+                );
+            } else {
+                throw new Error(
+                    `Missing target for link from node (${startingNode.type})x`
+                );
+            }
         }
     }
 
@@ -219,7 +234,11 @@ export function compilePattern(
 
             const inputMap: { [key: string]: NodePortPair } = {};
             for (const portName of Object.keys(inputs)) {
-                inputMap[portName] = {
+                const attributeName = portName.substring(
+                    0,
+                    portName.length - 2
+                );
+                inputMap[attributeName] = {
                     node: syntaxNodes[inputs[portName][0].nodeID],
                 };
             }
@@ -228,7 +247,11 @@ export function compilePattern(
             for (const portName of Object.keys(outputs)) {
                 if (portName === 'ref') continue;
                 if (outputs[portName].length) {
-                    activeOutoutPorts.push(portName);
+                    const attributeName = portName.substring(
+                        0,
+                        portName.length - 2
+                    );
+                    activeOutoutPorts.push(attributeName);
                 }
             }
 
@@ -249,6 +272,45 @@ export function compilePattern(
                     syntaxTree.addLeafNode(syntaxNode);
                 }
             } else {
+                syntaxTree.addLeafNode(syntaxNode);
+            }
+
+            continue;
+        }
+
+        if (node.type === RANGE_PREDICATE_NODE_TYPE) {
+            const outputs = getOutputs(node, links);
+            const inputs = getInputs(node, links);
+
+            const first: NodePortPair = {
+                node: syntaxNodes[inputs['value_a'][0].nodeID],
+                port: nodes[inputs['value_a'][0].nodeID].ports
+                    .filter(
+                        (port) => port.id === inputs['value_a'][0].sourcePortID
+                    )
+                    .map((port) =>
+                        port.name.substring(0, port.name.length - 2)
+                    )[0],
+            };
+
+            const second: NodePortPair = {
+                node: syntaxNodes[inputs['value_b'][0].nodeID],
+                port: nodes[inputs['value_b'][0].nodeID].ports
+                    .filter(
+                        (port) => port.id === inputs['value_b'][0].sourcePortID
+                    )
+                    .map((port) => port.name)[0],
+            };
+
+            const syntaxNode = new RangePredicateSyntaxNode(
+                node.op,
+                first,
+                second
+            );
+
+            syntaxNodes[node.id] = syntaxNode;
+
+            if (Object.keys(outputs).length === 0) {
                 syntaxTree.addLeafNode(syntaxNode);
             }
 

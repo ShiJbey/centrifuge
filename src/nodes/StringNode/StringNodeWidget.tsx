@@ -15,30 +15,12 @@ export interface StringNodeWidgetProps {
     engine: DiagramEngine;
 }
 
-export interface StringNodeWidgetState {
-    value: string;
-}
-
-export class StringNodeWidget extends React.Component<
-    StringNodeWidgetProps,
-    StringNodeWidgetState
-> {
+export class StringNodeWidget extends React.Component<StringNodeWidgetProps> {
     constructor(props: StringNodeWidgetProps) {
         super(props);
-        this.state = {
-            value: this.props.node.getOptions().value as string,
-        };
     }
 
     public render(): React.ReactNode {
-        const onValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            this.setState({
-                ...this.state,
-                value: event.target.value,
-            });
-            this.props.node.getOptions().value = event.target.value;
-        };
-
         return (
             <Node
                 background={PRIMITIVE_NODE_COLOR}
@@ -50,11 +32,13 @@ export class StringNodeWidget extends React.Component<
                     <div style={{ paddingRight: '3px', overflow: 'hidden' }}>
                         <NodeValueInput
                             type="text"
-                            value={this.state.value}
+                            value={`${this.props.node.getOptions().value}`}
                             onClick={(event) => {
                                 event.currentTarget.contentEditable = 'true';
                             }}
-                            onChange={onValueChange}
+                            onChange={(event) =>
+                                this.props.node.setValue(event.target.value)
+                            }
                             onDrag={(e) => e.preventDefault()}
                             onFocus={() => {
                                 this.props.node.setLocked(true);
