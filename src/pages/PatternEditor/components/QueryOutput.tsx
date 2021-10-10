@@ -36,7 +36,7 @@ const QueryOutput: React.FC<QueryOutputProps> = (props) => {
 
         setState({
             queryText: query,
-            ruleText: rules.join('\n'),
+            ruleText: rules.join('\n\n\n'),
         });
     };
 

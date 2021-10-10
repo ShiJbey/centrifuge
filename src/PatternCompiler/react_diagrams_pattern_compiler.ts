@@ -270,6 +270,10 @@ export function compilePattern(
 
             syntaxNodes[node.id] = syntaxNode;
 
+            if (Object.keys(outputs).length === 0) {
+                syntaxTree.addLeafNode(syntaxNode);
+            }
+
             continue;
         }
 

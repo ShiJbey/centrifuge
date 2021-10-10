@@ -7,6 +7,7 @@ import styles from './EditorWidget.module.scss';
 import PatternDiagramManager from '../../PatternDiagramManager';
 import { debounce } from 'lodash';
 import { SerializedDiagram } from 'src/utility/serialization';
+import { SAVE_PATTERN_REQUEST } from 'src/utility/electronChannels';
 
 const WidgetBody = styled.div`
     position: relative;
@@ -121,6 +122,16 @@ export class EditorWidget extends React.Component<
                     this.state.diagramManager.getActiveDiagram().serialize()
                 );
             },
+        });
+
+        window.addEventListener(SAVE_PATTERN_REQUEST, () => {
+            if (this.props.onChange) {
+                this.props.onChange({
+                    model: this.state.diagramManager
+                        .getActiveDiagram()
+                        .serialize(),
+                });
+            }
         });
     }
 

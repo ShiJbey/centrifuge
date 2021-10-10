@@ -503,7 +503,7 @@ export function toRuleString(pattern: CompiledPattern): string {
     const ruleHeader = `(${pattern.name} ${findVariables.join(
         ' '
     )} ${requiredVarsStr})`;
-    return `${ruleHeader}\n${pattern.whereClauses}`;
+    return `[${ruleHeader}\n${pattern.whereClauses}]`;
 }
 
 /** Concer a Compiled pattern to a query */
@@ -572,6 +572,7 @@ export class PatternSyntaxTree {
         }
 
         for (const node of this.leafNodes) {
+            if (node instanceof EntitySyntaxNode) continue;
             whereClauses.push(node.evaluate({ ctx, depth: 0 }));
         }
 

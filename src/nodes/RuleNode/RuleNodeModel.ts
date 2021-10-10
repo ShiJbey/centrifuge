@@ -42,15 +42,19 @@ export class RuleNodeModel extends NodeModel<
         for (const param of options.ruleParams) {
             const port = this.addPort(
                 new TypedPortModel({
-                    label: param,
+                    label: param.substr(1),
                     dataType: 'ref',
-                    name: param,
+                    name: param.substr(1),
                     maxLinks: 1,
                     in: true,
                 })
             ) as TypedPortModel;
             this.parameterPorts.push(port);
         }
+
+        console.log('Rule Node Constructor called');
+        console.log(options);
+        console.log(this.parameterPorts);
     }
 
     getParameterPorts(): TypedPortModel[] {
@@ -61,19 +65,10 @@ export class RuleNodeModel extends NodeModel<
         return {
             ...super.serialize(),
             ...this.options,
-            parameterPorts: this.parameterPorts.map((port) => {
-                return {
-                    id: port.getID(),
-                    name: port.getName(),
-                };
-            }),
         };
     }
 
     deserialize(event: DeserializeEvent<this>): void {
         super.deserialize(event);
-        this.parameterPorts = event.data.parameterPorts.map((port) => {
-            return this.getPort(port.name) as TypedPortModel;
-        });
     }
 }

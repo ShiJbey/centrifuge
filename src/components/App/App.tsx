@@ -11,6 +11,7 @@ import {
     OPEN_DIR,
     OPEN_PATTERN_FILE,
     SAVE_PATTERN,
+    SAVE_PATTERN_REQUEST,
 } from '../../utility/electronChannels';
 import ElectronAPI, {
     OpenDirectoryResponse,
@@ -134,6 +135,9 @@ export class App extends Component<AppProps> {
                 if (!this.props.activeEditor) {
                     return;
                 }
+
+                const savePatternRequestEvent = new Event(SAVE_PATTERN_REQUEST);
+                window.dispatchEvent(savePatternRequestEvent);
 
                 for (const editor of this.props.editors) {
                     if (editor.id === this.props.activeEditor) {
