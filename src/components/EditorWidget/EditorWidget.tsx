@@ -1,10 +1,6 @@
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
-import {
-    CanvasWidget,
-    BaseModel,
-    BaseModelGenerics,
-} from '@projectstorm/react-canvas-core';
+import { CanvasWidget } from '@projectstorm/react-canvas-core';
 import CanvasBackground from '../CanvasBackground';
 import { EditorState } from '../../redux/editorSlice';
 import styles from './EditorWidget.module.scss';
@@ -40,7 +36,6 @@ export interface EditorWidgetProps {
 
 export interface EditorWidgetState {
     patternNameEditable: boolean;
-    selectedNode?: BaseModel<BaseModelGenerics>;
     diagramManager: PatternDiagramManager;
 }
 
@@ -52,7 +47,6 @@ export class EditorWidget extends React.Component<
         super(props);
         this.state = {
             patternNameEditable: false,
-            selectedNode: undefined,
             diagramManager: new PatternDiagramManager(),
         };
 
@@ -64,6 +58,28 @@ export class EditorWidget extends React.Component<
                     this.state.diagramManager.getDiagramEngine()
                 );
         }
+
+        this.state.diagramManager
+            .getActiveDiagram()
+            .getLinks()
+            .map((link) => {
+                link.registerListener({
+                    sourcePortChanged: () => {
+                        this.handleUpdate(
+                            this.state.diagramManager
+                                .getActiveDiagram()
+                                .serialize()
+                        );
+                    },
+                    targetPortChanged: () => {
+                        this.handleUpdate(
+                            this.state.diagramManager
+                                .getActiveDiagram()
+                                .serialize()
+                        );
+                    },
+                });
+            });
 
         this.state.diagramManager
             .getActiveDiagram()
@@ -122,7 +138,7 @@ export class EditorWidget extends React.Component<
         const model = this.state.diagramManager
             .getDiagramEngine()
             .getFactoryForNode(data.type)
-            .generateModel({ initialConfig: {} });
+            .generateModel({ initialConfig: data.config });
 
         const point = this.state.diagramManager
             .getDiagramEngine()
@@ -131,11 +147,6 @@ export class EditorWidget extends React.Component<
         model.setPosition(point);
 
         model.registerListener({
-            // eventDidFire: () => {
-            //     this.handleUpdate(
-            //         this.state.diagramManager.getActiveDiagram().serialize()
-            //     );
-            // },
             positionChanged: () => {
                 this.handleUpdate(
                     this.state.diagramManager.getActiveDiagram().serialize()
@@ -152,6 +163,13 @@ export class EditorWidget extends React.Component<
         this.forceUpdate();
     }
 
+    clearSelection() {
+        this.state.diagramManager
+            .getActiveDiagram()
+            .getSelectedEntities()
+            .map((model) => model.setSelected(false));
+    }
+
     onDragOver(event: React.DragEvent): void {
         event.preventDefault();
     }
@@ -159,30 +177,33 @@ export class EditorWidget extends React.Component<
     render(): ReactNode {
         return (
             <WidgetBody>
-                <div
-                    contentEditable={this.state.patternNameEditable}
-                    suppressContentEditableWarning={true}
-                    onBlur={(event) => {
-                        if (this.props.onChange)
+                <input
+                    type="text"
+                    readOnly={!this.state.patternNameEditable}
+                    defaultValue={this.props.editor.patternName}
+                    onChange={(event) => {
+                        if (this.props.onChange) {
                             this.props.onChange({
-                                patternName: event.target.innerText,
+                                patternName: event.target.value,
                             });
-
+                        }
+                    }}
+                    onBlur={() => {
                         this.setState({
                             ...this.state,
                             patternNameEditable: false,
                         });
                     }}
-                    onDoubleClick={() =>
+                    onDoubleClick={() => {
+                        this.clearSelection();
                         this.setState({
                             ...this.state,
                             patternNameEditable: true,
-                        })
-                    }
+                        });
+                    }}
                     className={styles.PatternNameContainer}
-                >
-                    {this.props.editor.patternName}
-                </div>
+                />
+
                 <WidgetContent>
                     <WidgetLayer
                         onDrop={(event) => this.onDrop(event)}

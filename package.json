@@ -80,7 +80,7 @@
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
-    "@projectstorm/react-diagrams": "^6.6.1",
+    "@projectstorm/react-diagrams": "6.5.2",
     "@reduxjs/toolkit": "^1.5.1",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@types/fs-extra": "^9.0.13",

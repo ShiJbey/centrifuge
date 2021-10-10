@@ -2,10 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { app, BrowserWindow, Menu, ipcMain } from 'electron';
 import axios from 'axios';
-import installExtension, {
-    REDUX_DEVTOOLS,
-    REACT_DEVELOPER_TOOLS,
-} from 'electron-devtools-installer';
 import { createMenu } from './main-process/menu';
 import {
     CLOSE_DIR,
@@ -58,9 +54,6 @@ const createWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
     createWindow();
-    installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
-        .then((name) => console.log(`Added Extension:  ${name}`))
-        .catch((err) => console.log('An error occurred: ', err));
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

@@ -1,34 +1,21 @@
 import React from 'react';
 import TrayItem from './TrayItem';
 import {
-    EVENT_NODE_COLOR,
-    RELATIONSHIP_NODE_COLOR,
-    PERSON_NODE_COLOR,
     MODIFIER_NODE_COLOR,
-    BUSINESS_NODE_COLOR,
-    OCCUPATION_NODE_COLOR,
     SOCIAL_CONN_NODE_COLOR,
     VARIABLE_NODE_COLOR,
     PRIMITIVE_NODE_COLOR,
 } from '../../nodes/nodeStyles';
-import { PERSON_NODE_TYPE } from '../../nodes/PersonNode';
 import { SOCIAL_CONN_NODE_TYPE } from '../../nodes/SocialConnNode';
-import { BOOL_NODE_TYPE } from '../../nodes/BoolNode';
-import { NUMBER_NODE_TYPE } from '../../nodes/NumberNode';
-import { STRING_NODE_TYPE } from '../../nodes/StringNode';
-import { BUSINESS_NODE_TYPE } from '../../nodes/BusinessNode';
-import { EVENT_NODE_TYPE } from '../../nodes/EventNode';
-import { RELATIONSHIP_NODE_TYPE } from '../../nodes/RelationshipNode';
+import { ValueNodeConfig, VALUE_NODE_TYPE } from '../../nodes/ValueNode';
 import { VARIABLE_NODE_TYPE } from '../../nodes/VariableNode';
-import { OCCUPATION_NODE_TYPE } from '../../nodes/OccupationNode';
-import { NOT_NODE_TYPE } from '../../nodes/NotNode';
-import { AND_NODE_TYPE } from '../../nodes/AndNode';
-import { OR_JOIN_NODE_TYPE } from '../../nodes/OrJoinNode';
-import { NOT_JOIN_NODE_TYPE } from '../../nodes/NotJoinNode';
+import { LOGICAL_JOIN_NODE_TYPE } from '../../nodes/LogicalJoinNode';
 import { RANGE_PREDICATE_NODE_TYPE } from '../../nodes/RangePredicateNode';
 import { COUNT_NODE_TYPE } from '../../nodes/CountNode';
-import { OR_NODE_TYPE } from '../../nodes/OrNode';
 import styles from './NodeTray.module.scss';
+import { LOGICAL_NODE_TYPE } from 'src/nodes/LogicalNode';
+import { ENTITY_NODE_TYPE } from 'src/nodes/EntityNode';
+import { enity_node_configs } from 'src/nodes/entity_nodes';
 
 const NodeTray: React.FC = () => {
     return (
@@ -36,19 +23,28 @@ const NodeTray: React.FC = () => {
             <div className={styles.NodeCategoryTitle}>Primitive Nodes</div>
 
             <TrayItem
-                model={{ type: NUMBER_NODE_TYPE }}
+                model={{
+                    type: VALUE_NODE_TYPE,
+                    config: { value: 0 } as ValueNodeConfig,
+                }}
                 name="Number"
                 color={PRIMITIVE_NODE_COLOR}
             />
 
             <TrayItem
-                model={{ type: STRING_NODE_TYPE }}
+                model={{
+                    type: VALUE_NODE_TYPE,
+                    config: { value: '' } as ValueNodeConfig,
+                }}
                 name="String"
                 color={PRIMITIVE_NODE_COLOR}
             />
 
             <TrayItem
-                model={{ type: BOOL_NODE_TYPE }}
+                model={{
+                    type: VALUE_NODE_TYPE,
+                    config: { value: true } as ValueNodeConfig,
+                }}
                 name="Boolean"
                 color={PRIMITIVE_NODE_COLOR}
             />
@@ -71,65 +67,55 @@ const NodeTray: React.FC = () => {
             <hr></hr>
             <div className={styles.NodeCategoryTitle}>Entity Nodes</div>
 
-            <TrayItem
-                model={{ type: PERSON_NODE_TYPE }}
-                name="Person"
-                color={PERSON_NODE_COLOR}
-            />
-
-            <TrayItem
-                model={{ type: RELATIONSHIP_NODE_TYPE }}
-                name="Relationship"
-                color={RELATIONSHIP_NODE_COLOR}
-            />
-
-            <TrayItem
-                model={{ type: EVENT_NODE_TYPE }}
-                name="Event"
-                color={EVENT_NODE_COLOR}
-            />
-
-            <TrayItem
-                model={{ type: BUSINESS_NODE_TYPE }}
-                name="Business"
-                color={BUSINESS_NODE_COLOR}
-            />
-
-            <TrayItem
-                model={{ type: OCCUPATION_NODE_TYPE }}
-                name="Occupation"
-                color={OCCUPATION_NODE_COLOR}
-            />
+            {Object.keys(enity_node_configs).map((name, index) => {
+                return (
+                    <TrayItem
+                        key={`entity_node_item_${index}`}
+                        model={{
+                            type: ENTITY_NODE_TYPE,
+                            config: enity_node_configs[name],
+                        }}
+                        name={name}
+                        color={enity_node_configs[name].color}
+                    />
+                );
+            })}
 
             <hr></hr>
             <div className={styles.NodeCategoryTitle}>Logical Nodes</div>
 
             <TrayItem
-                model={{ type: NOT_NODE_TYPE }}
+                model={{ type: LOGICAL_NODE_TYPE, config: { op: 'not' } }}
                 name="NOT"
                 color={MODIFIER_NODE_COLOR}
             />
 
             <TrayItem
-                model={{ type: AND_NODE_TYPE }}
+                model={{ type: LOGICAL_NODE_TYPE, config: { op: 'and' } }}
                 name="AND"
                 color={MODIFIER_NODE_COLOR}
             />
 
             <TrayItem
-                model={{ type: OR_NODE_TYPE }}
+                model={{ type: LOGICAL_NODE_TYPE, config: { op: 'or' } }}
                 name="OR"
                 color={MODIFIER_NODE_COLOR}
             />
 
             <TrayItem
-                model={{ type: OR_JOIN_NODE_TYPE }}
+                model={{
+                    type: LOGICAL_JOIN_NODE_TYPE,
+                    config: { op: 'or-join' },
+                }}
                 name="OR-JOIN"
                 color={MODIFIER_NODE_COLOR}
             />
 
             <TrayItem
-                model={{ type: NOT_JOIN_NODE_TYPE }}
+                model={{
+                    type: LOGICAL_JOIN_NODE_TYPE,
+                    config: { op: 'not-join' },
+                }}
                 name="NOT-JOIN"
                 color={MODIFIER_NODE_COLOR}
             />

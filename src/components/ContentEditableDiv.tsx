@@ -11,6 +11,7 @@ interface Props {
     value: string;
     className?: string;
     onActive?: () => void;
+    onFocus?: () => void;
     onChange?: (text: string) => void;
 }
 
@@ -25,6 +26,9 @@ const ContentEditableDiv: React.FC<Props> = (props) => {
             className={props.className}
             contentEditable={state.isEditable}
             suppressContentEditableWarning={true}
+            onFocus={() => {
+                if (props.onFocus) props.onFocus();
+            }}
             onBlur={(event) => {
                 setState({
                     ...state,

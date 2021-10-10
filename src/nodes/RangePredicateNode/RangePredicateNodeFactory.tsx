@@ -3,14 +3,14 @@ import {
     RANGE_PREDICATE_NODE_TYPE,
     RangePredicateNodeModel,
 } from './RangePredicateNodeModel';
-import { InequalityNodeWidget } from './RangePredicateNodeWidget';
+import { RangePredicateNodeWidget } from './RangePredicateNodeWidget';
 import {
     AbstractReactFactory,
     GenerateWidgetEvent,
 } from '@projectstorm/react-canvas-core';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 
-export class InequalityNodeFactory extends AbstractReactFactory<
+export class RangePredicateNodeFactory extends AbstractReactFactory<
     RangePredicateNodeModel,
     DiagramEngine
 > {
@@ -25,6 +25,8 @@ export class InequalityNodeFactory extends AbstractReactFactory<
     public generateReactWidget(
         event: GenerateWidgetEvent<RangePredicateNodeModel>
     ) {
-        return <InequalityNodeWidget engine={this.engine} node={event.model} />;
+        return (
+            <RangePredicateNodeWidget engine={this.engine} node={event.model} />
+        );
     }
 }

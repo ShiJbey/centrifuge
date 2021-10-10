@@ -1,25 +1,49 @@
+// For debugging
+const INDENT_STR = '    ';
+
 export type PrimitiveValue = number | string | boolean;
+
 export type RangePredicateOp = '<' | '>' | '<=' | '>=' | '!=' | '=';
 
 export interface EvaluationOptions {
+    ctx: BuildContext;
     portName?: string;
-    depth?: number;
+    depth: number;
 }
 
-export interface NodePortPair {
-    node: SyntaxNode;
-    port?: string;
+export interface BuildContext {
+    fncs: { [scopeId: string]: CountSyntaxNode[] };
+    entities: { [scopeId: string]: EntitySyntaxNode[] };
+    scope: string[];
+    visited: Set<string>;
+}
+
+export interface NodePortPair<T extends SyntaxNode = SyntaxNode> {
+    node: T;
+    port: string;
 }
 
 export interface SyntaxNode {
-    evaluate(options?: EvaluationOptions): string;
+    getID(): string;
+    build(ctx: BuildContext): void;
+    evaluate(options: EvaluationOptions): string;
 }
 
 export class PrimitiveValueNode implements SyntaxNode {
     protected value: PrimitiveValue;
+    protected id: string;
 
-    constructor(value: PrimitiveValue) {
+    constructor(id: string, value: PrimitiveValue) {
+        this.id = id;
         this.value = value;
+    }
+
+    getID(): string {
+        return this.id;
+    }
+
+    build() {
+        // pass
     }
 
     evaluate(): string {
@@ -34,20 +58,44 @@ export class EntitySyntaxNode implements SyntaxNode {
     /** Variable assigned to the entity */
     protected variableName: string;
     /** Map of attributes that have been given input values */
-    protected attributeInputs: { [key: string]: NodePortPair };
+    protected attributeInputs: { [attributeName: string]: NodePortPair[] };
     /** Names of ports that have outgoing links */
     protected attributeOutputs: string[];
+    /** Unique identifier */
+    protected id: string;
 
     constructor(
+        id: string,
         entityType: string,
         variableName: string,
-        attributeInputs: { [key: string]: NodePortPair },
+        attributeInputs: { [key: string]: NodePortPair[] },
         attributeOutputs: string[]
     ) {
+        this.id = id;
         this.entityType = entityType;
         this.variableName = variableName;
         this.attributeInputs = attributeInputs;
         this.attributeOutputs = attributeOutputs;
+    }
+
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        if (ctx.visited) {
+            if (ctx.visited.has(this.getID())) return;
+        }
+
+        ctx.visited.add(this.getID());
+
+        ctx.entities[ctx.scope[ctx.scope.length - 1]].push(this);
+
+        for (const attributeName of Object.keys(this.attributeInputs)) {
+            for (const pair of this.attributeInputs[attributeName]) {
+                pair.node.build(ctx);
+            }
+        }
     }
 
     getEntityType(): string {
@@ -62,7 +110,7 @@ export class EntitySyntaxNode implements SyntaxNode {
         return `${this.getEnityVariableName()}_${portName}`;
     }
 
-    evaluate(options?: EvaluationOptions): string {
+    evaluate(options: EvaluationOptions): string {
         if (options?.portName) {
             if (options.portName === 'ref') {
                 return this.getEnityVariableName();
@@ -72,17 +120,18 @@ export class EntitySyntaxNode implements SyntaxNode {
             const lines: string[] = [];
 
             for (const key of Object.keys(this.attributeInputs)) {
-                const { node, port } = this.attributeInputs[key];
+                for (const { node, port } of this.attributeInputs[key]) {
+                    const value = node.evaluate({ ...options, portName: port });
 
-                const value = node.evaluate({ portName: port });
-
-                const attribute_name = `"${this.entityType}/${key}"`;
-                lines.push(
-                    `[${this.getEnityVariableName()} ${attribute_name} ${value}]`
-                );
+                    const attribute_name = `"${this.entityType}/${key}"`;
+                    lines.push(
+                        `[${this.getEnityVariableName()} ${attribute_name} ${value}]`
+                    );
+                }
             }
 
             for (const portName of this.attributeOutputs) {
+                if (portName === 'ref') continue;
                 const attribute_name = `"${this.entityType}/${portName}"`;
                 lines.push(
                     `[${this.getEnityVariableName()} ${attribute_name} ${this.getAttributeVariableName(
@@ -111,67 +160,113 @@ export class VariableSyntaxNode implements SyntaxNode {
     protected entity: EntitySyntaxNode;
     protected hidden = false;
     protected required = false;
+    protected id: string;
 
     constructor(
+        id: string,
         entity: EntitySyntaxNode,
         required?: boolean,
         hidden?: boolean
     ) {
+        this.id = id;
         this.entity = entity;
         this.required = !!required;
         this.hidden = !!hidden;
     }
 
-    evaluate(): string {
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        ctx.scope.push(this.getID());
+        ctx.entities[this.getID()] = [];
+        ctx.fncs[this.getID()] = [];
+        this.entity.build(ctx);
+        ctx.scope.pop();
+    }
+
+    getEntityVariableName(): string {
         return this.entity.getEnityVariableName();
+    }
+
+    evaluate(options: EvaluationOptions): string {
+        const lines: string[] = [];
+        for (const node of options.ctx.entities[this.getID()]) {
+            lines.push(node.evaluate(options));
+        }
+
+        return lines.join('\n');
     }
 }
 
 export class CountSyntaxNode implements SyntaxNode {
-    protected entity: EntitySyntaxNode;
-    protected attributeName: string;
+    protected pair: NodePortPair<EntitySyntaxNode>;
+    protected id: string;
 
-    constructor(entity: EntitySyntaxNode, attributePortId: string) {
-        this.entity = entity;
-        this.attributeName = attributePortId;
+    constructor(id: string, pair: NodePortPair<EntitySyntaxNode>) {
+        this.id = id;
+        this.pair = pair;
+    }
+
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        ctx.fncs[ctx.scope[ctx.scope.length - 1]].push(this);
+        this.pair.node.build(ctx);
     }
 
     getOutputVariableName(): string {
-        return `${this.entity.getAttributeVariableName(
-            this.attributeName
+        return `${this.pair.node.getAttributeVariableName(
+            this.pair.port
         )}_count`;
     }
 
-    evaluate(options?: EvaluationOptions): string {
+    evaluate(options: EvaluationOptions): string {
         if (options?.portName === 'out') {
             return this.getOutputVariableName();
         }
 
-        return `[(?count_attr $ ${this.entity.getEnityVariableName()} "${
-            this.attributeName
-        }") ${this.getOutputVariableName()}]\n`;
+        return `[(?count_attr $ ${this.pair.node.getEnityVariableName()} "${
+            this.pair.port
+        }") ${this.getOutputVariableName()}]`;
     }
 }
 
 export class SocialConnectionSyntaxNode implements SyntaxNode {
-    protected subject: EntitySyntaxNode;
-    protected other: EntitySyntaxNode;
+    protected subject: NodePortPair<EntitySyntaxNode>;
+    protected other: NodePortPair<EntitySyntaxNode>;
     protected relationshipType: string;
+    protected id: string;
 
     constructor(
+        id: string,
         relationshipType: string,
-        subject: EntitySyntaxNode,
-        other: EntitySyntaxNode
+        subject: NodePortPair<EntitySyntaxNode>,
+        other: NodePortPair<EntitySyntaxNode>
     ) {
+        this.id = id;
         this.relationshipType = relationshipType;
         this.subject = subject;
         this.other = other;
     }
 
-    evaluate(): string {
-        return `[${this.subject.getEnityVariableName()} "person/${
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        this.subject.node.build(ctx);
+        this.other.node.build(ctx);
+    }
+
+    evaluate(options: EvaluationOptions): string {
+        const indent = `${INDENT_STR}`.repeat(options.depth);
+        return `${indent}[${this.subject.node.getEnityVariableName()} "person/${
             this.relationshipType
-        }" ${this.other.getEnityVariableName()}]`;
+        }" ${this.other.node.getEnityVariableName()}]`;
     }
 }
 
@@ -179,49 +274,83 @@ export class RangePredicateSyntaxNode implements SyntaxNode {
     protected op: RangePredicateOp;
     protected first: NodePortPair;
     protected second: NodePortPair;
+    protected id: string;
 
     constructor(
+        id: string,
         op: RangePredicateOp,
         first: NodePortPair,
         second: NodePortPair
     ) {
+        this.id = id;
         this.op = op;
         this.first = first;
         this.second = second;
     }
 
-    evaluate(options?: EvaluationOptions): string {
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        this.first.node.build(ctx);
+        this.second.node.build(ctx);
+    }
+
+    evaluate(options: EvaluationOptions): string {
         const firstValue = this.first.node.evaluate({
+            ...options,
             portName: this.first.port,
         });
         const secondValue = this.second.node.evaluate({
+            ...options,
             portName: this.second.port,
         });
 
-        const prefix = options?.depth ? '\t'.repeat(options.depth) : '';
-        const suffix = options?.depth === 0 ? '\n' : '';
-
-        return `${prefix}[(${this.op} ${firstValue} ${secondValue})]${suffix}`;
+        const indent = `${INDENT_STR}`.repeat(options.depth);
+        return `${indent}[(${this.op} ${firstValue} ${secondValue})]`;
     }
 }
 
 export class LogicalSyntaxNode implements SyntaxNode {
     protected op: 'and' | 'or' | 'not';
     protected inputNodes: SyntaxNode[];
+    protected id: string;
 
-    constructor(op: 'and' | 'or' | 'not', inputNodes: SyntaxNode[]) {
+    constructor(
+        id: string,
+        op: 'and' | 'or' | 'not',
+        inputNodes: SyntaxNode[]
+    ) {
+        this.id = id;
         this.op = op;
         this.inputNodes = inputNodes;
     }
 
-    evaluate(): string {
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        for (const node of this.inputNodes) {
+            node.build(ctx);
+        }
+    }
+
+    evaluate(options: EvaluationOptions): string {
         const clauses: string[] = [];
 
         for (const node of this.inputNodes) {
-            clauses.push(node.evaluate());
+            clauses.push(
+                node.evaluate({
+                    ...options,
+                    depth: options.depth + 1,
+                })
+            );
         }
 
-        return `(${this.op}\n${clauses.join('\n')})`;
+        const indent = `${INDENT_STR}`.repeat(options.depth);
+        return `${indent}(${this.op}\n${indent}${clauses.join('\n' + indent)})`;
     }
 }
 
@@ -230,35 +359,80 @@ export class LogicalJoinSyntaxNode implements SyntaxNode {
     protected outerEntities: EntitySyntaxNode[];
     protected innerEntities: EntitySyntaxNode[];
     protected clauseNodes: SyntaxNode[];
+    protected id: string;
 
     constructor(
+        id: string,
         op: 'not-join' | 'or-join',
         outerEntities: EntitySyntaxNode[],
         innerEntities: EntitySyntaxNode[],
         clauseNodes: SyntaxNode[]
     ) {
+        this.id = id;
         this.op = op;
         this.outerEntities = outerEntities;
         this.innerEntities = innerEntities;
         this.clauseNodes = clauseNodes;
     }
 
-    evaluate(): string {
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        ctx.scope.push(this.getID());
+        ctx.entities[this.getID()] = [];
+        ctx.fncs[this.getID()] = [];
+
+        for (const node of this.innerEntities) {
+            node.build(ctx);
+        }
+
+        for (const node of this.clauseNodes) {
+            node.build(ctx);
+        }
+
+        ctx.scope.pop();
+    }
+
+    evaluate(options: EvaluationOptions): string {
         const joinVariables = `[${this.outerEntities
             .map((v) => v.getEnityVariableName())
             .join(' ')}]`;
 
         const clauses: string[] = [];
 
-        for (const node of this.innerEntities) {
-            clauses.push(node.evaluate());
+        for (const node of options.ctx.entities[this.getID()]) {
+            clauses.push(
+                node.evaluate({
+                    ...options,
+                    depth: options.depth + 1,
+                })
+            );
+        }
+
+        for (const node of options.ctx.fncs[this.getID()]) {
+            clauses.push(
+                node.evaluate({
+                    ...options,
+                    depth: options.depth + 1,
+                })
+            );
         }
 
         for (const node of this.clauseNodes) {
-            clauses.push(node.evaluate());
+            clauses.push(
+                node.evaluate({
+                    ...options,
+                    depth: options.depth + 1,
+                })
+            );
         }
 
-        return `(${this.op} ${joinVariables}\n${clauses.join('\n')})`;
+        const indent = `${INDENT_STR}`.repeat(options.depth);
+        return `${indent}(${this.op} ${joinVariables}\n${
+            indent + INDENT_STR
+        }${clauses.join(`\n${indent}`)})`;
     }
 }
 
@@ -320,18 +494,8 @@ export function toQueryString(pattern: CompiledPattern): string {
 }
 
 export class PatternSyntaxTree {
-    protected name: string;
-    protected leafNodes: SyntaxNode[];
-    protected variableNodes: SyntaxNode[];
-
-    constructor(
-        name: string,
-        nodes?: { leaf?: SyntaxNode[]; variables: SyntaxNode[] }
-    ) {
-        this.name = name;
-        this.leafNodes = nodes?.leaf ? nodes.leaf : [];
-        this.variableNodes = nodes?.variables ? nodes.variables : [];
-    }
+    protected leafNodes: SyntaxNode[] = [];
+    protected variableNodes: VariableSyntaxNode[] = [];
 
     addLeafNode(node: SyntaxNode) {
         this.leafNodes.push(node);
@@ -341,34 +505,45 @@ export class PatternSyntaxTree {
         this.variableNodes.push(node);
     }
 
-    evaluate(): string {
-        const variables = this.variableNodes
-            .map((node) => node.evaluate())
-            .join(' ');
-
-        const clauses = this.leafNodes
-            .map((node) => node.evaluate())
-            .join('\n');
-
-        return `[:find ${variables}\n:in $ %\n:where\n${clauses}]`;
-    }
-
-    compile(): CompiledPattern {
+    compile(patternName: string): CompiledPattern {
+        const ctx: BuildContext = {
+            fncs: { global: [] },
+            entities: { global: [] },
+            scope: ['global'],
+            visited: new Set<string>(),
+        };
         const whereClauses: string[] = [];
         const parameters: PatternParam[] = [];
 
         for (const node of this.variableNodes) {
-            parameters.push({
-                name: node.evaluate(),
-            });
+            node.build(ctx);
         }
 
         for (const node of this.leafNodes) {
-            whereClauses.push(node.evaluate());
+            node.build(ctx);
+        }
+
+        for (const node of this.variableNodes) {
+            parameters.push({
+                name: node.getEntityVariableName(),
+            });
+            whereClauses.push(node.evaluate({ ctx, depth: 0 }));
+        }
+
+        for (const node of ctx.entities['global']) {
+            whereClauses.push(node.evaluate({ ctx, depth: 0 }));
+        }
+
+        for (const node of ctx.fncs['global']) {
+            whereClauses.push(node.evaluate({ ctx, depth: 0 }));
+        }
+
+        for (const node of this.leafNodes) {
+            whereClauses.push(node.evaluate({ ctx, depth: 0 }));
         }
 
         return {
-            name: this.name,
+            name: patternName,
             parameters,
             whereClauses: whereClauses.join('\n'),
         };

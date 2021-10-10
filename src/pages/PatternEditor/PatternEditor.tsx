@@ -211,7 +211,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         dispatch(updateEditor({ id, changes })),
 });
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps, null, {
+    forwardRef: true,
+});
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

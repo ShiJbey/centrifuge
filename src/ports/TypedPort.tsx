@@ -74,9 +74,7 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
     serialize() {
         return {
             ...super.serialize(),
-            in: this.options.in,
-            label: this.options.label,
-            dataType: this.options.dataType,
+            ...this.options,
         };
     }
 
@@ -85,21 +83,19 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
     }
 
     canLinkToPort(port: PortModel): boolean {
-        console.log(
-            `${this.getType()} checking if it will link to ${port.getType()}`
-        );
         if (port instanceof TypedPortModel) {
             const areOppositeAlignment =
                 this.getOptions().in !== port.getOptions().in;
             const typeMatch =
                 this.getDataType() === port.getDataType() ||
                 (port.getDataType() === 'primitive' &&
-                    ['bool', 'string', 'number'].includes(this.getDataType()));
-            console.log(
-                `${this.getDataType()} -> ${port.getDataType()} [${
-                    typeMatch && areOppositeAlignment ? 'accepted' : 'rejected'
-                }]`
-            );
+                    ['boolean', 'string', 'number'].includes(
+                        this.getDataType()
+                    )) ||
+                (port.getDataType() === 'any' &&
+                    ['boolean', 'string', 'number', 'ref'].includes(
+                        this.getDataType()
+                    ));
             return typeMatch && areOppositeAlignment;
         }
         console.error('Attempting to link to non-custom port type');
@@ -107,6 +103,10 @@ export class TypedPortModel extends PortModel<TypedPortModelGenerics> {
     }
 
     createLinkModel(): DefaultLinkModel | null {
+        if (this.options.in) {
+            return null;
+        }
+
         if (this.options.maximumLinks) {
             const numberOfLinks: number = Object.keys(this.links).length;
             if (numberOfLinks < this.options.maximumLinks) {

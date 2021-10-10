@@ -28,13 +28,14 @@ export class VariableNodeModel extends NodeModel<
         this.options.hidden = options.hidden;
         this.options.required = options.required;
 
-        this.inPort = new TypedPortModel({
-            name: 'input',
-            dataType: 'ref',
-            in: true,
-            maxLinks: 1,
-        });
-        this.addPort(this.inPort);
+        this.inPort = this.addPort(
+            new TypedPortModel({
+                name: 'input',
+                dataType: 'ref',
+                in: true,
+                maxLinks: 1,
+            })
+        ) as TypedPortModel;
     }
 
     getInputNode(): NodeModel {

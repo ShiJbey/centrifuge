@@ -1,25 +1,17 @@
 import createEngine, {
+    DefaultDiagramState,
     DiagramEngine,
     DiagramModel,
 } from '@projectstorm/react-diagrams';
-import { PersonNodeFactory } from './nodes/PersonNode';
-import { EventNodeFactory } from './nodes/EventNode';
-import { RelationshipNodeFactory } from './nodes/RelationshipNode';
 import { VariableNodeFactory } from './nodes/VariableNode';
-import { NumberNodeFactory } from './nodes/NumberNode';
-import { StringNodeFactory } from './nodes/StringNode';
-import { BoolNodeFactory } from './nodes/BoolNode';
-import { InequalityNodeFactory } from './nodes/RangePredicateNode';
-import { BusinessNodeFactory } from './nodes/BusinessNode';
-import { OccupationNodeFactory } from './nodes/OccupationNode';
+import { RangePredicateNodeFactory } from './nodes/RangePredicateNode';
 import { SocialConnNodeFactory } from './nodes/SocialConnNode';
-import { NotNodeFactory } from './nodes/NotNode';
-import { NotJoinNodeFactory } from './nodes/NotJoinNode';
-import { OrNodeFactory } from './nodes/OrNode';
-import { OrJoinNodeFactory } from './nodes/OrJoinNode';
+import { LogicalJoinNodeFactory } from './nodes/LogicalJoinNode';
 import { CountNodeFactory } from './nodes/CountNode';
-import { AndNodeFactory } from './nodes/AndNode';
 import { TypedPortFactory } from './ports/TypedPort';
+import { LogicalNodeFactory } from './nodes/LogicalNode';
+import { ValueNodeFactory } from './nodes/ValueNode';
+import { EntityNodeFactory } from './nodes/EntityNode';
 
 class PatternDiagramManager {
     protected activeModel: DiagramModel;
@@ -29,57 +21,35 @@ class PatternDiagramManager {
         this.diagramEngine = createEngine();
         this.activeModel = new DiagramModel();
         this.initModel();
+
+        const state = this.diagramEngine.getStateMachine().getCurrentState();
+        if (state instanceof DefaultDiagramState) {
+            state.dragNewLink.config.allowLooseLinks = false;
+        }
     }
 
     private initModel(): void {
         this.diagramEngine
             .getNodeFactories()
-            .registerFactory(new EventNodeFactory());
+            .registerFactory(new ValueNodeFactory());
         this.diagramEngine
             .getNodeFactories()
-            .registerFactory(new PersonNodeFactory());
+            .registerFactory(new EntityNodeFactory());
         this.diagramEngine
             .getNodeFactories()
-            .registerFactory(new RelationshipNodeFactory());
+            .registerFactory(new LogicalJoinNodeFactory());
         this.diagramEngine
             .getNodeFactories()
-            .registerFactory(new NumberNodeFactory());
+            .registerFactory(new LogicalNodeFactory());
         this.diagramEngine
             .getNodeFactories()
-            .registerFactory(new StringNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new BoolNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new InequalityNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new BusinessNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new OccupationNodeFactory());
+            .registerFactory(new RangePredicateNodeFactory());
         this.diagramEngine
             .getNodeFactories()
             .registerFactory(new SocialConnNodeFactory());
         this.diagramEngine
             .getNodeFactories()
-            .registerFactory(new NotNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new NotJoinNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new OrNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new OrJoinNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
             .registerFactory(new CountNodeFactory());
-        this.diagramEngine
-            .getNodeFactories()
-            .registerFactory(new AndNodeFactory());
         this.diagramEngine
             .getNodeFactories()
             .registerFactory(new VariableNodeFactory());

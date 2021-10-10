@@ -10,13 +10,13 @@ import {
 import { InequalityOp } from '.';
 import { TypedPortLabel } from 'src/ports/TypedPort';
 
-export interface InequalityNodeWidgetProps {
+export interface RangePredicateNodeWidgetProps {
     node: RangePredicateNodeModel;
     engine: DiagramEngine;
 }
 
-export class InequalityNodeWidget extends React.Component<InequalityNodeWidgetProps> {
-    constructor(props: InequalityNodeWidgetProps) {
+export class RangePredicateNodeWidget extends React.Component<RangePredicateNodeWidgetProps> {
+    constructor(props: RangePredicateNodeWidgetProps) {
         super(props);
     }
 

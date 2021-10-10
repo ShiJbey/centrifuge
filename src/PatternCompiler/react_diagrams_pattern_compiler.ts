@@ -1,9 +1,3 @@
-import { PERSON_NODE_TYPE } from '../nodes/PersonNode';
-import { StringNodeModelOptions, STRING_NODE_TYPE } from '../nodes/StringNode';
-import { BoolNodeModelOptions, BOOL_NODE_TYPE } from '../nodes/BoolNode';
-import { NumberNodeModelOptions, NUMBER_NODE_TYPE } from '../nodes/NumberNode';
-import { VARIABLE_NODE_TYPE } from '../nodes/VariableNode';
-import { EntityNodeModelOptions } from '../nodes/SyntaxNode';
 import {
     SerializedDiagram,
     SerializedLinkModel,
@@ -18,17 +12,31 @@ import {
     PrimitiveValueNode,
     VariableSyntaxNode,
     RangePredicateSyntaxNode,
+    LogicalSyntaxNode,
+    LogicalJoinSyntaxNode,
+    SocialConnectionSyntaxNode,
+    CountSyntaxNode,
 } from './syntaxTree';
-import { BUSINESS_NODE_TYPE } from 'src/nodes/BusinessNode';
 import { CentrifugeNodeTypesModelOptions } from 'src/nodes/nodeTypes';
-import { EVENT_NODE_TYPE } from 'src/nodes/EventNode';
-import { RELATIONSHIP_NODE_TYPE } from 'src/nodes/RelationshipNode';
-import { OCCUPATION_NODE_TYPE } from 'src/nodes/OccupationNode';
+import { VARIABLE_NODE_TYPE } from '../nodes/VariableNode';
 import { RANGE_PREDICATE_NODE_TYPE } from 'src/nodes/RangePredicateNode';
+import { LOGICAL_NODE_TYPE } from 'src/nodes/LogicalNode';
+import { LOGICAL_JOIN_NODE_TYPE } from 'src/nodes/LogicalJoinNode';
+import { VALUE_NODE_TYPE } from 'src/nodes/ValueNode';
+import { ENTITY_NODE_TYPE } from 'src/nodes/EntityNode';
+import { SOCIAL_CONN_NODE_TYPE } from 'src/nodes/SocialConnNode';
+import { COUNT_NODE_TYPE } from 'src/nodes/CountNode';
 
 type LinkMap = {
     [id: string]: SerializedLinkModel;
 };
+
+type SerializedNode = SerializedNodeModel & CentrifugeNodeTypesModelOptions;
+
+interface Connection {
+    portName: string;
+    nodeId: string;
+}
 
 /** Get a map of all the links from a serialized diagram */
 function getLinks(model: SerializedDiagram): LinkMap {
@@ -42,7 +50,7 @@ function getLinks(model: SerializedDiagram): LinkMap {
 
 /** Get a map of all the nodes from a serialized diagram */
 function getNodes(model: SerializedDiagram): {
-    [id: string]: SerializedNodeModel & CentrifugeNodeTypesModelOptions;
+    [id: string]: SerializedNode;
 } {
     for (const layer of model.layers) {
         if (layer.type === 'diagram-nodes') {
@@ -54,10 +62,11 @@ function getNodes(model: SerializedDiagram): {
 
 function getOutputs(
     node: SerializedNodeModel,
+    nodes: { [id: string]: SerializedNode },
     links: { [id: string]: SerializedLinkModel }
-): { [portName: string]: { sourcePortID: string; nodeID: string }[] } {
+): { [portName: string]: Connection[] } {
     const ret: {
-        [portName: string]: { sourcePortID: string; nodeID: string }[];
+        [portName: string]: Connection[];
     } = {};
 
     for (const port of node.ports) {
@@ -71,8 +80,10 @@ function getOutputs(
                 }
 
                 ret[port.name].push({
-                    nodeID: link.target,
-                    sourcePortID: link.targetPort,
+                    nodeId: link.target,
+                    portName: nodes[link.target].ports.filter(
+                        (port) => port.id === link.targetPort
+                    )[0].name,
                 });
             }
         }
@@ -83,11 +94,10 @@ function getOutputs(
 
 function getInputs(
     node: SerializedNodeModel,
+    nodes: { [id: string]: SerializedNode },
     links: { [id: string]: SerializedLinkModel }
-): { [portName: string]: { sourcePortID: string; nodeID: string }[] } {
-    const ret: {
-        [portName: string]: { sourcePortID: string; nodeID: string }[];
-    } = {};
+): { [portName: string]: Connection[] } {
+    const ret: { [portName: string]: Connection[] } = {};
 
     for (const port of node.ports) {
         if (port.alignment === 'left') {
@@ -100,8 +110,10 @@ function getInputs(
                 }
 
                 ret[port.name].push({
-                    nodeID: link.source,
-                    sourcePortID: link.sourcePort,
+                    nodeId: link.source,
+                    portName: nodes[link.source].ports.filter(
+                        (port) => port.id === link.sourcePort
+                    )[0].name,
                 });
             }
         }
@@ -145,7 +157,7 @@ function dfs(
                 );
             } else {
                 throw new Error(
-                    `Missing target for link from node (${startingNode.type})x`
+                    `Missing target for link from node (${startingNode.type}).`
                 );
             }
         }
@@ -189,7 +201,7 @@ function topSort(patternGraph: SerializedDiagram): string[] {
 /** Convert Serialized Node Diagram to reusable query format */
 export function compilePattern(
     patternGraph: SerializedDiagram,
-    patternName = 'pattern'
+    patternName: string
 ): CompiledPattern {
     const buildOrder = topSort(patternGraph);
 
@@ -197,50 +209,35 @@ export function compilePattern(
     const nodes = getNodes(patternGraph);
     const syntaxNodes: { [key: string]: SyntaxNode } = {};
 
-    const syntaxTree = new PatternSyntaxTree(patternName);
+    const syntaxTree = new PatternSyntaxTree();
 
     for (const nodeID of buildOrder) {
         const node = nodes[nodeID];
 
-        if (
-            node.type === STRING_NODE_TYPE ||
-            node.type === NUMBER_NODE_TYPE ||
-            node.type === BOOL_NODE_TYPE
-        ) {
-            const diagramNode = node as SerializedNodeModel &
-                (
-                    | StringNodeModelOptions
-                    | NumberNodeModelOptions
-                    | BoolNodeModelOptions
-                );
-            const syntaxNode = new PrimitiveValueNode(diagramNode.value);
-            syntaxNodes[diagramNode.id] = syntaxNode;
+        if (node.type === VALUE_NODE_TYPE) {
+            const syntaxNode = new PrimitiveValueNode(node.id, node.value);
+            syntaxNodes[node.id] = syntaxNode;
             continue;
         }
 
-        if (
-            node.type === PERSON_NODE_TYPE ||
-            node.type === BUSINESS_NODE_TYPE ||
-            node.type === EVENT_NODE_TYPE ||
-            node.type === RELATIONSHIP_NODE_TYPE ||
-            node.type === OCCUPATION_NODE_TYPE
-        ) {
-            // Determine the entity type
-            const diagramNode = node as SerializedNodeModel &
-                EntityNodeModelOptions;
+        if (node.type === ENTITY_NODE_TYPE) {
+            const inputs = getInputs(node, nodes, links);
+            const outputs = getOutputs(node, nodes, links);
 
-            const inputs = getInputs(node, links);
-            const outputs = getOutputs(node, links);
-
-            const inputMap: { [key: string]: NodePortPair } = {};
+            const inputMap: { [key: string]: NodePortPair[] } = {};
             for (const portName of Object.keys(inputs)) {
-                const attributeName = portName.substring(
-                    0,
-                    portName.length - 2
-                );
-                inputMap[attributeName] = {
-                    node: syntaxNodes[inputs[portName][0].nodeID],
-                };
+                const attributeName =
+                    portName === 'ref'
+                        ? 'ref'
+                        : portName.substring(0, portName.length - 2);
+
+                inputMap[attributeName] = [];
+                for (const conn of inputs[portName]) {
+                    inputMap[attributeName].push({
+                        node: syntaxNodes[conn.nodeId],
+                        port: conn.portName,
+                    });
+                }
             }
 
             const activeOutoutPorts: string[] = [];
@@ -255,54 +252,49 @@ export function compilePattern(
                 }
             }
 
+            if (!node.entityName) {
+                throw new Error(
+                    `Entity of type "${node.entityType}" Node missing name`
+                );
+            }
+
             const syntaxNode = new EntitySyntaxNode(
-                diagramNode.entityType,
-                diagramNode.entityName,
+                node.id,
+                node.entityType,
+                node.entityName,
                 inputMap,
                 activeOutoutPorts
             );
 
             syntaxNodes[node.id] = syntaxNode;
 
-            // Check if top/level
-            if (outputs['ref']) {
-                if (
-                    nodes[outputs['ref'][0].nodeID].type === VARIABLE_NODE_TYPE
-                ) {
-                    syntaxTree.addLeafNode(syntaxNode);
-                }
-            } else {
-                syntaxTree.addLeafNode(syntaxNode);
-            }
-
             continue;
         }
 
         if (node.type === RANGE_PREDICATE_NODE_TYPE) {
-            const outputs = getOutputs(node, links);
-            const inputs = getInputs(node, links);
+            const outputs = getOutputs(node, nodes, links);
+            const inputs = getInputs(node, nodes, links);
 
             const first: NodePortPair = {
-                node: syntaxNodes[inputs['value_a'][0].nodeID],
-                port: nodes[inputs['value_a'][0].nodeID].ports
-                    .filter(
-                        (port) => port.id === inputs['value_a'][0].sourcePortID
-                    )
-                    .map((port) =>
-                        port.name.substring(0, port.name.length - 2)
-                    )[0],
+                node: syntaxNodes[inputs['value_a'][0].nodeId],
+                port: inputs['value_a'][0].portName,
             };
+
+            if (first.node instanceof EntitySyntaxNode) {
+                first.port = first.port.substring(0, first.port.length - 2);
+            }
 
             const second: NodePortPair = {
-                node: syntaxNodes[inputs['value_b'][0].nodeID],
-                port: nodes[inputs['value_b'][0].nodeID].ports
-                    .filter(
-                        (port) => port.id === inputs['value_b'][0].sourcePortID
-                    )
-                    .map((port) => port.name)[0],
+                node: syntaxNodes[inputs['value_b'][0].nodeId],
+                port: inputs['value_b'][0].portName,
             };
 
+            if (second.node instanceof EntitySyntaxNode) {
+                second.port = second.port.substring(0, second.port.length - 2);
+            }
+
             const syntaxNode = new RangePredicateSyntaxNode(
+                node.id,
                 node.op,
                 first,
                 second
@@ -318,13 +310,13 @@ export function compilePattern(
         }
 
         if (node.type === VARIABLE_NODE_TYPE) {
-            const inputs = getInputs(node, links);
+            const inputs = getInputs(node, nodes, links);
 
             if (inputs['input'] && inputs['input'].length) {
                 const inputNode = syntaxNodes[
-                    inputs['input'][0].nodeID
+                    inputs['input'][0].nodeId
                 ] as EntitySyntaxNode;
-                const syntaxNode = new VariableSyntaxNode(inputNode);
+                const syntaxNode = new VariableSyntaxNode(node.id, inputNode);
                 syntaxNodes[node.id] = syntaxNode;
                 syntaxTree.addVariableNode(syntaxNode);
             } else {
@@ -333,7 +325,111 @@ export function compilePattern(
 
             continue;
         }
+
+        if (node.type === LOGICAL_NODE_TYPE) {
+            const inputs = getInputs(node, nodes, links);
+            const outputs = getOutputs(node, nodes, links);
+
+            const syntaxNode = new LogicalSyntaxNode(
+                node.id,
+                node.op,
+                inputs['in'].map((pair) => syntaxNodes[pair.nodeId])
+            );
+
+            syntaxNodes[node.id] = syntaxNode;
+
+            if (Object.keys(outputs).length === 0) {
+                syntaxTree.addLeafNode(syntaxNode);
+            }
+
+            continue;
+        }
+
+        if (node.type === LOGICAL_JOIN_NODE_TYPE) {
+            const inputs = getInputs(node, nodes, links);
+            const outputs = getOutputs(node, nodes, links);
+
+            const internalEntities = inputs['internal_variables'].map(
+                (pair) => syntaxNodes[pair.nodeId] as EntitySyntaxNode
+            );
+
+            const externalEntities = inputs['external_variables'].map(
+                (pair) => syntaxNodes[pair.nodeId] as EntitySyntaxNode
+            );
+
+            const clauses = inputs['clauses'].map(
+                (pair) => syntaxNodes[pair.nodeId]
+            );
+
+            const syntaxNode = new LogicalJoinSyntaxNode(
+                node.id,
+                node.op,
+                externalEntities,
+                internalEntities,
+                clauses
+            );
+
+            syntaxNodes[node.id] = syntaxNode;
+
+            if (Object.keys(outputs).length === 0) {
+                syntaxTree.addLeafNode(syntaxNode);
+            }
+
+            continue;
+        }
+
+        if (node.type === SOCIAL_CONN_NODE_TYPE) {
+            const outputs = getOutputs(node, nodes, links);
+            const inputs = getInputs(node, nodes, links);
+
+            const first: NodePortPair<EntitySyntaxNode> = {
+                node: syntaxNodes[
+                    inputs['subject'][0].nodeId
+                ] as EntitySyntaxNode,
+                port: inputs['subject'][0].portName,
+            };
+
+            const second: NodePortPair<EntitySyntaxNode> = {
+                node: syntaxNodes[
+                    inputs['other'][0].nodeId
+                ] as EntitySyntaxNode,
+                port: inputs['other'][0].portName,
+            };
+
+            const syntaxNode = new SocialConnectionSyntaxNode(
+                node.id,
+                node.relationshipType,
+                first,
+                second
+            );
+
+            syntaxNodes[node.id] = syntaxNode;
+
+            if (Object.keys(outputs).length === 0) {
+                syntaxTree.addLeafNode(syntaxNode);
+            }
+
+            continue;
+        }
+
+        if (node.type === COUNT_NODE_TYPE) {
+            const inputs = getInputs(node, nodes, links);
+
+            const inputConn: NodePortPair<EntitySyntaxNode> = {
+                node: syntaxNodes[inputs['in'][0].nodeId] as EntitySyntaxNode,
+                port: inputs['in'][0].portName.substring(
+                    0,
+                    inputs['in'][0].portName.length - 2
+                ),
+            };
+
+            const syntaxNode = new CountSyntaxNode(node.id, inputConn);
+
+            syntaxNodes[node.id] = syntaxNode;
+
+            continue;
+        }
     }
 
-    return syntaxTree.compile();
+    return syntaxTree.compile(patternName);
 }

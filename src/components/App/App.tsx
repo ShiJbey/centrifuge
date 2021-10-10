@@ -45,6 +45,10 @@ declare const electron: ElectronAPI;
 type AppProps = PropsFromRedux;
 
 export class App extends Component<AppProps> {
+    constructor(props: AppProps) {
+        super(props);
+    }
+
     componentDidMount() {
         this.registerElectronListeners();
     }
