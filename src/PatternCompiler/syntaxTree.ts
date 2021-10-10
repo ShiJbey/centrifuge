@@ -270,6 +270,39 @@ export class SocialConnectionSyntaxNode implements SyntaxNode {
     }
 }
 
+export class RuleSyntaxNode implements SyntaxNode {
+    protected params: NodePortPair<EntitySyntaxNode>[];
+    protected ruleName: string;
+    protected id: string;
+
+    constructor(
+        id: string,
+        ruleName: string,
+        params: NodePortPair<EntitySyntaxNode>[]
+    ) {
+        this.id = id;
+        this.ruleName = ruleName;
+        this.params = params;
+    }
+
+    getID(): string {
+        return this.id;
+    }
+
+    build(ctx: BuildContext) {
+        for (const param of this.params) {
+            param.node.build(ctx);
+        }
+    }
+
+    evaluate(options: EvaluationOptions): string {
+        const indent = `${INDENT_STR}`.repeat(options.depth);
+        return `${indent}(${this.ruleName} ${this.params
+            .map((pair) => pair.node.getEnityVariableName())
+            .join(' ')})`;
+    }
+}
+
 export class RangePredicateSyntaxNode implements SyntaxNode {
     protected op: RangePredicateOp;
     protected first: NodePortPair;

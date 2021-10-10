@@ -6,16 +6,15 @@ import { CountNodeModelOptions } from './CountNode';
 import { LogicalNodeModelOptions } from './LogicalNode';
 import { ValueNodeModelOptions } from './ValueNode';
 import { EntityNodeModelOptions } from './EntityNode';
+import { RuleNodeModelOptions } from './RuleNode';
 
 export type CentrifugeNodeTypesModelOptions =
-    // Entities
     | EntityNodeModelOptions
-    // Modifiers
     | RangePredicateNodeModelOptions
     | LogicalNodeModelOptions
     | LogicalJoinNodeModelOptions
     | SocialConnNodeModelOptions
     | CountNodeModelOptions
-    // Primitives
+    | RuleNodeModelOptions
     | ValueNodeModelOptions
     | VariableNodeModelOptions;

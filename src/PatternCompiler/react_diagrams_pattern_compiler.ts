@@ -16,6 +16,7 @@ import {
     LogicalJoinSyntaxNode,
     SocialConnectionSyntaxNode,
     CountSyntaxNode,
+    RuleSyntaxNode,
 } from './syntaxTree';
 import { CentrifugeNodeTypesModelOptions } from 'src/nodes/nodeTypes';
 import { VARIABLE_NODE_TYPE } from '../nodes/VariableNode';
@@ -26,6 +27,7 @@ import { VALUE_NODE_TYPE } from 'src/nodes/ValueNode';
 import { ENTITY_NODE_TYPE } from 'src/nodes/EntityNode';
 import { SOCIAL_CONN_NODE_TYPE } from 'src/nodes/SocialConnNode';
 import { COUNT_NODE_TYPE } from 'src/nodes/CountNode';
+import { RULE_NODE_TYPE } from 'src/nodes/RuleNode';
 
 type LinkMap = {
     [id: string]: SerializedLinkModel;
@@ -426,6 +428,34 @@ export function compilePattern(
             const syntaxNode = new CountSyntaxNode(node.id, inputConn);
 
             syntaxNodes[node.id] = syntaxNode;
+
+            continue;
+        }
+
+        if (node.type === RULE_NODE_TYPE) {
+            const outputs = getOutputs(node, nodes, links);
+            const inputs = getInputs(node, nodes, links);
+
+            const params: NodePortPair<EntitySyntaxNode>[] = [];
+
+            for (const paramName of node.ruleParams) {
+                params.push({
+                    node: syntaxNodes[
+                        inputs[paramName][0].nodeId
+                    ] as EntitySyntaxNode,
+                    port: inputs[paramName][0].portName,
+                });
+            }
+
+            const syntaxNode = new RuleSyntaxNode(
+                node.id,
+                node.ruleName,
+                params
+            );
+
+            if (Object.keys(outputs).length === 0) {
+                syntaxTree.addLeafNode(syntaxNode);
+            }
 
             continue;
         }

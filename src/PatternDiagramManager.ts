@@ -12,6 +12,7 @@ import { TypedPortFactory } from './ports/TypedPort';
 import { LogicalNodeFactory } from './nodes/LogicalNode';
 import { ValueNodeFactory } from './nodes/ValueNode';
 import { EntityNodeFactory } from './nodes/EntityNode';
+import { RuleNodeFactory } from './nodes/RuleNode';
 
 class PatternDiagramManager {
     protected activeModel: DiagramModel;
@@ -53,6 +54,9 @@ class PatternDiagramManager {
         this.diagramEngine
             .getNodeFactories()
             .registerFactory(new VariableNodeFactory());
+        this.diagramEngine
+            .getNodeFactories()
+            .registerFactory(new RuleNodeFactory());
         this.diagramEngine
             .getPortFactories()
             .registerFactory(new TypedPortFactory());

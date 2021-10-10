@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from 'src/redux/store';
 import TrayItem from './TrayItem';
 import {
     MODIFIER_NODE_COLOR,
@@ -16,10 +18,13 @@ import styles from './NodeTray.module.scss';
 import { LOGICAL_NODE_TYPE } from 'src/nodes/LogicalNode';
 import { ENTITY_NODE_TYPE } from 'src/nodes/EntityNode';
 import { enity_node_configs } from 'src/nodes/entity_nodes';
+import { RuleNodeConfig, RULE_NODE_TYPE } from 'src/nodes/RuleNode';
 
-const NodeTray: React.FC = () => {
+type NodeTrayProps = PropsFromRedux;
+
+const NodeTray: React.FC<NodeTrayProps> = (props) => {
     return (
-        <div>
+        <div style={{ paddingBottom: '16px' }}>
             <div className={styles.NodeCategoryTitle}>Primitive Nodes</div>
 
             <TrayItem
@@ -136,8 +141,41 @@ const NodeTray: React.FC = () => {
                 name="Count"
                 color={MODIFIER_NODE_COLOR}
             />
+
+            {props.patterns.length > 0 && (
+                <>
+                    <hr></hr>
+                    <div className={styles.NodeCategoryTitle}>Rule Nodes</div>
+
+                    {props.patterns.map((pattern) => {
+                        const config: RuleNodeConfig = {
+                            ruleName: pattern.pattern.name,
+                            ruleParams: pattern.pattern.parameters.map(
+                                (p) => p.name
+                            ),
+                        };
+
+                        return (
+                            <TrayItem
+                                key={`rule_node_${pattern.pattern.name}`}
+                                model={{ type: RULE_NODE_TYPE, config }}
+                                name={pattern.pattern.name}
+                                color={MODIFIER_NODE_COLOR}
+                            />
+                        );
+                    })}
+                </>
+            )}
         </div>
     );
 };
 
-export default NodeTray;
+const mapStateToProps = (state: RootState) => ({
+    patterns: state.patternCache.patterns,
+});
+
+const connector = connect(mapStateToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(NodeTray);
