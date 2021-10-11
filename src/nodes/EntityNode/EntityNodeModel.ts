@@ -113,29 +113,11 @@ export class EntityNodeModel extends NodeModel<
         return {
             ...super.serialize(),
             ...this.options,
-            attributePorts: this.attributePorts.map((row) => {
-                return {
-                    inputPortID: row.inputPort.getID(),
-                    label: row.label,
-                    outputPortID: row.outputPort.getID(),
-                };
-            }),
         };
     }
 
     public deserialize(event: DeserializeEvent<this>): void {
         super.deserialize(event);
         this.options.entityName = event.data.entityName;
-        this.attributePorts = event.data.attributePorts.map((row) => {
-            return {
-                inputPort: this.getPortFromID(
-                    row.inputPortID
-                ) as TypedPortModel,
-                label: row.label,
-                outputPort: this.getPortFromID(
-                    row.outputPortID
-                ) as TypedPortModel,
-            };
-        });
     }
 }

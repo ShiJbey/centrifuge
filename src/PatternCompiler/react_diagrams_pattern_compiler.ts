@@ -442,7 +442,7 @@ export function compilePattern(
 
             const params: NodePortPair<EntitySyntaxNode>[] = [];
 
-            for (const paramName of node.ruleParams) {
+            for (const paramName of Object.keys(inputs)) {
                 params.push({
                     node: syntaxNodes[
                         inputs[paramName][0].nodeId
@@ -456,6 +456,8 @@ export function compilePattern(
                 node.ruleName,
                 params
             );
+
+            syntaxNodes[node.id] = syntaxNode;
 
             if (Object.keys(outputs).length === 0) {
                 syntaxTree.addLeafNode(syntaxNode);

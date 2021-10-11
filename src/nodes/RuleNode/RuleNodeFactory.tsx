@@ -17,7 +17,6 @@ export class RuleNodeFactory extends AbstractReactFactory<
     }
 
     public generateModel(event: GenerateModelEvent): RuleNodeModel {
-        console.log('Generating Model');
         return new RuleNodeModel(event.initialConfig);
     }
 

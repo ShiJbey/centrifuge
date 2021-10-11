@@ -55,14 +55,6 @@ export class PatternEditor extends Component<
         throw new Error('Not Implemented');
     }
 
-    componentDidMount() {
-        if (this.props.editors.length == 0) {
-            this.props.addEditor({
-                patternName: 'New Pattern',
-            });
-        }
-    }
-
     render() {
         return (
             <>

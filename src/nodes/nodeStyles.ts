@@ -2,12 +2,12 @@ import styled from 'styled-components';
 
 export const SELECTION_BORDER_COLOR = 'rgb(0, 192, 255)';
 export const ERROR_BORDER_COLOR = 'rgb(255, 0, 0)';
-export const PERSON_NODE_COLOR = '#FFAC81';
-export const EVENT_NODE_COLOR = '#FF928B';
-export const OCCUPATION_NODE_COLOR = '#FEC3A6';
-export const BUSINESS_NODE_COLOR = '#EFE9AE';
+export const PERSON_NODE_COLOR = '#EF7B45B3';
+export const EVENT_NODE_COLOR = '#ce2d4fB3';
+export const OCCUPATION_NODE_COLOR = '#48845eB3';
+export const BUSINESS_NODE_COLOR = '#313b72B3';
 export const SOCIAL_CONN_NODE_COLOR = 'rgb(255, 204, 153)';
-export const RELATIONSHIP_NODE_COLOR = '#CDEAC0';
+export const RELATIONSHIP_NODE_COLOR = '#462255B3';
 export const VARIABLE_NODE_COLOR = '#ccc';
 export const PRIMITIVE_NODE_COLOR = '#ccc';
 export const MODIFIER_NODE_COLOR = 'steelblue';

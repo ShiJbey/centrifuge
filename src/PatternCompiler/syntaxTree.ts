@@ -1,3 +1,5 @@
+import { stringify } from 'uuid';
+
 // For debugging
 const INDENT_STR = '    ';
 
@@ -297,7 +299,7 @@ export class RuleSyntaxNode implements SyntaxNode {
 
     evaluate(options: EvaluationOptions): string {
         const indent = `${INDENT_STR}`.repeat(options.depth);
-        return `${indent}(${this.ruleName} ${this.params
+        return `${indent}(${toValidRuleName(this.ruleName)} ${this.params
             .map((pair) => pair.node.getEnityVariableName())
             .join(' ')})`;
     }
@@ -500,7 +502,7 @@ export function toRuleString(pattern: CompiledPattern): string {
     const requiredVarsStr = requiredVariables.length
         ? `[${requiredVariables.join('')}]`
         : '';
-    const ruleHeader = `(${pattern.name} ${findVariables.join(
+    const ruleHeader = `(${toValidRuleName(pattern.name)} ${findVariables.join(
         ' '
     )} ${requiredVarsStr})`;
     return `[${ruleHeader}\n${pattern.whereClauses}]`;
@@ -524,6 +526,13 @@ export function toQueryString(pattern: CompiledPattern): string {
         : '';
     const whereClauses = `:where\n${pattern.whereClauses}]`;
     return `[${findSpec}${withClause}:in\n$ %\n${whereClauses}`;
+}
+
+export function toValidRuleName(name: string): string {
+    return name
+        .replace(/[^\w\s]/gi, '')
+        .toLowerCase()
+        .replace(/ +/g, '_');
 }
 
 export class PatternSyntaxTree {

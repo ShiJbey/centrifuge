@@ -51,10 +51,6 @@ export class RuleNodeModel extends NodeModel<
             ) as TypedPortModel;
             this.parameterPorts.push(port);
         }
-
-        console.log('Rule Node Constructor called');
-        console.log(options);
-        console.log(this.parameterPorts);
     }
 
     getParameterPorts(): TypedPortModel[] {

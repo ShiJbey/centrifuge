@@ -114,8 +114,8 @@ export const enity_node_configs: { [key: string]: EntityNodeConfig } = {
             { name: 'type', label: 'Relationship Type', datatype: 'string' },
             { name: 'subject', label: 'Subject', datatype: 'ref' },
             { name: 'person', label: 'Other Person', datatype: 'ref' },
-            { name: 'charge', label: 'Charge', datatype: 'ref' },
-            { name: 'spark', label: 'Spark', datatype: 'ref' },
+            { name: 'charge', label: 'Charge', datatype: 'number' },
+            { name: 'spark', label: 'Spark', datatype: 'number' },
         ],
     },
 };
