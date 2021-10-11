@@ -9,5 +9,10 @@
       }
     ],
     "@babel/preset-react"
-  ]
+  ],
+  "env": {
+    "development" : {
+      "compact": false
+    }
+  }
 }

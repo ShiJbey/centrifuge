@@ -1,131 +1,83 @@
 $sidebarWidth: 4rem;
-$sidebarWidthFull: 15rem;
 $font-size: 16px;
-$font-family: "Open Sans";
+$font-family: 'Open Sans';
 $textPrimary: #b6b6b6;
 $textSecondary: #ececec;
 $bgPrimary: hsl(207, 44%, 15%); //hsl(0, 0%, 20%);
-$bgSecondary: #141418;
-$transitionSpeed: 600ms;
+$bgSecondary: hsl(240, 9%, 9%);
 
 .AppNavbar {
-  font-size: 16px;
-  font-family: "Open Sans";
-  width: $sidebarWidth;
-  height: 100vh;
-  top: 0;
-  position: fixed;
-  background-color: $bgPrimary;
-  transition: width $transitionSpeed ease;
-  overflow: hidden;
-  overflow-y: auto;
-  color: $textPrimary;
-  border-right: 2px solid $textPrimary;
-  z-index: 100;
+    font-size: 16px;
+    font-family: 'Open Sans';
+    width: $sidebarWidth;
+    height: 100vh;
+    top: 0;
+    position: fixed;
+    background-color: $bgPrimary;
+    overflow: hidden;
+    overflow-y: auto;
+    color: $textPrimary;
+    z-index: 100;
 }
 
 .AppNavbarNav {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
 }
 
 .NavLink {
-  display: flex;
-  align-items: center;
-  height: $sidebarWidth;
-  color: $textPrimary;
-  text-decoration: none;
-  filter: grayscale(100%) opacity(0.7);
-  transition: $transitionSpeed;
-  font-weight: bold;
-  text-transform: uppercase;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    height: $sidebarWidth;
+    color: $textPrimary;
+    text-decoration: none;
+    filter: grayscale(100%) opacity(0.7);
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
 }
 
 .NavLink.active {
-  filter: grayscale(0%) opacity(1);
+    filter: grayscale(0%) opacity(1);
 }
 
 .NavLink:hover {
-  filter: grayscale(0%) opacity(1);
-  background: $bgSecondary;
-  color: $textSecondary;
-  text-decoration: none;
-}
-
-.AppNavbar:hover {
-  width: $sidebarWidthFull;
-
-  .LinkText {
-    display: inline;
-  }
-
-  .LogoText {
-    left: 0px;
-  }
-
-  .Logo .NavIcon {
-    margin-left: 11.75rem;
-    transform: rotate(720deg);
-    transition: 0.9s;
-  }
+    filter: grayscale(0%) opacity(1);
+    background: $bgSecondary;
+    color: $textSecondary;
+    text-decoration: none;
 }
 
 .ActiveIndicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 100%;
-  border-radius: 0 50% 50% 0;
-  background: lightgreen;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: rgb(233, 233, 233);
 }
-
-.Logo {
-  display: flex;
-  text-align: center;
-  height: $sidebarWidth;
-  color: $textSecondary;
-  text-decoration: none;
-  transition: $transitionSpeed;
-  background: $bgSecondary;
-  font-weight: bold;
-  font-size: 1.4rem;
-  letter-spacing: 0.3ch;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
-  width: 100%;
-}
-
 
 .NavItem {
-  width: 100%;
+    width: 100%;
 }
 
 .NavItem:last-child {
-  margin-top: auto;
+    margin-top: auto;
 }
 
 .NavLink .NavIcon {
-  width: 2rem;
-  min-width: 2rem;
-  margin: 0 1rem;
+    width: 2rem;
+    min-width: 2rem;
+    margin: 0 1rem;
 }
 
 .LinkText {
-  display: none;
-  text-decoration: none;
-  margin-left: 0.5rem;
-}
-
-.LogoText {
-  display: inline;
-  position: absolute;
-  left: -999px;
-  transition: $transitionSpeed;
+    display: none;
+    text-decoration: none;
+    margin-left: 0.5rem;
 }

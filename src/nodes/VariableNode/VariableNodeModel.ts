@@ -1,63 +1,60 @@
-import { NodeModel, DefaultPortModel, PortModelAlignment } from '@projectstorm/react-diagrams';
+import { NodeModel } from '@projectstorm/react-diagrams';
 import { NodeModelGenerics } from '@projectstorm/react-diagrams-core';
 import { DeserializeEvent } from '@projectstorm/react-canvas-core';
-import { SerializedNodeModel } from '../../utility/serialization';
+import { TypedPortModel } from 'src/ports/TypedPort';
 
 export const VARIABLE_NODE_TYPE = 'variable-node';
 
 export interface VariableNodeModelOptions {
-	type: typeof VARIABLE_NODE_TYPE;
-	label: string;
-	name: string;
+    type: typeof VARIABLE_NODE_TYPE;
+    required?: boolean;
+    hidden?: boolean;
 }
 
 export interface VariableNodeModelGenerics {
-	OPTIONS: VariableNodeModelOptions;
+    OPTIONS: VariableNodeModelOptions;
 }
 
-export class VariableNodeModel extends NodeModel<VariableNodeModelGenerics & NodeModelGenerics> {
-	public outPort: DefaultPortModel;
-	public inPort: DefaultPortModel;
+export class VariableNodeModel extends NodeModel<
+    VariableNodeModelGenerics & NodeModelGenerics
+> {
+    public inPort: TypedPortModel;
 
-	constructor(
-		options: VariableNodeModelOptions = {
-			type: VARIABLE_NODE_TYPE,
-			label: 'Variable',
-			name: 'var',
-		}
-	) {
-		super({
-			...options,
-		});
+    constructor(options: { hidden?: boolean; required?: boolean }) {
+        super({
+            type: VARIABLE_NODE_TYPE,
+            ...options,
+        });
+        this.options.hidden = options.hidden;
+        this.options.required = options.required;
 
-		this.outPort = new DefaultPortModel({
-			in: false,
-			name: 'out',
-			label: 'out',
-			alignment: PortModelAlignment.RIGHT,
-		});
+        this.inPort = this.addPort(
+            new TypedPortModel({
+                name: 'input',
+                dataType: 'ref',
+                in: true,
+                maxLinks: 1,
+            })
+        ) as TypedPortModel;
+    }
 
-		this.inPort = new DefaultPortModel({
-			in: true,
-			name: 'in',
-			label: 'in',
-			alignment: PortModelAlignment.LEFT,
-		});
+    getInputNode(): NodeModel {
+        const [node] = Object.values(this.ports['input'].links)
+            .filter((link) => !!link.getSourcePort())
+            .map((link) => link.getSourcePort().getNode());
+        return node;
+    }
 
-		this.addPort(this.outPort);
-		this.addPort(this.inPort);
-	}
+    public serialize() {
+        return {
+            ...super.serialize(),
+            ...this.options,
+        };
+    }
 
-	public serialize(): SerializedNodeModel & VariableNodeModelOptions {
-		return {
-			...super.serialize(),
-			...this.options,
-		};
-	}
-
-	public deserialize(event: DeserializeEvent<this>): void {
-		super.deserialize(event);
-		this.options.label = event.data.label;
-		this.options.name = event.data.name;
-	}
+    public deserialize(event: DeserializeEvent<this>): void {
+        super.deserialize(event);
+        this.options.required = event.data.required;
+        this.options.hidden = event.data.hidden;
+    }
 }

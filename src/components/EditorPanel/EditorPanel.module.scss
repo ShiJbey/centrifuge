@@ -1,37 +1,37 @@
 .PanelContainer {
-  height: 100%;
-  width: 100%;
-  padding: 6px;
-  overflow: hidden;
+    height: 100%;
+    width: 100%;
+    padding: 6px;
+    overflow: hidden;
 }
 
 .Panel {
-  height: 100%;
-  width: 100%;
-  background: hsl(0, 0%, 95%);
-  border-radius: 8px;
-  overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background: hsla(0, 0%, 100%, 0.85);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .PanelBody {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  overflow-y: auto;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    overflow-y: auto;
 
-  &::-webkit-scrollbar {
-    width: 0.4rem;
-  }
+    &::-webkit-scrollbar {
+        width: 0.4rem;
+    }
 
-  &::-webkit-scrollbar:hover {
-    cursor: pointer;
-  }
+    &::-webkit-scrollbar:hover {
+        cursor: pointer;
+    }
 
-  &::-webkit-scrollbar-track {
-    background: hsla(0, 0%, 0%, 0.10);;
-  }
+    &::-webkit-scrollbar-track {
+        background: hsla(0, 0%, 0%, 0.1);
+    }
 
-  &::-webkit-scrollbar-thumb {
-    background: #008cff;
-  }
+    &::-webkit-scrollbar-thumb {
+        background: #008cff;
+    }
 }
