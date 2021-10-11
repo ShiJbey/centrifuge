@@ -1,141 +1,248 @@
 import React, { Component } from 'react';
 import { Switch, Route, HashRouter, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
 import AppNavbar from '../AppNavbar';
 import styles from './App.module.scss';
-import MetricsDashboard from '../MetricsDashboard';
-import PatternEditor from '../PatternEditor';
-import Help from '../Help';
+import PatternEditor from '../../pages/PatternEditor';
+import Help from '../../pages/Help';
 import {
-	CLOSE_DIR,
-	DIR_CHANGE,
-	OPEN_DIR,
-	OPEN_PATTERN_FILE,
-	OPEN_TOWN_FILE,
-	// QUERY_DATABASE,
+    CLOSE_DIR,
+    DIR_CHANGE,
+    OPEN_DIR,
+    OPEN_PATTERN_FILE,
+    SAVE_PATTERN,
+    SAVE_PATTERN_REQUEST,
 } from '../../utility/electronChannels';
-import ElectronAPI, { OpenDirectoryResponse, OpenFileResponse } from '../../utility/electronApi';
+import ElectronAPI, {
+    OpenDirectoryResponse,
+    OpenFileResponse,
+    SaveFileRequest,
+    SaveFileResponse,
+} from '../../utility/electronApi';
 import { Dispatch } from 'redux';
-import { loadData, clearData } from '../../redux/database/databaseActions';
-import TownToolbar from '../TownToolbar';
 import { DirectoryTree } from 'directory-tree';
-import { updateDirectoryTree, clearDirectoryTree } from '../../redux/fileTree/fileTreeActions';
-import { addEditor } from '../../redux/editors/editorActions';
-import { SerializedDiagram } from '../../utility/serialization';
-import { wrap } from 'comlink';
+import {
+    updateDirectoryTree,
+    clearDirectoryTree,
+} from '../../redux/fileTreeSclice';
+import {
+    addEditor,
+    updateEditor,
+    selectEditor,
+    UpdateEditorChanges,
+} from '../../redux/editorSlice';
+import { RootState } from '../../redux/store';
+import {
+    addPattern,
+    clearPatterns,
+    PatternInfo,
+    updatePattern,
+} from '../../redux/patternSlice';
+import { compilePattern } from '../../PatternCompiler';
+import SavedPatternData from 'src/utility/models/savedPatternData';
 
 declare const electron: ElectronAPI;
 
-interface AppProps {
-	loadTown: typeof loadData;
-	clearTown: typeof clearData;
-	loadPattern: typeof addEditor;
-	updateFileTree: typeof updateDirectoryTree;
-	clearFileTree: typeof clearDirectoryTree;
-}
+type AppProps = PropsFromRedux;
 
 export class App extends Component<AppProps> {
-	componentDidMount() {
-		this.registerElectronListeners();
-		// this.launchWorker();
-		// electron.invoke(
-		//   QUERY_DATABASE,
-		//   `[
-		//     :find
-		//     [?eventType ...]
-		//     :in $ %
-		//     :where
-		//     [?e "event/type" ?eventType]
-		//   ]`
-		// ).then((res) => {
-		//   console.log(res);
-		// });
-	}
+    constructor(props: AppProps) {
+        super(props);
+    }
 
-	componentWillUnmount() {
-		this.unregisterElectronListeners();
-	}
+    componentDidMount() {
+        this.registerElectronListeners();
+    }
 
-	async launchWorker() {
-		const worker = new Worker('worker/index.js');
-		const { hello } = wrap<import('../../db.worker').HelloWorker>(worker);
-		console.log(await hello());
-		worker.terminate();
-	}
+    componentWillUnmount() {
+        this.unregisterElectronListeners();
+    }
 
-	registerElectronListeners() {
-		electron.receive(OPEN_DIR, (_, res: OpenDirectoryResponse) => {
-			if (res.status === 'ok' && res.payload) {
-				this.props.updateFileTree(res.payload);
-			}
-		});
+    processPatterns(directoryTree: DirectoryTree) {
+        const queue: DirectoryTree[] = [];
+        queue.push(directoryTree);
+        while (queue.length) {
+            const node = queue.shift();
 
-		electron.receive(CLOSE_DIR, () => {
-			this.props.clearFileTree();
-		});
+            if (!node) break;
 
-		electron.receive(DIR_CHANGE, (_, change: DirectoryTree) => {
-			this.props.updateFileTree(change);
-		});
+            if (node.children) {
+                for (const child of node.children) {
+                    queue.push(child);
+                }
+            } else {
+                electron
+                    .readDiagramFile(node.path)
+                    .then((data) => {
+                        this.props.updatePattern({
+                            filepath: node.path,
+                            pattern: compilePattern(data.diagram, data.name),
+                        });
+                    })
+                    .catch((error) => console.error(error));
+            }
+        }
+    }
 
-		electron.receive(OPEN_PATTERN_FILE, (_, res: OpenFileResponse) => {
-			if (res.status === 'ok') {
-				this.props.loadPattern({
-					title: res.payload.name,
-					path: res.payload.path,
-					model: res.payload.data,
-				});
-			}
-		});
+    registerElectronListeners() {
+        electron.receive(OPEN_DIR, (_, res: OpenDirectoryResponse) => {
+            if (res.status === 'ok' && res.payload) {
+                this.props.updateFileTree(res.payload);
+                this.props.clearPatterns();
+                this.processPatterns(res.payload);
+            } else {
+                console.error(res.payload);
+            }
+        });
 
-		electron.receive(OPEN_TOWN_FILE, (_, res: OpenFileResponse) => {
-			const worker = new Worker('worker/index.js');
-			const { processTown } = wrap<import('../../db.worker').HelloWorker>(worker);
-			processTown(res.payload.data);
-		});
-	}
+        electron.receive(CLOSE_DIR, () => {
+            this.props.clearFileTree();
+        });
 
-	unregisterElectronListeners() {
-		electron.removeAllListeners(OPEN_DIR);
-		electron.removeAllListeners(CLOSE_DIR);
-		electron.removeAllListeners(DIR_CHANGE);
-		electron.removeAllListeners(OPEN_PATTERN_FILE);
-		electron.removeAllListeners(OPEN_TOWN_FILE);
-	}
+        electron.receive(DIR_CHANGE, async (_, change: DirectoryTree) => {
+            this.props.updateFileTree(change);
+            this.props.clearPatterns();
+            this.processPatterns(change);
+        });
 
-	render() {
-		return (
-			<HashRouter>
-				<div className={styles.App}>
-					<AppNavbar />
-					<div className={styles.Main}>
-						{/* <div>
-							<TownToolbar />
-						</div> */}
-						<Switch>
-							<Route exact path="/editor" component={PatternEditor} />
-							<Route exact path="/metrics" component={MetricsDashboard} />
-							<Route exact path="/help" component={Help} />
-							<Route exact path="/">
-								<Redirect to="/editor" />
-							</Route>
-						</Switch>
-					</div>
-				</div>
-			</HashRouter>
-		);
-	}
+        electron.receive(
+            OPEN_PATTERN_FILE,
+            (_, res: OpenFileResponse<SavedPatternData>) => {
+                if (res.status === 'ok') {
+                    if (res.payload) {
+                        this.props.addEditor({
+                            patternName: res.payload.data.name,
+                            filepath: res.payload.path,
+                            model: res.payload.data.diagram,
+                        });
+                        this.props.updatePattern({
+                            filepath: res.payload.path,
+                            pattern: compilePattern(
+                                res.payload.data.diagram,
+                                res.payload.data.name
+                            ),
+                        });
+                    }
+                } else {
+                    console.error(res.payload);
+                }
+            }
+        );
+
+        electron.receive(
+            SAVE_PATTERN,
+            async (event: Electron.IpcRendererEvent, req: SaveFileRequest) => {
+                if (!this.props.activeEditor) {
+                    return;
+                }
+
+                const savePatternRequestEvent = new Event(SAVE_PATTERN_REQUEST);
+                window.dispatchEvent(savePatternRequestEvent);
+
+                for (const editor of this.props.editors) {
+                    if (editor.id === this.props.activeEditor) {
+                        let savePath = req.path ?? editor.filepath;
+                        if (!savePath) {
+                            const { path } = await electron.saveAs();
+                            if (!path) {
+                                return;
+                            } else {
+                                savePath = path;
+                            }
+                        }
+
+                        const response: SaveFileResponse =
+                            await electron.invoke(
+                                SAVE_PATTERN,
+                                savePath,
+                                JSON.stringify({
+                                    name: editor.patternName,
+                                    diagram: editor.model,
+                                })
+                            );
+
+                        if (response.status === 'ok') {
+                            this.props.updateEditor(editor.id, {
+                                ...editor,
+                                dirty: false,
+                                filepath: savePath,
+                            });
+                            this.props.selectEditor(editor.id);
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+    unregisterElectronListeners() {
+        electron.removeAllListeners(OPEN_DIR);
+        electron.removeAllListeners(CLOSE_DIR);
+        electron.removeAllListeners(DIR_CHANGE);
+        electron.removeAllListeners(OPEN_PATTERN_FILE);
+        electron.removeAllListeners(SAVE_PATTERN);
+    }
+
+    /** Save the pattern in the given editor ID to Localfile */
+    savePatternFile() {
+        throw new Error('Not Implemented');
+    }
+
+    /** Open the file dialog to open a pattern file */
+    openPatternFile() {
+        throw new Error('Not Implemented');
+    }
+
+    /** Open the file dialog to open a workspace directory */
+    openWorkspaceDirectory() {
+        throw new Error('Not Implemented');
+    }
+
+    render() {
+        return (
+            <HashRouter>
+                <div className={styles.App}>
+                    <AppNavbar />
+                    <div className={styles.Main}>
+                        <Switch>
+                            <Route
+                                exact
+                                path="/editor"
+                                render={() => <PatternEditor />}
+                            />
+                            <Route exact path="/help" component={Help} />
+                            <Route exact path="/">
+                                <Redirect to="/editor" />
+                            </Route>
+                        </Switch>
+                    </div>
+                </div>
+            </HashRouter>
+        );
+    }
 }
 
-const mapStateToProps = () => ({});
-
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-	loadTown: (data: { [attr: string]: any }) => dispatch(loadData(data)),
-	clearTown: () => dispatch(clearData()),
-	loadPattern: (options?: { title?: string; path?: string; model?: SerializedDiagram }) =>
-		dispatch(addEditor(options)),
-	updateFileTree: (tree: DirectoryTree) => dispatch(updateDirectoryTree(tree)),
-	clearFileTree: () => dispatch(clearDirectoryTree()),
+const mapStateToProps = (state: RootState) => ({
+    editors: state.editors.editors,
+    activeEditor: state.editors.activeEditor,
+    patterns: state.patternCache.patterns,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+    selectEditor: (id: string) => dispatch(selectEditor(id)),
+    updateEditor: (id: string, changes: UpdateEditorChanges) =>
+        dispatch(updateEditor({ id, changes })),
+    updateFileTree: (tree: DirectoryTree) =>
+        dispatch(updateDirectoryTree(tree)),
+    clearFileTree: () => dispatch(clearDirectoryTree()),
+    addEditor: (options: UpdateEditorChanges) => dispatch(addEditor(options)),
+    addPattern: (info: PatternInfo) => dispatch(addPattern(info)),
+    updatePattern: (info: PatternInfo) => dispatch(updatePattern(info)),
+    clearPatterns: () => dispatch(clearPatterns()),
+});
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(App);

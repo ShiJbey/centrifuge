@@ -1,29 +1,16 @@
 const rules = require('./webpack.rules');
-const plugins = require('./webpack.plugins');
+const plugins = [...require('./webpack.plugins')];
 
-rules.push({
-  test: /\.ts?$/,
-  exclude: /(node_modules|\.webpack)/,
-  use: {
-    loader: 'ts-loader',
-    options: {
-      transpileOnly: true
-    }
-  }
-});
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
-  /**
-   * This is the main entry point for your application, it's the first file
-   * that runs in the main process.
-   */
-  entry: './src/index.ts',
-  // Put your normal webpack config below here
-  module: {
-    rules,
-  },
-  plugins: plugins,
-  resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json']
-  },
+    entry: './src/index.ts',
+    module: {
+        rules,
+    },
+    plugins: plugins,
+    resolve: {
+        extensions: ['.js', '.ts', '.jsx', '.tsx', '.json'],
+        plugins: [new TsconfigPathsPlugin({ configFile: './tsconfig.json' })],
+    },
 };

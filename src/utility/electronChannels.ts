@@ -10,3 +10,5 @@ export const GET_INIT_DATA = 'GET_INIT_DATA';
 export const OPEN_SAVE_AS = 'OPEN_SAVE_AS';
 export const DIR_CHANGE = 'DIR_CHANGE';
 export const QUERY_DATABASE = 'QUERY_DATABASE';
+
+export const SAVE_PATTERN_REQUEST = 'SAVE_PATTERN_REQUEST';

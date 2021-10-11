@@ -1,84 +1,88 @@
 import * as React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { VariableNodeModel } from './VariableNodeModel';
-import { DefaultPortLabel } from '@projectstorm/react-diagrams-defaults';
 import {
-	Node,
-	Header,
-	Ports,
-	PortContainer,
-	NodeValueInput,
-	PRIMITIVE_NODE_COLOR,
+    Node,
+    Header,
+    PortContainer,
+    VARIABLE_NODE_COLOR,
 } from '../nodeStyles';
+import { TypedPortLabel } from 'src/ports/TypedPort';
 
 export interface VariableNodeWidgetProps {
-	node: VariableNodeModel;
-	engine: DiagramEngine;
+    node: VariableNodeModel;
+    engine: DiagramEngine;
 }
 
 export interface VariableNodeWidgetState {
-	name: string;
+    hidden?: boolean;
+    required?: boolean;
 }
 
 export class VariableNodeWidget extends React.Component<
-	VariableNodeWidgetProps,
-	VariableNodeWidgetState
+    VariableNodeWidgetProps,
+    VariableNodeWidgetState
 > {
-	constructor(props: VariableNodeWidgetProps) {
-		super(props);
-		this.state = {
-			name: this.props.node.getOptions().name,
-		};
-	}
+    constructor(props: VariableNodeWidgetProps) {
+        super(props);
+        this.state = {
+            hidden: this.props.node.getOptions().hidden,
+            required: this.props.node.getOptions().required,
+        };
+    }
 
-	public render(): React.ReactNode {
-		const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-			this.setState({
-				...this.state,
-				name: event.target.value.trim(),
-			});
-			this.props.node.getOptions().name = event.target.value.trim();
-		};
+    onRequiredChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        this.setState({
+            ...this.state,
+            required: event.target.checked,
+        });
+        this.props.node.getOptions().required = event.target.checked;
+    }
 
-		return (
-			<Node background={PRIMITIVE_NODE_COLOR} selected={this.props.node.isSelected()}>
-				<Header>Variable</Header>
-				<div style={{ width: '100%', display: 'flex' }}>
-					<label style={{ paddingLeft: '0.1rem', paddingRight: '0.1rem' }}>Name:</label>
-					<NodeValueInput
-						type="text"
-						value={this.state.name}
-						onClick={(event) => {
-							event.currentTarget.contentEditable = 'true';
-						}}
-						onChange={onNameChange}
-						onDrag={(e) => e.preventDefault()}
-						onFocus={() => {
-							this.props.node.setLocked(true);
-						}}
-						onBlur={(event) => {
-							event.currentTarget.contentEditable = 'false';
-							this.props.node.setLocked(false);
-						}}
-					/>
-				</div>
-				<Ports>
-					<PortContainer>
-						<DefaultPortLabel
-							engine={this.props.engine}
-							port={this.props.node.inPort}
-							key={this.props.node.inPort.getID()}
+    onHiddenChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        this.setState({
+            ...this.state,
+            hidden: event.target.checked,
+        });
+        this.props.node.getOptions().hidden = event.target.checked;
+    }
+
+    public render(): React.ReactNode {
+        const missingInput = this.props.node.getInputNode() === undefined;
+
+        return (
+            <Node
+                background={VARIABLE_NODE_COLOR}
+                selected={this.props.node.isSelected()}
+                hasError={missingInput}
+            >
+                <Header>Variable</Header>
+                <PortContainer>
+                    <TypedPortLabel
+                        engine={this.props.engine}
+                        port={this.props.node.inPort}
+                        key={this.props.node.inPort.getID()}
+                    />
+                </PortContainer>
+                {/* <div style={{ textAlign: 'right', paddingRight: '0.3rem' }}>
+					<div>
+						Required:{' '}
+						<input
+							type="checkbox"
+							checked={this.state.required}
+							onChange={this.onRequiredChange.bind(this)}
 						/>
-					</PortContainer>
-					<PortContainer>
-						<DefaultPortLabel
-							engine={this.props.engine}
-							port={this.props.node.outPort}
-							key={this.props.node.outPort.getID()}
+					</div>
+					<div>
+						Hidden:{' '}
+						<input
+							type="checkbox"
+							checked={this.state.hidden}
+							onChange={this.onHiddenChange.bind(this)}
 						/>
-					</PortContainer>
-				</Ports>
-			</Node>
-		);
-	}
+					</div>
+				</div> */}
+            </Node>
+        );
+    }
 }

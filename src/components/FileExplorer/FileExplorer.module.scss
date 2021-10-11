@@ -1,59 +1,57 @@
 .FileExplorer {
-  color: black;
-  width: 100%;
-  height: 100%;
-  background: rgb(238, 238, 238);
-  padding-top: 1rem;
+    color: black;
+    width: 100%;
+    height: 100%;
+    padding: 0.25rem;
 
+    &::-webkit-scrollbar {
+        margin-top: 10px;
+        width: 0.3rem;
+    }
 
-  &::-webkit-scrollbar {
-    margin-top: 10px;
-    width: 0.3rem;
-  }
+    &::-webkit-scrollbar-track {
+        background: hsla(0, 0%, 0%, 0.1);
+    }
 
-  &::-webkit-scrollbar-track {
-    background: hsla(0, 0%, 0%, 0.10);
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #008cff;
-  }
+    &::-webkit-scrollbar-thumb {
+        background: #008cff;
+    }
 }
 
 .DTreeContainer {
-  width: 100%;
-  list-style: none;
-  padding: 0;
+    width: 100%;
+    list-style: none;
+    padding: 0;
 
-  .DTreeNode:first .NodeName:first {
-    background: #777;
-  }
+    .DTreeNode:first .NodeName:first {
+        background: #777;
+    }
 }
 
 .DTreeNode {
-  width: 100%;
-
-  .NodeName {
     width: 100%;
-    text-align: left;
-    text-overflow: ellipsis;
-    display: flex;
-    cursor: pointer;
 
-    &.RootDir {
-      background: hsl(0, 0%, 70%);
-    }
+    .NodeName {
+        width: 100%;
+        text-align: left;
+        text-overflow: ellipsis;
+        display: flex;
+        cursor: pointer;
 
-    &.RootDir:hover {
-      background: hsl(0, 0%, 60%);
-    }
+        &.RootDir {
+            background: hsl(0, 0%, 70%);
+        }
 
-    &:hover {
-      background: hsl(0, 0%, 50%);
+        &.RootDir:hover {
+            background: hsl(0, 0%, 60%);
+        }
+
+        &:hover {
+            background: hsl(0, 0%, 50%);
+        }
     }
-  }
 }
 
 .DTreeToggler.active {
-  transform: rotate(90deg);
+    transform: rotate(90deg);
 }

@@ -1,26 +1,24 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "module": "commonjs",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "rootDir": "src",
-    "outDir": "dist",
-    "target": "ES6",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "paths": {
-      "*": ["node_modules/*"]
+    "compilerOptions": {
+        "strict": true,
+        "allowJs": true,
+        "module": "commonjs",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "baseUrl": "./",
+        "rootDir": "./",
+        "outDir": "dist",
+        "target": "ES6",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "react",
+        "lib": ["DOM", "ES6", "ES2020"],
+        "paths": {
+            "src/*": ["src/*"]
+        }
     },
-    "jsx": "react",
-    "lib": ["DOM", "ES6", "ES2020", "WebWorker", "ScriptHost"]
-  },
-  "include": ["src/**/*"],
-  "exclude": [".webpack/**/*"],
-  "types": [ "node", "custom"],
-  "typeRoots": ["node_modules/@types", "./typings"]
+    "include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }
